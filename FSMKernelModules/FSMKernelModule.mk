@@ -3,17 +3,17 @@
 ## any manual changes will be erased      
 ##
 ## Debug
-ProjectName            :=FSMSendPack
+ProjectName            :=FSMKernelModule
 ConfigurationName      :=Debug
 WorkspacePath          := "/home/gusenkovs/FSMCoreFile"
-ProjectPath            := "/home/gusenkovs/FSMCoreFile/FSMSenPckg"
+ProjectPath            := "/home/gusenkovs/FSMCoreFile/FSMKernelModules"
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=gusenkovs
-Date                   :=23/03/16
+Date                   :=09/03/16
 CodeLitePath           :="/home/gusenkovs/.codelite"
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -27,16 +27,16 @@ OutputSwitch           :=-o
 LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
-OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
+OutputFile             :=
 Preprocessors          :=
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
-ObjectsFileList        :="FSMSendPack.txt"
+ObjectsFileList        :="FSMKernelModule.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)/home/gusenkovs/FSMCoreFile/FSMHeader/ 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := 
@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch).
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS :=  -g -O0 -Wall $(Preprocessors)
-CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
+CXXFLAGS :=  -g $(Preprocessors)
+CFLAGS   :=  -g $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 
@@ -60,11 +60,9 @@ AS       := /usr/bin/as
 ## User defined environment variables
 ##
 CodeLiteDir:=/usr/share/codelite
-Objects0=$(IntermediateDirectory)/main.c$(ObjectSuffix) 
 
 
-
-Objects=$(Objects0) 
+Objects=
 
 ##
 ## Main Build Targets 
@@ -75,8 +73,9 @@ all: $(OutputFile)
 $(OutputFile): $(IntermediateDirectory)/.d $(Objects) 
 	@$(MakeDirCommand) $(@D)
 	@echo "" > $(IntermediateDirectory)/.d
-	@echo $(Objects0)  > $(ObjectsFileList)
-	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
+	$(SharedObjectLinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
+	@$(MakeDirCommand) "/home/gusenkovs/FSMCoreFile/.build-debug"
+	@echo rebuilt > "/home/gusenkovs/FSMCoreFile/.build-debug/FSMKernelModule"
 
 MakeIntermediateDirs:
 	@test -d ./Debug || $(MakeDirCommand) ./Debug
@@ -91,14 +90,6 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/main.c$(ObjectSuffix): main.c $(IntermediateDirectory)/main.c$(DependSuffix)
-	$(CC) $(SourceSwitch) "/home/gusenkovs/FSMCoreFile/FSMSenPckg/main.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/main.c$(DependSuffix): main.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.c$(ObjectSuffix) -MF$(IntermediateDirectory)/main.c$(DependSuffix) -MM "main.c"
-
-$(IntermediateDirectory)/main.c$(PreprocessSuffix): main.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.c$(PreprocessSuffix) "main.c"
-
 
 -include $(IntermediateDirectory)/*$(DependSuffix)
 ##

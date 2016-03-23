@@ -14,6 +14,10 @@
 #include <sys/socket.h>
 #include <net/if.h>
 #include <netinet/ether.h>
+#include "FSM/FSMDevice/fcmprotocol.h"
+#include "FSM/FSMDevice/fcm_audiodeviceclass.h"
+#include "FSM/FSMDevice/FSM_DeviceProcess.h"
+#include "FSM/FSMSetting/FSM_settings.h"
 
 #define MY_DEST_MAC0	0x00
 #define MY_DEST_MAC1	0x00
@@ -33,7 +37,7 @@ int main(int argc, char *argv[])
 	int tx_len = 0;
 	char sendbuf[BUF_SIZ];
 	struct ether_header *eh = (struct ether_header *) sendbuf;
-	struct iphdr *iph = (struct iphdr *) (sendbuf + sizeof(struct ether_header));
+	struct FSM_DeviceRegistr *regp = (struct FSM_DeviceRegistr *) (sendbuf + sizeof(struct ether_header));
 	struct sockaddr_ll socket_address;
 	char ifName[IFNAMSIZ];
 	
@@ -78,11 +82,25 @@ int main(int argc, char *argv[])
 	eh->ether_type = htons(0x1996);
 	tx_len += sizeof(struct ether_header);
 
+
+     
+        regp->IDDevice=10;
+        regp->VidDevice=CommunicationDevice;
+        regp->PodVidDevice=CCK;
+        regp->KodDevice=MN524;
+        regp->type=AudioDevice;
+        regp->opcode=RegDevice;
+        regp->CRC=0;
+        
+    tx_len += sizeof(struct FSM_DeviceRegistr);
+    
 	/* Packet data */
-	sendbuf[tx_len++] = 0xde;
+	/*sendbuf[tx_len++] = 0x01;
 	sendbuf[tx_len++] = 0xad;
 	sendbuf[tx_len++] = 0xbe;
 	sendbuf[tx_len++] = 0xef;
+     * */
+     
 
 	/* Index of the network device */
 	socket_address.sll_ifindex = if_idx.ifr_ifindex;
