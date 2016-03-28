@@ -25,6 +25,9 @@ enum FSMNetwork_RodDevice
 
 struct fsm_ethernet_dev
 {
+    char reg;
+    unsigned short id;
     char destmac[6];
+    struct net_device *dev;
 };
 #endif

@@ -18,8 +18,35 @@ struct FSM_DeviceFunctionTree dft;
 
 void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
-    printk( KERN_INFO "RPack\n" ); 
+    switch(data[0])
+      {
+          case RegDevice: ///< Регистрация устройства
+          
+          break;
+          case DelLisr:
+          break;
+          case AnsPing:///< Пинг
+          break;
+          case SendCmdToServer: ///< Отправка команды серверу
+           break;
+          case SendTxtMassage: ///< Отправка текстового сообщения
+           break;
+          case Alern: ///<Тревога
+          break;
+          case Warning: ///<Предупреждение
+          break;
+          case Trouble: ///<Сбой
+          break;
+          case Beep: ///<Звук
+          break;
+          default:
+          break;
+      }                 
+    
+    
+    printk( KERN_INFO "RPack %u \n" ,len); 
 }
+EXPORT_SYMBOL(FSM_E1Recive);
 
 static int __init FSME1Protocol_init(void)
 {

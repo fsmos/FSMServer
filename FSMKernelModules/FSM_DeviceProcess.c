@@ -138,13 +138,17 @@ struct FSM_DeviceTree* FSM_FindDevice(unsigned short id)
     int i;
     for(i=0;i<FSM_DeviceTreeSize;i++)
     {
+        if(fsm_dt[i].IDDevice!=0) printk( KERN_INFO "DeviceNotFindScan: ID: %u - %u \n", fsm_dt[i].IDDevice,fsm_dt[i].registr);
         if((fsm_dt[i].IDDevice==id)&&(fsm_dt[i].registr==1))
         {
+            
             return &fsm_dt[i];
         }
     } 
+    printk( KERN_INFO "DeviceNotFind: ID: %u \n", id);
     return 0;
 }
+EXPORT_SYMBOL(FSM_FindDevice);
 /*!
 \brief Удаление из списка устроства
 \param[in] fdd Пакет удаления устройства

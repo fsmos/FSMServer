@@ -32,18 +32,24 @@
 int main(int argc, char *argv[])
 {
 	int sockfd;
+    char n;
 	struct ifreq if_idx;
 	struct ifreq if_mac;
 	int tx_len = 0;
 	char sendbuf[BUF_SIZ];
 	struct ether_header *eh = (struct ether_header *) sendbuf;
 	struct FSM_DeviceRegistr *regp = (struct FSM_DeviceRegistr *) (sendbuf + sizeof(struct ether_header));
+    struct FSM_DeviceDelete *regpd = (struct FSM_DeviceDelete *) (sendbuf + sizeof(struct ether_header));
+    struct  FSM_SendCmdTS *regpcmdts = (struct FSM_SendCmdTS *) (sendbuf + sizeof(struct ether_header));
 	struct sockaddr_ll socket_address;
 	char ifName[IFNAMSIZ];
 	
 	/* Get interface name */
 	if (argc > 1)
+    {
 		strcpy(ifName, argv[1]);
+        n= argv[2][0];
+    }
 	else
 		strcpy(ifName, DEFAULT_IF);
 
@@ -82,17 +88,7 @@ int main(int argc, char *argv[])
 	eh->ether_type = htons(0x1996);
 	tx_len += sizeof(struct ether_header);
 
-
-     
-        regp->IDDevice=10;
-        regp->VidDevice=CommunicationDevice;
-        regp->PodVidDevice=CCK;
-        regp->KodDevice=MN524;
-        regp->type=AudioDevice;
-        regp->opcode=RegDevice;
-        regp->CRC=0;
-        
-    tx_len += sizeof(struct FSM_DeviceRegistr);
+  
     
 	/* Packet data */
 	/*sendbuf[tx_len++] = 0x01;
@@ -114,9 +110,43 @@ int main(int argc, char *argv[])
 	socket_address.sll_addr[4] = MY_DEST_MAC4;
 	socket_address.sll_addr[5] = MY_DEST_MAC5;
 
+      switch(n)  
+    {  
+        case '1':
+        
+        regp->IDDevice=10;
+        regp->VidDevice=CommunicationDevice;
+        regp->PodVidDevice=CCK;
+        regp->KodDevice=MN524;
+        regp->type=AudioDevice;
+        regp->opcode=RegDevice;
+        regp->CRC=0;
+        
+    tx_len += sizeof(struct FSM_DeviceRegistr);
+   
 	/* Send packet */
 	if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0)
 	    printf("Send failed\n");
-
+     break;
+     case '2':;
+        tx_len += sizeof(struct FSM_DeviceDelete);
+    regpd->CRC=0;
+    regpd->IDDevice=10;
+    regpd->opcode=DelLisr;
+    if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0)
+	    printf("Send failed\n");
+        break;
+        case '3':
+        tx_len += sizeof(struct FSM_SendCmdTS);
+        regpcmdts->opcode=SendCmdToServer;
+        regpcmdts->countparam=1;
+        regpcmdts->CRC=0;
+        regpcmdts->IDDevice=10;
+        regpcmdts->Data[0]=5;   
+        regpcmdts->cmd=4;
+ if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0)
+	    printf("Send failed\n");
+        break;
+    }
 	return 0;
 }

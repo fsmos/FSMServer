@@ -12,10 +12,20 @@
 */
 #define FSM_DeviceFunctionTreeSize 100
 /*!
-\brief Размер дерва устройств
+\brief Размер дерева устройств
 */
 #define FSM_DeviceTreeSize 100
-
-#define FSM_EthernetID 1;
+/*!
+\brief Размер дерва Ethernet устройств
+*/
+#define FSM_EthernetDeviceTreeSize 100
+/*!
+\brief ID Ethernet передатчика
+*/
+#define FSM_EthernetID 1
+/*!
+\brief Размер дерева аудио потоков
+*/
+#define FSM_AudioStreamDeviceTreeSize 100
 #endif	/* FSM_SETTINGS_H */
 

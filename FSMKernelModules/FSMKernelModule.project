@@ -46,6 +46,7 @@
       <File Name="../FSMHeader/FSM/FSMDevice/fcm_audiodeviceclass.h"/>
       <File Name="../FSMHeader/FSM/FSMDevice/fcmprotocol.h"/>
       <File Name="../FSMHeader/FSM/FSMDevice/FSM_DeviceProcess.h"/>
+      <File Name="../FSMHeader/FSM/FSMAudio/FSM_AudioStream.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="FSMSetting">
       <File Name="../FSMHeader/FSM/FSMSetting/FSM_settings.h"/>
@@ -148,4 +149,7 @@
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="FSMAudioStream">
+    <File Name="FSM_AudioStream.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>
