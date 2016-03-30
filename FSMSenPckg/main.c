@@ -41,6 +41,7 @@ int main(int argc, char *argv[])
 	struct FSM_DeviceRegistr *regp = (struct FSM_DeviceRegistr *) (sendbuf + sizeof(struct ether_header));
     struct FSM_DeviceDelete *regpd = (struct FSM_DeviceDelete *) (sendbuf + sizeof(struct ether_header));
     struct  FSM_SendCmdTS *regpcmdts = (struct FSM_SendCmdTS *) (sendbuf + sizeof(struct ether_header));
+     struct  FSM_SendAudioData *regad = (struct FSM_SendAudioData *) (sendbuf + sizeof(struct ether_header));
 	struct sockaddr_ll socket_address;
 	char ifName[IFNAMSIZ];
 	
@@ -144,6 +145,18 @@ int main(int argc, char *argv[])
         regpcmdts->IDDevice=10;
         regpcmdts->Data[0]=5;   
         regpcmdts->cmd=4;
+ if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0)
+	    printf("Send failed\n");
+        break;
+        case '4':
+        tx_len += sizeof(struct FSM_SendAudioData);
+        regad->opcode=SendAudio;
+        regad->IDDevice=0;
+        regad->CRC=0;
+        regad->codec=0;
+        regad->len=2;
+        regad->Data[0]=0xd0;
+        regad->Data[1]=0xd1;
  if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0)
 	    printf("Send failed\n");
         break;

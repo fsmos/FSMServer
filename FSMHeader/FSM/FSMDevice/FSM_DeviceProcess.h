@@ -17,6 +17,9 @@ struct FSM_DeviceTree
    unsigned char registr; ///< Состояние регистрации
    unsigned short IDDevice;///< Ид устройства
    struct FSM_DeviceFunctionTree* dt;///< Информации о виде устройства
+   char state[32];
+   char comment[128];
+   char fullstate[128];
 };
 /*!
 \brief Прототип функции обратной связи

@@ -33,5 +33,16 @@ enum FSMAD_RodDevice
     PO06=5,///< PO06
     MN524=6,///< MN524
 };
+struct FSM_E1Device
+{
+    char reg;
+    unsigned short iddev;
+    int idstream;
+};
+
+enum FSME1Command
+{
+    FSME1SendStream=1
+};
 #endif	/* FCM_AUDIODEVICECLASS_H */
 

@@ -27,5 +27,9 @@
 \brief Размер дерева аудио потоков
 */
 #define FSM_AudioStreamDeviceTreeSize 100
+/*!
+\brief Размер дерева E1 устройств потоков
+*/
+#define FSM_E1DeviceTreeSize 6
 #endif	/* FSM_SETTINGS_H */
 

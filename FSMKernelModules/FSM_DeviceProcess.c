@@ -13,6 +13,7 @@
 #include "FSM/FSMDevice/fcm_audiodeviceclass.h"
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
+#include "FSM/FSMDevice/fsm_statusstruct.h"
 /*!
 \brief Список классов устройств
  */
@@ -21,6 +22,7 @@ struct FSM_DeviceFunctionTree fsm_dft[FSM_DeviceFunctionTreeSize];
 \brief Список  устройств
  */
 struct FSM_DeviceTree fsm_dt[FSM_DeviceTreeSize];
+struct fsm_statusstruct fsm_str;
 
 static int __init FSMDeviceProcess_init(void)
 {
@@ -35,6 +37,22 @@ static void __exit FSMDeviceProcess_exit(void)
     memset(fsm_dt,0,sizeof(fsm_dt));
     printk( KERN_INFO "FSMDeviceProcess module unloaded\n" ); 
 }
+/*!
+\brief Получение статистики
+\return Структуру статистики
+*/
+struct fsm_statusstruct *FSM_GetStatistic(void)
+{
+   int i;
+   for(i=0;i<status_cnt;i++)
+   {
+       fsm_str.statel[i%srow_cnt][i%scolumn_cnt].devid=fsm_dt[i].IDDevice;
+       strcpy(fsm_str.statel[i%srow_cnt][i%scolumn_cnt].state,fsm_dt[i].state);
+       sprintf(fsm_str.statel[i%srow_cnt][i%scolumn_cnt].fsmdevcode,"t%uv%upv%uk%uid%u",fsm_dt[i].dt->type,fsm_dt[i].dt->VidDevice,fsm_dt[i].dt->PodVidDevice,fsm_dt[i].dt->KodDevice,fsm_dt[i].IDDevice);
+  }
+   return &fsm_str;
+}
+EXPORT_SYMBOL(FSM_GetStatistic);
 /*!
 \brief Регистрация класса устройств
 \param[in] dft Пакет класса устроства
