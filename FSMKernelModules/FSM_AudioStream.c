@@ -1,3 +1,10 @@
+/*!
+\file
+\brief Модуль управления аудиопотоками
+\authors Гусенков.С.В
+\version 0.0.1_rc1
+\date 30.12.2015
+*/
 #include <linux/fs.h>
 #include <linux/init.h>
 #include <linux/module.h>

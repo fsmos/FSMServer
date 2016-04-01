@@ -30,6 +30,6 @@ struct fsm_ethernet_dev
     char destmac[6];
     struct net_device *dev;
 };
-static unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev);
+unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev);
 void FSM_RegisterAudioStreamCallback(FSM_StreamProcessSend FSM_ASC);
 #endif

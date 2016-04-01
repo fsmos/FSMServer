@@ -18,8 +18,6 @@ struct FSM_DeviceTree
    unsigned short IDDevice;///< Ид устройства
    struct FSM_DeviceFunctionTree* dt;///< Информации о виде устройства
    char state[32];
-   char comment[128];
-   char fullstate[128];
 };
 /*!
 \brief Прототип функции обратной связи
@@ -78,6 +76,19 @@ void FSM_DeRegister(struct FSM_DeviceDelete fdd);
 \param[in] dft Пакет класса устроства
 */
 void FSM_ClassDeRegister(struct FSM_DeviceFunctionTree dft);
+
+/*!
+\brief Получение статистики
+\return Статистику
+*/
+struct fsm_statusstruct *FSM_GetStatistic(void);
+
+/*!
+\brief Установка статуса
+ \param[in] fdt Устроство
+ \param[in] status Состояние
+*/
+void FSM_Statstic_SetStatus(struct FSM_DeviceTree* fdt,char* status);
 
 /*!
 \brief Регистрация устройства

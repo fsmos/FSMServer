@@ -43,16 +43,34 @@ static void __exit FSMDeviceProcess_exit(void)
 */
 struct fsm_statusstruct *FSM_GetStatistic(void)
 {
-   int i;
-   for(i=0;i<status_cnt;i++)
+   int i,j;
+   int m=0;
+   for(i=0;i<srow_cnt;i++)
    {
-       fsm_str.statel[i%srow_cnt][i%scolumn_cnt].devid=fsm_dt[i].IDDevice;
-       strcpy(fsm_str.statel[i%srow_cnt][i%scolumn_cnt].state,fsm_dt[i].state);
-       sprintf(fsm_str.statel[i%srow_cnt][i%scolumn_cnt].fsmdevcode,"t%uv%upv%uk%uid%u",fsm_dt[i].dt->type,fsm_dt[i].dt->VidDevice,fsm_dt[i].dt->PodVidDevice,fsm_dt[i].dt->KodDevice,fsm_dt[i].IDDevice);
-  }
+   for(j=0;j<scolumn_cnt;j++)
+   {
+       if(fsm_dt[m].IDDevice!=0)
+       {
+       fsm_str.statel[i][j].devid=fsm_dt[m].IDDevice;
+       strcpy(fsm_str.statel[i][j].state,fsm_dt[m].state);
+       sprintf(fsm_str.statel[i][j].fsmdevcode,"t%uv%upv%uk%u",fsm_dt[m].dt->type,fsm_dt[m].dt->VidDevice,fsm_dt[m].dt->PodVidDevice,fsm_dt[m].dt->KodDevice);
+       fsm_str.statel[i][j].row=i;
+       fsm_str.statel[i][j].column=j;
+       }
+       m++;
+       
+
+   } 
+ }
    return &fsm_str;
 }
 EXPORT_SYMBOL(FSM_GetStatistic);
+
+void FSM_Statstic_SetStatus(struct FSM_DeviceTree* fdt,char* status)
+{
+  strcpy(fdt->state,status);
+}
+EXPORT_SYMBOL(FSM_Statstic_SetStatus);
 /*!
 \brief Регистрация класса устройств
 \param[in] dft Пакет класса устроства

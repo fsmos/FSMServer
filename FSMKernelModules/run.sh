@@ -1,3 +1,4 @@
+rmmod FSM_StatisticServer.ko
 rmmod FSM_E1Device.ko
 rmmod FSM_AudioStream.ko
 rmmod FSMClientProtocol.ko
@@ -8,6 +9,7 @@ insmod FSM_DeviceProcess.ko
 insmod FSMClientProtocol.ko
 insmod FSM_AudioStream.ko
 insmod FSM_E1Device.ko
+insmod FSM_StatisticServer.ko
 ./FSMSendPack lo 1
 ./FSMSendPack lo 3
 ./FSMSendPack lo 4

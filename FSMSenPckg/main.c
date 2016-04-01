@@ -18,6 +18,8 @@
 #include "FSM/FSMDevice/fcm_audiodeviceclass.h"
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
+#include "FSM/FSMDevice/fsm_statusstruct.h"
+
 
 #define MY_DEST_MAC0	0x00
 #define MY_DEST_MAC1	0x00
@@ -115,13 +117,21 @@ int main(int argc, char *argv[])
     {  
         case '1':
         
-        regp->IDDevice=10;
+      /*  regp->IDDevice=10;
         regp->VidDevice=CommunicationDevice;
         regp->PodVidDevice=CCK;
         regp->KodDevice=MN524;
         regp->type=AudioDevice;
         regp->opcode=RegDevice;
         regp->CRC=0;
+         * */
+            regp->IDDevice=(unsigned short)FSM_StatisicID;
+   regp->VidDevice=(unsigned char)FSMDeviceConfig;
+   regp->PodVidDevice=(unsigned char)ComputerStatistic;
+   regp->KodDevice=(unsigned char)PCx86;
+   regp->type=(unsigned char)StatisticandConfig;
+   regp->opcode=RegDevice;
+   regp->CRC=0;
         
     tx_len += sizeof(struct FSM_DeviceRegistr);
    
@@ -142,9 +152,8 @@ int main(int argc, char *argv[])
         regpcmdts->opcode=SendCmdToServer;
         regpcmdts->countparam=1;
         regpcmdts->CRC=0;
-        regpcmdts->IDDevice=10;
-        regpcmdts->Data[0]=5;   
-        regpcmdts->cmd=4;
+        regpcmdts->IDDevice=21;  
+        regpcmdts->cmd=1;
  if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0)
 	    printf("Send failed\n");
         break;

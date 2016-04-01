@@ -70,7 +70,8 @@ enum FSM_TypeDevice
     MindTepl=2, ///<Умная Теплица
     SmartPhone=3, ///< Смартфон
     AudioDevice=4, ///< Устройство аудио связи
-    Network=5 ///< Сеть
+    Network=5, ///< Сеть
+    StatisticandConfig=6 ///< Модуль статистики и конфигурации
 };
 /*!
 \brief Регистрация устроства

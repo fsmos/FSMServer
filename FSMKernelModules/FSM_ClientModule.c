@@ -1,6 +1,6 @@
 /*!
 \file
-\brief Модуль взаимодествия с Ethernet
+\brief Модуль клиент статистики
 \authors Гусенков.С.В
 \version 0.0.1_rc1
 \date 30.12.2015
@@ -33,15 +33,13 @@
 #include "FSM/FSMDevice/fcm_audiodeviceclass.h"
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
-
+#include "FSM/FSMDevice/fsm_statusstruct.h"
 
 
 
 struct sock *nl_sk = NULL; 
-struct FSM_DeviceFunctionTree dft;
-struct FSM_DeviceTree* dt;
-struct fsm_ethernet_dev fsdev[FSM_EthernetDeviceTreeSize];
-FSM_StreamProcessSend FSM_AudioStreamCallback;
+struct FSM_DeviceTree dt;
+struct fsm_ethernet_dev fsdev;
 
  unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
 {
@@ -67,121 +65,22 @@ FSM_StreamProcessSend FSM_AudioStreamCallback;
 }
 EXPORT_SYMBOL(FSM_Send_Ethernet_Package);
 
-
-int FSM_RegisterEthernetDevice(struct FSM_DeviceRegistr *fsmrg, struct net_device *dev, char* mac)
-{
-    int i=0;
-    for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
-    {
-        if((fsmrg->IDDevice==fsdev[i].id)&&(fsdev[i].reg==1)) return 1;
-    }
-    for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
-    {
-        if(fsdev[i].reg==0) 
-        {
-            fsdev[i].dev=dev;
-            fsdev[i].id=fsmrg->IDDevice;
-            fsdev[i].reg=1;
-            memcpy(fsdev[i].destmac,mac,6);
-            printk( KERN_INFO "FSM Ethernet Device Registred %u \n",fsmrg->IDDevice); 
-            return 0;
-        }
-    }
-    return 2;
-}
-struct fsm_ethernet_dev*  FSM_FindEthernetDevice(unsigned short id)
-{
-    int i;
-    for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
-    {
-        if((id==fsdev[i].id)&&(fsdev[i].reg==1)) return &fsdev[i];
-    }
-    return 0;
-}
-int  FSM_DeleteEthernetDevice(unsigned short id)
-{
-    int i;
-    for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
-    {
-        if((id==fsdev[i].id)&&(fsdev[i].reg==1)) 
-        {
-                fsdev[i].reg=0;
-                 printk( KERN_INFO "FSM Ethernet Device UnRegistred %u \n",id); 
-                return 0;
-        }
-    }
-    return 1;
-}
-void FSM_EthernetSendPckt(char* data,short len, struct FSM_DeviceTree* fsmdt)
-{
-    struct fsm_ethernet_dev* fsmsd=FSM_FindEthernetDevice(fsmdt->IDDevice);
-    if(fsmsd==0) 
-        {
-            printk( KERN_INFO "FSM Ethernet Not Registred %u \n",fsmdt->IDDevice); 
-            return;
-        }
-    FSM_Send_Ethernet_Package(data,len,fsmsd);
-}
-
-void FSM_RegisterAudioStreamCallback(FSM_StreamProcessSend FSM_ASC)
-{
-    FSM_AudioStreamCallback=FSM_ASC;
-}
-EXPORT_SYMBOL(FSM_RegisterAudioStreamCallback);
-
 int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev, 
                    struct packet_type *pt, struct net_device *odev ) { 
-     struct FSM_DeviceTree* dftv;
      char dats= ((char*)skb->data)[0];
      struct ethhdr *eth=eth_hdr(skb);
     
      if (skb->pkt_type == PACKET_OTHERHOST || skb->pkt_type == PACKET_LOOPBACK) return 0;
-      
-       //printk( KERN_ERR "RegDev %u\n",dats);
+     printk( KERN_ERR "RegDev %u\n",dats);
      switch(dats)
       {
           case RegDevice: ///< Регистрация устройства
-    
-          if(FSM_RegisterEthernetDevice((struct FSM_DeviceRegistr *)skb->data,dev,eth->h_source)==0) 
-          {
-          if(FSM_DeviceRegister(*((struct FSM_DeviceRegistr *)skb->data))!=0) return 1; 
-          }
-           dftv=FSM_FindDevice(((struct FSM_DeviceRegistr *)skb->data)->IDDevice);
-           if(dftv==0) 
-            {
-                printk( KERN_INFO "Eror \n"); 
-                 return 5;
-            }
-           //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
-           dftv->dt->Proc((char*)skb->data,sizeof(struct FSM_DeviceRegistr),dftv);
-          ((struct FSM_DeviceRegistr *)skb->data)->opcode=AnsRegDevice;
-          FSM_Send_Ethernet_Package(skb->data,sizeof(struct FSM_DeviceRegistr),FSM_FindEthernetDevice(((struct FSM_DeviceRegistr *)skb->data)->IDDevice));
-        
-          
-          break;
-          case AnsRegDevice: ///< Подтверждение регистрации
-          break;
-          case DelLisr: ///< Удаление устройства из списка
-          dftv=FSM_FindDevice(((struct FSM_DeviceDelete *)skb->data)->IDDevice);
-           if(dftv==0) 
-            {
-                printk( KERN_INFO "Eror \n"); 
-                 return 5;
-            }
-           //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
-           dftv->dt->Proc((char*)skb->data,sizeof(struct FSM_DeviceDelete),dftv);
-          FSM_DeRegister(*((struct FSM_DeviceDelete *)skb->data));
-          ((struct FSM_DeviceDelete *)skb->data)->opcode=AnsDelList;
-          FSM_Send_Ethernet_Package(skb->data,sizeof(struct FSM_DeviceDelete),FSM_FindEthernetDevice(((struct FSM_DeviceDelete *)skb->data)->IDDevice));
-          FSM_DeleteEthernetDevice(((struct FSM_DeviceDelete *)skb->data)->IDDevice);
-          
           break;
           case AnsDelList: ///< Подтверждение удаления устройства из списка
           break;
           case AnsPing:///< Пинг
           break;
           case SendCmdToDevice:///< Отправка команды устройству
-          return;
           break;
           case AnsSendCmdToDevice: ///< Подтверждение приёма команды устройством
           break;
@@ -190,16 +89,6 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           case AnsRqToDevice: ///< Подтверждение приёма команды сервером
           break;
           case SendCmdToServer: ///< Отправка команды серверу
-          dftv=FSM_FindDevice(((struct FSM_SendCmdTS *)skb->data)->IDDevice);
-           if(dftv==0) 
-            {
-                printk( KERN_INFO "Eror \n"); 
-                 return 5;
-            }
-           //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
-           dftv->dt->Proc((char*)skb->data,skb->len,dt);
-           ((struct FSM_SendCmdTS *)skb->data)->opcode=AnsRqToDevice;
-          FSM_Send_Ethernet_Package(skb->data,sizeof(struct FSM_SendCmdTS),FSM_FindEthernetDevice(((struct FSM_SendCmdTS *)skb->data)->IDDevice));
            break;
           case SendTxtMassage: ///< Отправка текстового сообщения
            break;
@@ -210,7 +99,6 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           case AnsSendTxtEncMassage: ///< Подтверждение приёма зашифрованного текстового сообщения
            break;
           case SendAudio:///< Передача аудио данных
-          if(FSM_AudioStreamCallback!=0) FSM_AudioStreamCallback(((struct FSM_SendAudioData*)skb->data)->IDDevice,skb->data,skb->len);
           break;
           case SendVideo:///< Передача видео данных
            break;
@@ -277,18 +165,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
       }                 
                     
                        
-                    
-   
-  
-  
-
-
-  /*fsdev.destmac[0]=0xa0;
-   fsdev.destmac[1]=0xa1;
-   fsdev.destmac[2]=0xa2;
-   fsdev.destmac[3]=0xa3;
-   fsdev.destmac[4]=0xa4;
-   fsdev.destmac[5]=0xa5;*/
+                
    
    printk( KERN_ERR "packet received with length: %u\n", skb->len );
    
@@ -307,47 +184,33 @@ static struct packet_type FSMClientProtocol_proto = {
 
 
  
-static int __init FSMClientProtocol_init(void)
+static int __init FSM_ClientModule_init(void)
 {
     struct FSM_DeviceRegistr regp;
    dev_add_pack( &FSMClientProtocol_proto ); 
-   dft.type=(unsigned char)Network;
-   dft.VidDevice=(unsigned char)Ethernet;
-   dft.PodVidDevice=(unsigned char)WireEthernet;
-   dft.KodDevice=(unsigned char)StandartEthernet;
-   dft.Proc= FSM_EthernetSendPckt;
-   FSM_DeviceClassRegister(dft);
-   
-   regp.IDDevice=FSM_EthernetID;
-   regp.VidDevice=dft.VidDevice;
-   regp.PodVidDevice= dft.PodVidDevice;
-   regp.KodDevice=dft.KodDevice;
-   regp.type=dft.type;
+   regp.IDDevice=(unsigned short)FSM_StatisicID;
+   regp.VidDevice=(unsigned char)FSMDeviceConfig;
+   regp.PodVidDevice=(unsigned char)ComputerStatistic;
+   regp.KodDevice=(unsigned char)PCx86;
+   regp.type=(unsigned char)StatisticandConfig;
    regp.opcode=RegDevice;
    regp.CRC=0;
-   FSM_DeviceRegister(regp);
-   dt=FSM_FindDevice(FSM_EthernetID);
-   if(dt==0) return 1;
-   memset(fsdev,0,sizeof(fsdev));
+   //FSM_DeviceRegister(regp);
+   memset(&fsdev,0,sizeof(fsdev));
    printk( KERN_INFO "FSMClientProtocol module loaded\n" ); 
    return 0;  
 }
 
-static void __exit FSMClientProtocol_exit(void)
+static void __exit FSM_ClientModule_exit(void)
 {  
     struct FSM_DeviceDelete delp;
     dev_remove_pack( &FSMClientProtocol_proto ); 
-    delp.IDDevice=FSM_EthernetID;
-    delp.opcode=DelLisr;
-    delp.CRC=0;
-    FSM_DeRegister(delp);
-    FSM_ClassDeRegister(dft);
-   printk( KERN_INFO "FSMClientProtocol module unloaded\n" );  
+   printk( KERN_INFO "FSM Client module unloaded\n" );  
 }
 
-module_init(FSMClientProtocol_init);
-module_exit(FSMClientProtocol_exit);
+module_init(FSM_ClientModule_init);
+module_exit(FSM_ClientModule_exit);
 
 MODULE_AUTHOR("Gusenkov S.V FSM");
-MODULE_DESCRIPTION("FSM Protocol Module");
+MODULE_DESCRIPTION("FSM Client Module");
 MODULE_LICENSE("GPL");

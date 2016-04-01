@@ -24,6 +24,10 @@
 */
 #define FSM_EthernetID 1
 /*!
+\brief ID сервера статистики
+*/
+#define FSM_StatisicID 21
+/*!
 \brief Размер дерева аудио потоков
 */
 #define FSM_AudioStreamDeviceTreeSize 100

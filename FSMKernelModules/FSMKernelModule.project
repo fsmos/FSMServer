@@ -156,4 +156,11 @@
   <VirtualDirectory Name="FSMAudioStream">
     <File Name="FSM_AudioStream.c"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="FSM_PO06">
+    <File Name="FSM_PO06Device.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FSM_Statistic">
+    <File Name="FSM_StatisticServer.c"/>
+    <File Name="FSM_ClientModule.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>
