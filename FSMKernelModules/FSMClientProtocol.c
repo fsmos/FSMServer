@@ -67,6 +67,12 @@ FSM_StreamProcessSend FSM_AudioStreamCallback;
 }
 EXPORT_SYMBOL(FSM_Send_Ethernet_Package);
 
+unsigned int FSM_Send_Ethernet_Package2(void * data, int len, int id)
+{
+
+ return FSM_Send_Ethernet_Package(data,len,&fsdev[id]);
+}
+EXPORT_SYMBOL(FSM_Send_Ethernet_Package2);
 
 int FSM_RegisterEthernetDevice(struct FSM_DeviceRegistr *fsmrg, struct net_device *dev, char* mac)
 {
@@ -82,6 +88,7 @@ int FSM_RegisterEthernetDevice(struct FSM_DeviceRegistr *fsmrg, struct net_devic
             fsdev[i].dev=dev;
             fsdev[i].id=fsmrg->IDDevice;
             fsdev[i].reg=1;
+           fsdev[i].numdev=i;
             memcpy(fsdev[i].destmac,mac,6);
             printk( KERN_INFO "FSM Ethernet Device Registred %u \n",fsmrg->IDDevice); 
             return 0;
@@ -98,6 +105,7 @@ struct fsm_ethernet_dev*  FSM_FindEthernetDevice(unsigned short id)
     }
     return 0;
 }
+EXPORT_SYMBOL(FSM_FindEthernetDevice);
 int  FSM_DeleteEthernetDevice(unsigned short id)
 {
     int i;
@@ -120,6 +128,8 @@ void FSM_EthernetSendPckt(char* data,short len, struct FSM_DeviceTree* fsmdt)
             printk( KERN_INFO "FSM Ethernet Not Registred %u \n",fsmdt->IDDevice); 
             return;
         }
+      //  printk( KERN_INFO "FSM Send %u \n",len); 
+
     FSM_Send_Ethernet_Package(data,len,fsmsd);
 }
 
@@ -128,6 +138,13 @@ void FSM_RegisterAudioStreamCallback(FSM_StreamProcessSend FSM_ASC)
     FSM_AudioStreamCallback=FSM_ASC;
 }
 EXPORT_SYMBOL(FSM_RegisterAudioStreamCallback);
+
+FSM_ADSendEthPack* FSM_GetAudioStreamCallback(void)
+{
+    return FSM_Send_Ethernet_Package2;
+}
+EXPORT_SYMBOL(FSM_GetAudioStreamCallback);
+
 
 int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev, 
                    struct packet_type *pt, struct net_device *odev ) { 
@@ -210,7 +227,9 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           case AnsSendTxtEncMassage: ///< Подтверждение приёма зашифрованного текстового сообщения
            break;
           case SendAudio:///< Передача аудио данных
-          if(FSM_AudioStreamCallback!=0) FSM_AudioStreamCallback(((struct FSM_SendAudioData*)skb->data)->IDDevice,skb->data,skb->len);
+          //printk( KERN_INFO "FSM ID %u\n",((struct FSM_SendAudioData*)skb->data)->IDDevice); 
+          if((FSM_AudioStreamCallback!=0)&&(((struct FSM_SendAudioData*)skb->data)->IDDevice<FSM_AudioStreamDeviceTreeSize) )FSM_AudioStreamCallback(((struct FSM_SendAudioData*)skb->data)->IDDevice,skb->data,skb->len);
+            return;         
           break;
           case SendVideo:///< Передача видео данных
            break;

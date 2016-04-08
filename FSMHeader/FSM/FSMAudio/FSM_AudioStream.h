@@ -7,9 +7,10 @@
 */
 #ifndef FCM_AUDIO_STREAM_H
 #define	FCM_AUDIO_STREAM_H
-typedef void (*FSM_StreamProcessUser)(char*,short,void*);
+typedef void (*FSM_StreamProcessUser)(char*,short,int id);
 typedef void (*FSM_StreamProcessProcess)(char*,short);
 typedef void (*FSM_StreamProcessSend)(unsigned short,char*,short);
+typedef unsigned int (*FSM_ADSendEthPack)(void * data, int len, int id);
 
 
 struct FSM_AudioStream
@@ -18,7 +19,7 @@ struct FSM_AudioStream
     unsigned short iddev;
     FSM_StreamProcessUser ToUser;
     FSM_StreamProcessProcess ToProcess;
-    void* TransportDevice;
+    int TransportDevice;
     char TransportDeviceType;
 };
 

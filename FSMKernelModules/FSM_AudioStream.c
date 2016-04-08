@@ -15,7 +15,13 @@
 #include "FSM/FSMAudio/FSM_AudioStream.h"
 #include "FSM/FSMEthernet/FSMEthernetHeader.h"
 
+FSM_ADSendEthPack FSM_sendpkt;
+
 struct FSM_AudioStream FSMASDB[FSM_AudioStreamDeviceTreeSize];
+ unsigned int FSM_AudioStrean_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
+ {
+     FSM_Send_Ethernet_Package2(data,len,fsmdev);
+ }
 int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas)
 {
     int i;
@@ -29,11 +35,11 @@ int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas)
            
             FSMASDB[i].TransportDevice=fsmas.TransportDevice;
             FSMASDB[i].TransportDeviceType=fsmas.TransportDeviceType;
-            
+            FSM_sendpkt=FSM_GetAudioStreamCallback();
             switch(fsmas.TransportDeviceType)
             {
             case FSM_EthernetID: 
-            FSMASDB[i].ToUser=FSM_Send_Ethernet_Package;
+            FSMASDB[i].ToUser=FSM_sendpkt;
             break;
             }
             printk( KERN_INFO "Registred Stream %u",i ); 
@@ -44,6 +50,7 @@ int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas)
     return -1;
 }
 EXPORT_SYMBOL(FSM_AudioStreamRegistr);
+
 
 void  FSM_AudioStreamUnRegistr(int id)
 {
@@ -59,7 +66,7 @@ void FSM_AudioStreamToUser(int id,char* Data,short len)
      printk( KERN_INFO "NotStreamID TUn" ); 
     return;
     }
-    FSMASDB[id].ToUser(Data,len, FSMASDB[id].TransportDevice);
+    if((((char*)&FSMASDB[id])[0]!=0)&&(FSMASDB[id].ToUser!=0)) FSMASDB[id].ToUser(Data,len, FSMASDB[id].TransportDevice);
 }
 
 EXPORT_SYMBOL(FSM_AudioStreamToUser);

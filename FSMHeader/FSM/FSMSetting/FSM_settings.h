@@ -35,5 +35,6 @@
 \brief Размер дерева E1 устройств потоков
 */
 #define FSM_E1DeviceTreeSize 6
+#define FSM_PO06DeviceTreeSize 6
 #endif	/* FSM_SETTINGS_H */
 

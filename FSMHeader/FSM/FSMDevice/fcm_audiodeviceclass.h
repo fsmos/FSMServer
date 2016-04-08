@@ -38,11 +38,23 @@ struct FSM_E1Device
     char reg;
     unsigned short iddev;
     int idstream;
+    struct fsm_ethernet_dev* ethdev;
+};
+struct FSM_PO06Device
+{
+    char reg;
+    unsigned short iddev;
+    int idstream;
+    struct fsm_ethernet_dev* ethdev;
 };
 
 enum FSME1Command
 {
     FSME1SendStream=1
+};
+enum FSMPO06Command
+{
+    FSMPO06SendStream=1
 };
 #endif	/* FCM_AUDIODEVICECLASS_H */
 

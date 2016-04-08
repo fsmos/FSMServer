@@ -14,6 +14,7 @@
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
 #include "FSM/FSMAudio/FSM_AudioStream.h"
+#include <FSM/FSMEthernet/FSMEthernetHeader.h> 
 
 
 struct FSM_DeviceFunctionTree dft;
@@ -51,13 +52,23 @@ void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
         case RegDevice: ///< Регистрация устройства
           for(i=0;i<FSM_E1DeviceTreeSize;i++)
           {
+              if(FSME1Dev[i].iddev==fsmdt->IDDevice)
+              {
+                 FSM_E1SendStreaminfo(FSME1Dev[i].idstream,fsmdt);
+                 return; 
+              }
+          }
+          for(i=0;i<FSM_E1DeviceTreeSize;i++)
+          {
           if(FSME1Dev[i].reg==0)
           {
              FSME1Dev[i].reg=1;
+             FSME1Dev[i].ethdev=FSM_FindEthernetDevice(fsmdt->IDDevice);
              fsmas.iddev=fsmdt->IDDevice;
+             
              fsmas.ToProcess=FSM_E1RecivePacket;
              //fsmas.ToUser=FSM_E1SendPacket;
-             fsmas.TransportDevice=FSME1Ethernet;
+             fsmas.TransportDevice=FSME1Dev[i].ethdev->numdev;
              fsmas.TransportDeviceType=FSM_EthernetID;
              FSME1Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
              FSME1Dev[i].iddev=fsmdt->IDDevice;
