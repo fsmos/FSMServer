@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
         regp->opcode=RegDevice;
         regp->CRC=0;
          * */
-            regp->IDDevice=(unsigned short)FSM_StatisicID;
+            regp->IDDevice=(unsigned short)23;
    regp->VidDevice=(unsigned char)FSMDeviceConfig;
    regp->PodVidDevice=(unsigned char)ComputerStatistic;
    regp->KodDevice=(unsigned char)PCx86;
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
      case '2':;
         tx_len += sizeof(struct FSM_DeviceDelete);
     regpd->CRC=0;
-    regpd->IDDevice=10;
+    regpd->IDDevice=23;
     regpd->opcode=DelLisr;
     if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0)
 	    printf("Send failed\n");
@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
         regpcmdts->opcode=SendCmdToServer;
         regpcmdts->countparam=1;
         regpcmdts->CRC=0;
-        regpcmdts->IDDevice=21;  
+        regpcmdts->IDDevice=22;  
         regpcmdts->cmd=1;
  if (sendto(sockfd, sendbuf, tx_len, 0, (struct sockaddr*)&socket_address, sizeof(struct sockaddr_ll)) < 0)
 	    printf("Send failed\n");

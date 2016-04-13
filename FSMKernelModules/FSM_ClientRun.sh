@@ -1,0 +1,2 @@
+rmmod FSM_ClientModule.ko
+insmod FSM_ClientModule.ko

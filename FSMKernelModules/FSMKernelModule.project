@@ -61,6 +61,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="Script">
     <File Name="run.sh"/>
+    <File Name="FSM_ClientRun.sh"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_E1Device">
     <File Name="FSM_E1Device.c"/>

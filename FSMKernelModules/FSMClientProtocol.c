@@ -309,7 +309,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
    fsdev.destmac[4]=0xa4;
    fsdev.destmac[5]=0xa5;*/
    
-   printk( KERN_ERR "packet received with length: %u\n", skb->len );
+   //printk( KERN_ERR "packet received with length: %u\n", skb->len );
    
    
    //FSM_Send_Ethernet_Package(odev,dts,3,fsdev);
@@ -346,6 +346,7 @@ static int __init FSMClientProtocol_init(void)
    regp.CRC=0;
    FSM_DeviceRegister(regp);
    dt=FSM_FindDevice(FSM_EthernetID);
+   FSM_Statstic_SetStatus(dt,"ok");
    if(dt==0) return 1;
    memset(fsdev,0,sizeof(fsdev));
    printk( KERN_INFO "FSMClientProtocol module loaded\n" ); 

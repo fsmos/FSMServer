@@ -45,11 +45,12 @@ struct fsm_statusstruct *FSM_GetStatistic(void)
 {
    int i,j;
    int m=0;
+   memset(&fsm_str,0,sizeof(fsm_str));
    for(i=0;i<srow_cnt;i++)
    {
    for(j=0;j<scolumn_cnt;j++)
    {
-       if(fsm_dt[m].IDDevice!=0)
+       if((fsm_dt[m].IDDevice!=0)&&(fsm_dt[m].registr==1))
        {
        fsm_str.statel[i][j].devid=fsm_dt[m].IDDevice;
        strcpy(fsm_str.statel[i][j].state,fsm_dt[m].state);
@@ -174,7 +175,7 @@ struct FSM_DeviceTree* FSM_FindDevice(unsigned short id)
     int i;
     for(i=0;i<FSM_DeviceTreeSize;i++)
     {
-        if(fsm_dt[i].IDDevice!=0) printk( KERN_INFO "DeviceNotFindScan: ID: %u - %u \n", fsm_dt[i].IDDevice,fsm_dt[i].registr);
+        //if(fsm_dt[i].IDDevice!=0) printk( KERN_INFO "DeviceNotFindScan: ID: %u - %u \n", fsm_dt[i].IDDevice,fsm_dt[i].registr);
         if((fsm_dt[i].IDDevice==id)&&(fsm_dt[i].registr==1))
         {
             

@@ -47,12 +47,15 @@ void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 
     switch(data[0])
     {
+         case RegDevice:
+            FSM_Statstic_SetStatus(fsmdt,"ok");
+         break;
          case SendCmdToServer: ///< Отправка команды серверу
          fsmstate=FSM_GetStatistic();
          fsdt= FSM_FindDevice(fscts->IDDevice);
          switch(fscts->cmd)
          {
-         printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
+         //printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
           case GetStatistic:
           hlen=sizeof(struct FSM_SendCmd)-sizeof(scmdt.Data)+sizeof(struct fsm_status_element);
           scmdt.cmd=AnsGetStatistic;
@@ -69,7 +72,7 @@ void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
                    {
                    memcpy(scmdt.Data,&fsmstate->statel[i][j],sizeof(struct fsm_status_element));
                    fsmdt->dt->Proc(&scmdt,hlen,fsdt);
-                      printk( KERN_INFO "FSM Send %u %s\n",fsmstate->statel[i][j].devid,fsmstate->statel[i][j].fsmdevcode);
+                      //printk( KERN_INFO "FSM Send %u %s\n",fsmstate->statel[i][j].devid,fsmstate->statel[i][j].fsmdevcode);
                    }
 
                }

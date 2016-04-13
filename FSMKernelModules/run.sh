@@ -15,4 +15,4 @@ insmod FSM_StatisticServer.ko
 ./FSMSendPack lo 1
 ./FSMSendPack lo 3
 ./FSMSendPack lo 4
-./FSMSendPack lo 2
+//./FSMSendPack lo 2

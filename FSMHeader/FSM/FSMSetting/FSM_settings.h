@@ -36,5 +36,6 @@
 */
 #define FSM_E1DeviceTreeSize 6
 #define FSM_PO06DeviceTreeSize 6
+#define FSM_InterfaceID "esp4"
 #endif	/* FSM_SETTINGS_H */
 
