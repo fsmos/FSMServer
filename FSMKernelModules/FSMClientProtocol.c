@@ -149,6 +149,8 @@ EXPORT_SYMBOL(FSM_GetAudioStreamCallback);
 int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev, 
                    struct packet_type *pt, struct net_device *odev ) { 
      struct FSM_DeviceTree* dftv;
+     struct FSM_SendCmd fsmsc;
+     struct fsm_ethernet_dev fsdev2;
      char dats= ((char*)skb->data)[0];
      struct ethhdr *eth=eth_hdr(skb);
     
@@ -211,6 +213,17 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
            if(dftv==0) 
             {
                 printk( KERN_INFO "Eror \n"); 
+                fsmsc.cmd=FSMNotRegistred;
+                fsmsc.CRC=0;
+                fsmsc.countparam=0;
+                fsmsc.IDDevice=((struct FSM_SendCmdTS *)skb->data)->IDDevice;
+                fsmsc.opcode=SendCmdToDevice;
+                 memset(fsdev2.destmac,0xFF,6);
+                 fsdev2.id=((struct FSM_SendCmdTS *)skb->data)->IDDevice;
+                 fsdev2.numdev=1;
+                 fsdev2.dev = dev; 
+                FSM_Send_Ethernet_Package(&fsmsc,sizeof(struct FSM_SendCmd)-sizeof(fsmsc.Data),&fsdev2);
+
                  return 5;
             }
            //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 

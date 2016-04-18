@@ -131,5 +131,10 @@ typedef void (*FSM_FDeRegister)(struct FSM_DeviceDelete fdd);
 \param[in] dft Пакет класса устроства
 */
 typedef void (*FSM_FClassDeRegister)(struct FSM_DeviceFunctionTree dft);
+
+enum FSM_UK /*125 *** 254*/
+{
+   FSMNotRegistred=125,
+};
 #endif	/* FSM_DEVICEPROCESS_H */
 

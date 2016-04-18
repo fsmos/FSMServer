@@ -55,6 +55,9 @@
     <VirtualDirectory Name="FSM_AudioStream">
       <File Name="../FSMHeader/FSM/FSMAudio/FSM_AudioStream.h"/>
     </VirtualDirectory>
+    <VirtualDirectory Name="FSMCrypt">
+      <File Name="../FSMHeader/FSM/FSMCrypto/FSM_crypt.h"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Make">
     <File Name="Makefile"/>
@@ -163,5 +166,8 @@
   <VirtualDirectory Name="FSM_Statistic">
     <File Name="FSM_StatisticServer.c"/>
     <File Name="FSM_ClientModule.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FSM_crypt">
+    <File Name="FSM_Crypt.c"/>
   </VirtualDirectory>
 </CodeLite_Project>

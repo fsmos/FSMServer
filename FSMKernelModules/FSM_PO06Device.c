@@ -49,8 +49,8 @@ struct FSM_PO06Device FSMPO06Dev[FSM_PO06DeviceTreeSize];
 
 void FSM_PO06RecivePacket(char* data,short len)
 {
-  // printk( KERN_INFO "Stream Recived %u \n",len); 
-   FSM_AudioStreamToUser(0,data,len); 
+  //printk( KERN_INFO "Stream Recived %u \n",len); 
+  // FSM_AudioStreamToUser(0,data,len); 
   
 }
 
@@ -81,6 +81,7 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
       {
                         
         case RegDevice: ///< Регистрация устройства
+        FSM_Statstic_SetStatus(fsmdt,"ok");
         for(i=0;i<FSM_PO06DeviceTreeSize;i++)
           {
               if(FSMPO06Dev[i].iddev==fsmdt->IDDevice)

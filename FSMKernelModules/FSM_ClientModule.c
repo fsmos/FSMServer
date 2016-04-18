@@ -49,6 +49,7 @@ static struct class *cl; // Global variable for the device class
 char is_device_open;
 char *dthw="Hello World";
 struct fsm_statusstruct fsm_ss;
+struct FSM_DeviceRegistr regp;
 
  unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
 {
@@ -102,6 +103,9 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
             case AnsGetStatistic:
             printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
             memcpy(&fsm_ss.statel[((struct fsm_status_element*)fscts->Data)->row][((struct fsm_status_element*)fscts->Data)->column],fscts->Data,sizeof(struct fsm_status_element));
+            break;
+            case FSMNotRegistred:
+            FSM_Send_Ethernet_Package(&regp,sizeof(struct FSM_DeviceRegistr),&fsdev);
             break;
           }
           break;
@@ -261,7 +265,7 @@ static struct file_operations fops =
 static int __init FSM_ClientModule_init(void)
 {
     struct fsm_ethernet_dev fsdev2;
-    struct FSM_DeviceRegistr regp;
+    
     memset(&fsdev,0,sizeof(fsdev));
 
     dev_add_pack( &FSMClientProtocol_proto );

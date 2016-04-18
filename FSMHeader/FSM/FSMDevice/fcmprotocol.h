@@ -136,7 +136,7 @@ struct FSM_SendCmd
    unsigned char cmd;///< Команда
    unsigned char countparam;///< Количество параметров
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Параметры
+   unsigned char Data[250] __attribute__((aligned(4)));///< Параметры
 };
 /*!
 \brief  Подтверждение приёма команды устройством

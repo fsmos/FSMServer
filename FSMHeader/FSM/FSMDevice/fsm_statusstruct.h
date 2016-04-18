@@ -35,7 +35,7 @@ enum FSMST_RodDevice
 {
     PCx86=1,///< PCx86
 };
-enum FSMST_Cmd
+enum FSMST_Cmd /*0*****125*/
 {
     GetStatistic=1,
     AnsGetStatistic=2

@@ -48,13 +48,25 @@ struct FSM_PO06Device
     struct fsm_ethernet_dev* ethdev;
 };
 
-enum FSME1Command
+enum FSME1Command /*0*****125*/
 {
     FSME1SendStream=1
 };
-enum FSMPO06Command
+enum FSMPO06Command /*0*****125*/
 {
     FSMPO06SendStream=1
+};
+
+struct FSME1Pkt
+{
+    char channels;
+    char count;
+    char Data[254];
+};
+struct FSME1Buff
+{
+    unsigned short count;
+    char Data[31][320];
 };
 #endif	/* FCM_AUDIODEVICECLASS_H */
 
