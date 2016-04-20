@@ -50,7 +50,8 @@ struct FSM_PO06Device FSMPO06Dev[FSM_PO06DeviceTreeSize];
 void FSM_PO06RecivePacket(char* data,short len)
 {
   //printk( KERN_INFO "Stream Recived %u \n",len); 
-  // FSM_AudioStreamToUser(0,data,len); 
+  FSM_E1SendPacket(data,160);
+  //FSM_AudioStreamToUser(1,data,len); 
   
 }
 

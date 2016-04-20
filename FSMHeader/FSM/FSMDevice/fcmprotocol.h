@@ -237,7 +237,7 @@ struct FSM_SendAudioData
    unsigned char codec;///< Кодек
    unsigned char len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Аудио
+   unsigned char Data[1024];///< Аудио
 };
 /*!
 \brief Передача видео данных

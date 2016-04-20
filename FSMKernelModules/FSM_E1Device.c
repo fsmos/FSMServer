@@ -22,13 +22,16 @@ struct FSME1Buff E1buffs;
 struct FSM_DeviceFunctionTree dft;
 struct FSM_DeviceTree* FSME1Ethernet;
 struct FSM_E1Device FSME1Dev[FSM_E1DeviceTreeSize];
+struct FSME1Pkt fsme1pkt2;
 struct FSM_SendAudioData sad;
 void FSM_SendToStream(void)
 {
       
       sad.IDDevice=0;
+      sad.len=160;
       memcpy(sad.Data,E1buffs.Data[0],sad.len);
       FSM_AudioStreamToUser(0,(char*)&sad,sizeof(struct FSM_SendAudioData)-sizeof(sad.Data)+sad.len); 
+      
      // printk( KERN_INFO "Stream Recived %u \n",E1buffs.count); 
   
 }
@@ -38,7 +41,8 @@ void FSM_E1RecivePacket(char* data,short len)
     struct FSME1Pkt * pkt= (struct FSME1Pkt *)FSMAPk->Data;
    int i=0;
    int j=0;
-    printk( KERN_INFO "Stream Recived %u \n",pkt->channels); 
+   
+   // printk( KERN_INFO "Stream Recived %u \n",pkt->channels); 
    for(i=0;i<pkt->count;i++)
    {
         for(j=0;j<pkt->channels;j++)
@@ -47,7 +51,7 @@ void FSM_E1RecivePacket(char* data,short len)
         }
         E1buffs.count++;
         //printk( KERN_INFO "Stream Recived %u \n",E1buffs.count); 
-        if( E1buffs.count>=180)
+        if( E1buffs.count>=160)
         {
             FSM_SendToStream();
             E1buffs.count=0;
@@ -55,6 +59,32 @@ void FSM_E1RecivePacket(char* data,short len)
         }
    }
 }
+void FSM_E1SendPacket(char* Data1,unsigned char len)
+{
+    int i,j;
+    char* sb=fsme1pkt2.Data;
+    short size=0;
+    struct FSM_SendAudioData * FSMAPk =Data1;
+   
+    sad.IDDevice=1;
+     fsme1pkt2.count=len;
+     for(i=0;i<len;i++)
+     {
+       for(j=0;j<fsme1pkt2.channels;j++)  
+       {
+           sb[0]=FSMAPk->Data[i];
+           sb++;
+           size++;
+       }
+     }
+     //printk( KERN_INFO "FSME1 Data %u \n",size); 
+     memcpy(sad.Data,fsme1pkt2.Data,size);
+     
+     sad.len=size+2;
+     FSM_AudioStreamToUser(1,(char*)&sad,sizeof(struct FSM_SendAudioData)-sizeof(sad.Data)+sad.len); 
+}
+EXPORT_SYMBOL(FSM_E1SendPacket);
+
 
 void FSM_E1SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 {
@@ -162,7 +192,7 @@ static int __init FSME1Protocol_init(void)
    dft.KodDevice=(unsigned char)MN524;
    dft.Proc=FSM_E1Recive;
    FSM_DeviceClassRegister(dft);
-   
+   fsme1pkt2.channels=3;
    FSME1Ethernet = FSM_FindDevice(FSM_EthernetID);
    if(FSME1Ethernet == 0 )
    {

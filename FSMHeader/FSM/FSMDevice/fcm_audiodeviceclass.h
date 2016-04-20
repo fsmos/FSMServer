@@ -61,12 +61,13 @@ struct FSME1Pkt
 {
     char channels;
     char count;
-    char Data[254];
+    char Data[1024];
 };
 struct FSME1Buff
 {
     unsigned short count;
     char Data[31][320];
 };
+void FSM_E1SendPacket(char* Data1,unsigned char len);
 #endif	/* FCM_AUDIODEVICECLASS_H */
 

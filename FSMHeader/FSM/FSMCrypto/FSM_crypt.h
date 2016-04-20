@@ -8,6 +8,7 @@ struct FSM_cryptalg
     char reg;
     FunctionEncDec Encode;
     FunctionEncDec Decode;
+    void* Keys;
 };
 
 

@@ -35,7 +35,11 @@ void FSMDecrypt(char id,char* dst,char * src,short len)
     if(FSMCA[id].reg==1) FSMCA[id].Decode(dst,src,len);
 }
 EXPORT_SYMBOL(FSMDecrypt);
-
+void FSMSetKey(char id,void* key)
+{
+    if(FSMCA[id].reg==1) FSMCA[id].Keys=key;
+}
+EXPORT_SYMBOL(FSMSetKey);
 
 static int __init FSMCrypto_init(void)
 {
