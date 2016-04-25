@@ -63,7 +63,7 @@ void FSM_E1SendPacket(char* Data1,unsigned char len)
 {
     int i,j;
     char* sb=fsme1pkt2.Data;
-    short size=0;
+    unsigned short size=0;
     struct FSM_SendAudioData * FSMAPk =Data1;
    
     sad.IDDevice=1;
@@ -191,6 +191,7 @@ static int __init FSME1Protocol_init(void)
    dft.PodVidDevice=(unsigned char)CCK;
    dft.KodDevice=(unsigned char)MN524;
    dft.Proc=FSM_E1Recive;
+   dft.config_len=0;
    FSM_DeviceClassRegister(dft);
    fsme1pkt2.channels=3;
    FSME1Ethernet = FSM_FindDevice(FSM_EthernetID);

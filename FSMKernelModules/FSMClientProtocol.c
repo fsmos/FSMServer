@@ -348,6 +348,7 @@ static int __init FSMClientProtocol_init(void)
    dft.PodVidDevice=(unsigned char)WireEthernet;
    dft.KodDevice=(unsigned char)StandartEthernet;
    dft.Proc= FSM_EthernetSendPckt;
+   dft.config_len=0;
    FSM_DeviceClassRegister(dft);
    
    regp.IDDevice=FSM_EthernetID;

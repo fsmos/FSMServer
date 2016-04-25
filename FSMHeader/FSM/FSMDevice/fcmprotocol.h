@@ -136,7 +136,7 @@ struct FSM_SendCmd
    unsigned char cmd;///< Команда
    unsigned char countparam;///< Количество параметров
    unsigned char CRC;///< CRC
-   unsigned char Data[250] __attribute__((aligned(4)));///< Параметры
+   unsigned char Data[1500] __attribute__((aligned(4)));///< Параметры
 };
 /*!
 \brief  Подтверждение приёма команды устройством
@@ -181,7 +181,7 @@ struct FSM_SendCmdTS
    unsigned char cmd;///< Команда
    unsigned char countparam;///< Количество параметров
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Параметры
+   unsigned char Data[1500];///< Параметры
 };
 /*!
 \brief Отправка текстового сообщения
@@ -235,7 +235,7 @@ struct FSM_SendAudioData
    unsigned char opcode;///< Код операции
    unsigned short IDDevice;///< Ид устройства
    unsigned char codec;///< Кодек
-   unsigned char len;///< Длина
+   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
    unsigned char Data[1024];///< Аудио
 };

@@ -1,6 +1,6 @@
 /*!
 \file
-\brief Модуль сервер статистики
+\brief Модуль сервер настроек 
 \authors Гусенков.С.В
 \version 0.0.1_rc1
 \date 30.12.2015
@@ -35,10 +35,10 @@
 #include "FSM/FSMDevice/fsm_statusstruct.h"
 
 
-void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
+void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
     struct FSM_SendCmd scmdt;
-    struct fsm_statusstruct* fsmstate;
+    struct fsm_devices_config* fsmset;
     struct FSM_DeviceTree* fsdt;
     int i,j;
     short hlen;
@@ -51,14 +51,14 @@ void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
             FSM_Statstic_SetStatus(fsmdt,"ok");
          break;
          case SendCmdToServer: ///< Отправка команды серверу
-         fsmstate=FSM_GetStatistic();
+         fsmset=FSM_GetSetting();
          fsdt= FSM_FindDevice(fscts->IDDevice);
          switch(fscts->cmd)
          {
          //printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
-          case GetStatistic:
-          hlen=sizeof(struct FSM_SendCmd)-sizeof(scmdt.Data)+sizeof(struct fsm_status_element);
-          scmdt.cmd=AnsGetStatistic;
+          case GetSet:
+          hlen=sizeof(struct FSM_SendCmd)-sizeof(scmdt.Data)+sizeof(struct fsm_device_config);
+          scmdt.cmd=AnsGetSet;
           scmdt.countparam=1;
           scmdt.IDDevice=fscts->IDDevice;
           scmdt.CRC=0;
@@ -68,9 +68,9 @@ void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
            {
                for(j=0;j<scolumn_cnt;j++)
                {
-                   if(fsmstate->statel[i][j].devid!=0)
+                   if(fsmset->setel[i][j].IDDevice!=0)
                    {
-                   memcpy(scmdt.Data,&fsmstate->statel[i][j],sizeof(struct fsm_status_element));
+                   memcpy(scmdt.Data,&fsmset->setel[i][j],sizeof(struct fsm_device_config));
                    fsmdt->dt->Proc(&scmdt,hlen,fsdt);
                       //printk( KERN_INFO "FSM Send %u %s\n",fsmstate->statel[i][j].devid,fsmstate->statel[i][j].fsmdevcode);
                    }
@@ -85,27 +85,27 @@ void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
      
 }
 struct FSM_DeviceFunctionTree dft;
-static int __init FSM_Statistic_Server_init(void)
+static int __init FSM_Setting_Server_init(void)
 {
    dft.type=(unsigned char)StatisticandConfig;
-   dft.VidDevice=(unsigned char)FSMDeviceStatistic;
+   dft.VidDevice=(unsigned char)FSMDeviceConfig;
    dft.PodVidDevice=(unsigned char)ComputerStatistic;
    dft.KodDevice=(unsigned char)PCx86;
-   dft.Proc=FSM_StatisticRecive;
+   dft.Proc=FSM_SettingRecive;
    dft.config_len=0;
    FSM_DeviceClassRegister(dft);
-   printk( KERN_INFO "FSM Statistic Server loaded\n" ); 
+   printk( KERN_INFO "FSM Setting Server loaded\n" ); 
    return 0;  
 }
 
-static void __exit FSM_Statistic_Server_exit(void)
+static void __exit FSM_Setting_Server_exit(void)
 {
-   printk( KERN_INFO "FSM  Statistic Server unloaded\n" );  
+   printk( KERN_INFO "FSM  Setting Server unloaded\n" );  
 }
 
-module_init(FSM_Statistic_Server_init);
-module_exit(FSM_Statistic_Server_exit);
+module_init(FSM_Setting_Server_init);
+module_exit(FSM_Setting_Server_exit);
 
 MODULE_AUTHOR("Gusenkov S.V FSM");
-MODULE_DESCRIPTION("FSM Statistic Server Module");
+MODULE_DESCRIPTION("FSM Setting Server Module");
 MODULE_LICENSE("GPL");

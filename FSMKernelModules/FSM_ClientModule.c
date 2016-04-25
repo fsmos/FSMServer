@@ -30,6 +30,7 @@
 #include <linux/timer.h>
 #include <net/sock.h>
 #include <linux/etherdevice.h> 
+#include <linux/unistd.h>
 #include "FSM/FSMAudio/FSM_AudioStream.h"
 #include <FSM/FSMEthernet/FSMEthernetHeader.h> 
 #include "FSM/FSMDevice/fcmprotocol.h"
@@ -46,10 +47,43 @@ struct fsm_ethernet_dev fsdev;
 static dev_t first; // Global variable for the first device number
 static struct cdev c_dev; // Global variable for the character device structure
 static struct class *cl; // Global variable for the device class
+static dev_t firstset; // Global variable for the first device number
+static struct cdev c_devset; // Global variable for the character device structure
+static struct class *clset; // Global variable for the device class
 char is_device_open;
 char *dthw="Hello World";
 struct fsm_statusstruct fsm_ss;
+struct fsm_devices_config fsm_ds;
 struct FSM_DeviceRegistr regp;
+struct FSM_DeviceRegistr regset;
+
+/*
+static ssize_t fsmset_show(struct class *class, struct class_attribute *attr,char *buf)
+{
+  // strcpy( buf, buf_msg );
+  // printk( "read %d\n", strlen( buf ) );
+   return 1;
+}
+static ssize_t fsmset_store(struct class *class, struct class_attribute *attr,const char *buf, size_t count)
+{
+   //printk( "write %d\n" , count );
+   //strncpy( buf_msg, buf, count );
+   //buf_msg[ count ] = '\0';
+   return count;
+}
+struct class_attribute class_attr_fsmset=
+{				
+	.attr = {
+         .name = __stringify(fsmsetc),				
+		 .mode = (S_IWUSR | S_IRUGO)
+           },		
+	.show	= fsmset_show,						\
+	.store	= fsmset_store,						\
+};
+
+static struct class *fsmset_class;
+ * */
+//CLASS_ATTR(fsmsetc,0666,&fsmset_show,&fsmset_store);
 
  unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
 {
@@ -67,8 +101,8 @@ struct FSM_DeviceRegistr regp;
   memcpy(skb_put(skb, len),data,len);
   if(dev_hard_header(skb, dev, __constant_htons(FSM_PROTO_ID_R), fsmdev->destmac, dev->dev_addr, skb->len)<0) goto out;
   if(dev_queue_xmit(skb)<0) goto out;
+  
   return 0;
-
  out:
 	kfree_skb(skb);
 	return 0;
@@ -82,6 +116,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
      if (skb->pkt_type == PACKET_OTHERHOST || skb->pkt_type == PACKET_LOOPBACK) return 0;
      printk( KERN_ERR "RegDev %u\n",dats);
      struct FSM_SendCmd* fscts= skb->data;  
+     struct FSM_AnsDeviceRegistr* fscar= skb->data;  
      switch(dats)
       {
           case RegDevice: ///< Регистрация устройства
@@ -90,14 +125,17 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           fsdev.reg=1;
           memcpy(fsdev.destmac,eth->h_source,6);
           fsdev.dev=dev; 
-         
-             printk( KERN_INFO "Device Registred\n" ); 
+          if(fscar->IDDevice==FSM_StatisicID) FSM_Send_Ethernet_Package(&regset,sizeof(struct FSM_DeviceRegistr),&fsdev);
+          printk( KERN_INFO "Device Registred\n" ); 
           break;
           case AnsDelList: ///< Подтверждение удаления устройства из списка
           break;
           case AnsPing:///< Пинг
           break;
           case SendCmdToDevice:///< Отправка команды устройству
+          switch(fscts->IDDevice)
+          {
+          case FSM_StatisicID:
           switch(fscts->cmd)
           {
             case AnsGetStatistic:
@@ -107,6 +145,17 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
             case FSMNotRegistred:
             FSM_Send_Ethernet_Package(&regp,sizeof(struct FSM_DeviceRegistr),&fsdev);
             break;
+          }
+          break;
+           case AnsGetSet:
+            printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
+            memcpy(&fsm_ds.setel[((struct fsm_device_config*)fscts->Data)->row][((struct fsm_device_config*)fscts->Data)->column],fscts->Data,sizeof(struct fsm_device_config));
+            break;
+          case FSM_SettingID:
+            case FSMNotRegistred:
+            FSM_Send_Ethernet_Package(&regset,sizeof(struct FSM_DeviceRegistr),&fsdev);
+            break;
+          break;
           }
           break;
           case AnsSendCmdToDevice: ///< Подтверждение приёма команды устройством
@@ -234,6 +283,9 @@ regpcmdts.CRC=0;
 regpcmdts.IDDevice=FSM_StatisicID;  
 regpcmdts.cmd=GetStatistic;
 FSM_Send_Ethernet_Package(&regpcmdts,sizeof(struct FSM_SendCmdTS),&fsdev);
+regpcmdts.cmd=GetSet;
+regpcmdts.IDDevice=FSM_SettingID;  
+FSM_Send_Ethernet_Package(&regpcmdts,sizeof(struct FSM_SendCmdTS),&fsdev);
  printk( "SendReqest" );
  return len;
 }
@@ -260,6 +312,15 @@ static struct file_operations fops =
   .open = device_open,
   .release = device_release
  };
+ 
+static struct file_operations fopsset =
+ {
+  .read = device_read,
+  .write = device_write,
+  .open = device_open,
+  .release = device_release
+ };
+
 
  
 static int __init FSM_ClientModule_init(void)
@@ -276,6 +337,15 @@ static int __init FSM_ClientModule_init(void)
    regp.type=(unsigned char)StatisticandConfig;
    regp.opcode=RegDevice;
    regp.CRC=0;
+   
+   regset.IDDevice=(unsigned short)FSM_SettingID;
+   regset.VidDevice=(unsigned char)FSMDeviceConfig;
+   regset.PodVidDevice=(unsigned char)ComputerStatistic;
+   regset.KodDevice=(unsigned char)PCx86;
+   regset.type=(unsigned char)StatisticandConfig;
+   regset.opcode=RegDevice;
+   regset.CRC=0;
+   
    fsdev.dev=0;
    fsdev.id=FSM_StatisicID;
    fsdev.numdev=1;
@@ -290,30 +360,49 @@ static int __init FSM_ClientModule_init(void)
    fsdev2.dev = next_net_device( fsdev2.dev );
    }
    
-   if (alloc_chrdev_region(&first, 0, 1, "fsmr") < 0)
-  {
-    return -1;
-  }
+    if (alloc_chrdev_region(&first, 0, 1, "fsmr") < 0) return -1;
     if ((cl = class_create(THIS_MODULE, "fsm")) == NULL)
-  {
+    {
     unregister_chrdev_region(first, 1);
     return -1;
-  }
+    }
     if (device_create(cl, NULL, first, NULL, "fsmstatistic") == NULL)
-  {
+    {
     class_destroy(cl);
     unregister_chrdev_region(first, 1);
     return -1;
-  }
+    }
     cdev_init(&c_dev, &fops);
     if (cdev_add(&c_dev, first, 1) == -1)
-  {
+    {
     device_destroy(cl, first);
     class_destroy(cl);
     unregister_chrdev_region(first, 1);
     return -1;
-  }
+    }
+    
+    if (alloc_chrdev_region(&firstset, 0, 1, "fsms") < 0) return -1;
+    if ((clset = class_create(THIS_MODULE, "fsmsetc")) == NULL)
+    {
+    unregister_chrdev_region(firstset, 1);
+    return -1;
+    }
+    if (device_create(clset, NULL, firstset, NULL, "fsmset") == NULL)
+    {
+    class_destroy(clset);
+    unregister_chrdev_region(firstset, 1);
+    return -1;
+    }
+    cdev_init(&c_devset, &fopsset);
+    if (cdev_add(&c_devset, firstset, 1) == -1)
+    {
+    device_destroy(clset, firstset);
+    class_destroy(clset);
+    unregister_chrdev_region(firstset, 1);
+    return -1;
+    }
    //FSM_DeviceRegister(regp);
+   //fsmset_class = class_create( THIS_MODULE, "fsmset" );
    
    printk( KERN_INFO "FSMClientProtocol module loaded\n" ); 
    return 0;  
@@ -327,14 +416,21 @@ static void __exit FSM_ClientModule_exit(void)
     delp.IDDevice=FSM_StatisicID;
     delp.opcode=DelLisr;
     FSM_Send_Ethernet_Package(&delp,sizeof(struct FSM_DeviceDelete),&fsdev);
+    delp.IDDevice=FSM_SettingID;
+    FSM_Send_Ethernet_Package(&delp,sizeof(struct FSM_DeviceDelete),&fsdev);
     dev_remove_pack( &FSMClientProtocol_proto ); 
      cdev_del(&c_dev);
   device_destroy(cl, first);
   class_destroy(cl);
   unregister_chrdev_region(first, 1);
+  
+   cdev_del(&c_devset);
+  device_destroy(clset, firstset);
+  class_destroy(clset);
+  unregister_chrdev_region(firstset, 1);
+  // class_destroy( fsmset_class );
    printk( KERN_INFO "FSM Client module unloaded\n" );  
 }
-
 module_init(FSM_ClientModule_init);
 module_exit(FSM_ClientModule_exit);
 

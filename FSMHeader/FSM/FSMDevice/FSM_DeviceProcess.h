@@ -9,6 +9,7 @@
 #ifndef FSM_DEVICEPROCESS_H
 #define	FSM_DEVICEPROCESS_H
 
+typedef void (*ApplayProcess)(struct FSM_DeviceTree*);
 /*!
 \brief Информации о  устройстве
 */
@@ -18,6 +19,8 @@ struct FSM_DeviceTree
    unsigned short IDDevice;///< Ид устройства
    struct FSM_DeviceFunctionTree* dt;///< Информации о виде устройства
    char state[32];
+   void * config;
+  
 };
 /*!
 \brief Прототип функции обратной связи
@@ -34,6 +37,8 @@ struct FSM_DeviceFunctionTree
    unsigned char PodVidDevice;///< Подвид устройства
    unsigned char KodDevice;///<Код устройства
    DeviceProcess Proc;///< Обратная связь
+    ApplayProcess aplayp;
+   unsigned short config_len; 
 };
 /*!
 \brief Регистрация устройства
@@ -90,6 +95,27 @@ struct fsm_statusstruct *FSM_GetStatistic(void);
 */
 void FSM_Statstic_SetStatus(struct FSM_DeviceTree* fdt,char* status);
 
+
+/*!
+\brief Получение настроек
+\return Настройки
+*/
+struct fsm_devices_config *FSM_GetSetting(void);
+
+/*!
+\brief Установка структуры настроек
+ \param[in] fdt Устроство
+ \param[in] set Настроки
+*/
+void FSM_Setting_Set(struct FSM_DeviceTree* fdt,void* set);
+
+/*!
+\brief Применить настройки
+ \param[in] fdt Устроство
+ \param[in] set Настроки
+*/
+void FSM_Setting_Applay(struct FSM_DeviceTree* fdt,void* set);
+
 /*!
 \brief Регистрация устройства
 \param[in] dt Пакет регистрации
@@ -136,5 +162,6 @@ enum FSM_UK /*125 *** 254*/
 {
    FSMNotRegistred=125,
 };
+
 #endif	/* FSM_DEVICEPROCESS_H */
 

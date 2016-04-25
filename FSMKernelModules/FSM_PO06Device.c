@@ -159,6 +159,7 @@ static int __init FSM_PO06_init(void)
    dft.PodVidDevice=(unsigned char)CCK;
    dft.KodDevice=(unsigned char)PO06;
    dft.Proc=FSM_PO06Recive;
+   dft.config_len=0;
    FSM_DeviceClassRegister(dft);
    FSMPO06Ethernet = FSM_FindDevice(FSM_EthernetID);
    if(FSMPO06Ethernet == 0 )

@@ -23,6 +23,7 @@ struct FSM_DeviceFunctionTree fsm_dft[FSM_DeviceFunctionTreeSize];
  */
 struct FSM_DeviceTree fsm_dt[FSM_DeviceTreeSize];
 struct fsm_statusstruct fsm_str;
+struct fsm_devices_config fsm_set;
 
 static int __init FSMDeviceProcess_init(void)
 {
@@ -67,6 +68,45 @@ struct fsm_statusstruct *FSM_GetStatistic(void)
 }
 EXPORT_SYMBOL(FSM_GetStatistic);
 
+struct fsm_devices_config *FSM_GetSetting(void)
+{
+   int i,j;
+   int m=0;
+   memset(&fsm_set,0,sizeof(fsm_set));
+   for(i=0;i<srow_cnt;i++)
+   {
+   for(j=0;j<scolumn_cnt;j++)
+   {
+       if((fsm_dt[m].IDDevice!=0)&&(fsm_dt[m].registr==1))
+       {
+       fsm_set.setel[i][j].IDDevice=fsm_dt[m].IDDevice;
+       fsm_set.setel[i][j].Len=fsm_dt[m].dt->config_len;
+       memcpy(fsm_set.setel[i][j].config,fsm_dt[m].config,fsm_set.setel[i][j].Len);
+       fsm_set.setel[i][j].row=i;
+       fsm_set.setel[i][j].column=j;
+       m++;
+       }
+       
+
+   } 
+ }
+   return &fsm_set;
+}
+EXPORT_SYMBOL(FSM_GetSetting);
+
+void FSM_Setting_Set(struct FSM_DeviceTree* fdt,void* set)
+{
+  fdt->config=set;
+}
+EXPORT_SYMBOL(FSM_Setting_Set);
+
+void FSM_Setting_Applay(struct FSM_DeviceTree* fdt,void* set)
+{
+  memcpy(fdt->config,set,fdt->dt->config_len);
+  if(fdt->dt->aplayp!=0) fdt->dt->aplayp(fdt);
+}
+EXPORT_SYMBOL(FSM_Setting_Applay);
+
 void FSM_Statstic_SetStatus(struct FSM_DeviceTree* fdt,char* status)
 {
   strcpy(fdt->state,status);
@@ -91,6 +131,7 @@ unsigned char FSM_DeviceClassRegister(struct FSM_DeviceFunctionTree dft)
             fsm_dft[i].PodVidDevice=dft.PodVidDevice;
             fsm_dft[i].KodDevice=dft.KodDevice;
             fsm_dft[i].Proc=dft.Proc;
+            fsm_dft[i].config_len=dft.config_len;
              printk( KERN_INFO "DeviceClassRegistred: Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n", dft.type,dft.VidDevice,dft.PodVidDevice,dft.KodDevice ); 
             return 0;
         }

@@ -166,6 +166,7 @@
   <VirtualDirectory Name="FSM_Statistic">
     <File Name="FSM_StatisticServer.c"/>
     <File Name="FSM_ClientModule.c"/>
+    <File Name="FSM_SettingServer.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_crypt">
     <File Name="FSM_Crypt.c"/>

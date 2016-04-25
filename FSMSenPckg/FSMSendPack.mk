@@ -5,16 +5,16 @@
 ## Debug
 ProjectName            :=FSMSendPack
 ConfigurationName      :=Debug
-WorkspacePath          := "/home/gusenkovs/FSMCoreFile"
-ProjectPath            := "/home/gusenkovs/FSMCoreFile/FSMSenPckg"
+WorkspacePath          :=/home/gusenkovs/FSMCoreFile
+ProjectPath            :=/home/gusenkovs/FSMCoreFile/FSMSenPckg
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=gusenkovs
-Date                   :=18/04/16
-CodeLitePath           :="/home/gusenkovs/.codelite"
+Date                   :=25/04/16
+CodeLitePath           :=/home/gusenkovs/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
 ObjectSuffix           :=.o
