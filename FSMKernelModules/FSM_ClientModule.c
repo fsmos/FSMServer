@@ -56,7 +56,8 @@ struct fsm_statusstruct fsm_ss;
 struct fsm_devices_config fsm_ds;
 struct FSM_DeviceRegistr regp;
 struct FSM_DeviceRegistr regset;
-
+struct FSMSSetconfigParam fsmspar;
+unsigned short setservid;
 /*
 static ssize_t fsmset_show(struct class *class, struct class_attribute *attr,char *buf)
 {
@@ -113,8 +114,9 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
                    struct packet_type *pt, struct net_device *odev ) { 
      char dats= ((char*)skb->data)[0];
      struct ethhdr *eth=eth_hdr(skb);
+     struct FSM_DeviceDelete delp;
      if (skb->pkt_type == PACKET_OTHERHOST || skb->pkt_type == PACKET_LOOPBACK) return 0;
-     printk( KERN_ERR "RegDev %u\n",dats);
+     //printk( KERN_ERR "RegDev %u\n",dats);
      struct FSM_SendCmd* fscts= skb->data;  
      struct FSM_AnsDeviceRegistr* fscar= skb->data;  
      switch(dats)
@@ -125,37 +127,57 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           fsdev.reg=1;
           memcpy(fsdev.destmac,eth->h_source,6);
           fsdev.dev=dev; 
-          if(fscar->IDDevice==FSM_StatisicID) FSM_Send_Ethernet_Package(&regset,sizeof(struct FSM_DeviceRegistr),&fsdev);
-          printk( KERN_INFO "Device Registred\n" ); 
+           printk( KERN_INFO "Device Registred\n" ); 
+          if(fscar->IDDevice==FSM_StatisicID)
+          { 
+          FSM_Send_Ethernet_Package(&regset,sizeof(struct FSM_DeviceRegistr),&fsdev);
+          printk( KERN_INFO "Device Reg2\n" ); 
+          }
+          
           break;
           case AnsDelList: ///< Подтверждение удаления устройства из списка
           break;
           case AnsPing:///< Пинг
           break;
           case SendCmdToDevice:///< Отправка команды устройству
-          switch(fscts->IDDevice)
+          if(fscts->IDDevice==FSM_StatisicID)
           {
-          case FSM_StatisicID:
           switch(fscts->cmd)
           {
             case AnsGetStatistic:
-            printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
+            //printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
             memcpy(&fsm_ss.statel[((struct fsm_status_element*)fscts->Data)->row][((struct fsm_status_element*)fscts->Data)->column],fscts->Data,sizeof(struct fsm_status_element));
             break;
             case FSMNotRegistred:
             FSM_Send_Ethernet_Package(&regp,sizeof(struct FSM_DeviceRegistr),&fsdev);
             break;
           }
-          break;
-           case AnsGetSet:
-            printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
+          }
+          if(fscts->IDDevice==FSM_SettingID)
+          {
+          switch(fscts->cmd)
+          {
+            case AnsGetSet:
+           // printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
             memcpy(&fsm_ds.setel[((struct fsm_device_config*)fscts->Data)->row][((struct fsm_device_config*)fscts->Data)->column],fscts->Data,sizeof(struct fsm_device_config));
             break;
-          case FSM_SettingID:
+            
             case FSMNotRegistred:
+            printk( KERN_INFO "Device FSR\n" ); 
             FSM_Send_Ethernet_Package(&regset,sizeof(struct FSM_DeviceRegistr),&fsdev);
             break;
-          break;
+            
+            case SetSettingClient:
+             printk( KERN_INFO "FSM_Setting_Applay\n" ); 
+             delp.CRC=0;
+             delp.opcode=DelLisr;
+             delp.IDDevice=FSM_SettingID;
+             setservid=((struct fsm_ClientSetting_Setting*)fscts->Data)->id;
+             FSM_Send_Ethernet_Package(&delp,sizeof(struct FSM_DeviceDelete),&fsdev);
+             regset.IDDevice=(unsigned short)FSM_SettingID;
+             FSM_Send_Ethernet_Package(&regset,sizeof(struct FSM_DeviceRegistr),&fsdev);
+            break;
+          }
           }
           break;
           case AnsSendCmdToDevice: ///< Подтверждение приёма команды устройством
@@ -243,7 +265,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
                        
                 
    
-   printk( KERN_ERR "packet received with length: %u\n", skb->len );
+   //printk( KERN_ERR "packet received with length: %u\n", skb->len );
    
    
    //FSM_Send_Ethernet_Package(odev,dts,3,fsdev);
@@ -275,7 +297,7 @@ static int device_release( struct inode *inode, struct file *file )
 
 static int device_write( struct file *filp, const char *buff, size_t len, loff_t * off )
 {
-struct  FSM_SendCmdTS regpcmdts;
+    struct  FSM_SendCmdTS regpcmdts;
 memset(&fsm_ss,0,sizeof(fsm_ss));
 regpcmdts.opcode=SendCmdToServer;
 regpcmdts.countparam=1;
@@ -286,8 +308,9 @@ FSM_Send_Ethernet_Package(&regpcmdts,sizeof(struct FSM_SendCmdTS),&fsdev);
 regpcmdts.cmd=GetSet;
 regpcmdts.IDDevice=FSM_SettingID;  
 FSM_Send_Ethernet_Package(&regpcmdts,sizeof(struct FSM_SendCmdTS),&fsdev);
- printk( "SendReqest" );
+ //printk( "SendReqest" );
  return len;
+
 }
 
 static ssize_t device_read( struct file *filp, /* include/linux/fs.h */
@@ -304,6 +327,77 @@ static ssize_t device_read( struct file *filp, /* include/linux/fs.h */
  return sizeof(fsm_ss);
 }
 
+static int deviceset_open( struct inode *inode, struct file *file )
+{
+ if ( is_device_open )
+  return -EBUSY;
+  printk(KERN_INFO "%s",file->f_path.dentry->d_name.name);
+ is_device_open++;
+
+ return SUCCESS;
+}
+
+static int deviceset_release( struct inode *inode, struct file *file )
+{
+ is_device_open--;
+ return SUCCESS;
+}
+
+
+static int deviceset_write( struct file *filp, const char *buff, size_t len, loff_t * off )
+{
+    int i;
+    int j;
+struct FSMSSetconfig* scp=buff;
+struct  FSM_SendCmdTS regpcmdts;
+    fsmspar.cmd=scp->cmd;
+    fsmspar.IDDevice=scp->IDDevice;
+    for(i=0;i<srow_cnt;i++)
+    {
+        for(j=0;j<scolumn_cnt;j++)
+           {
+            if(fsm_ds.setel[i][j].IDDevice==fsmspar.IDDevice)
+            {
+            fsmspar.config=&fsm_ds.setel[i][j];
+            //printk( KERN_INFO "FSM Send %u %s\n",fsmstate->statel[i][j].devid,fsmstate->statel[i][j].fsmdevcode);
+            }
+            }
+    }
+    if(fsmspar.cmd==SetFSMSetting)
+    {
+        regpcmdts.opcode=SendCmdToServer;
+        regpcmdts.countparam=1;
+        regpcmdts.CRC=0;
+       regpcmdts.cmd=SetSetting;
+       regpcmdts.IDDevice=FSM_SettingID;
+       scp->config.row=fsmspar.config->row;
+       scp->config.column=fsmspar.config->column;
+       memcpy(&regpcmdts.Data,&scp->config,sizeof(struct fsm_device_config));
+       FSM_Send_Ethernet_Package(&regpcmdts,sizeof(struct FSM_SendCmdTS),&fsdev); 
+       printk( KERN_INFO "Set %i",fsmspar.IDDevice );
+    }
+    if(fsmspar.cmd==GetFSMSetting)
+    {
+         
+    }
+ return len;
+}
+
+static ssize_t deviceset_read( struct file *filp, /* include/linux/fs.h */
+       char *buffer, /* buffer */
+       size_t length, /* buffer length */
+       loff_t * offset )
+{
+  if( *offset != 0 ) {
+      return 0;
+   }
+
+   
+   
+  memcpy(buffer,fsmspar.config,sizeof(struct fsm_device_config));
+  *offset =sizeof(struct fsm_device_config);
+ return sizeof(struct fsm_device_config);
+}
 
 static struct file_operations fops =
  {
@@ -315,10 +409,10 @@ static struct file_operations fops =
  
 static struct file_operations fopsset =
  {
-  .read = device_read,
-  .write = device_write,
-  .open = device_open,
-  .release = device_release
+  .read = deviceset_read,
+  .write = deviceset_write,
+  .open = deviceset_open,
+  .release = deviceset_release
  };
 
 
@@ -326,7 +420,7 @@ static struct file_operations fopsset =
 static int __init FSM_ClientModule_init(void)
 {
     struct fsm_ethernet_dev fsdev2;
-    
+    setservid=22;
     memset(&fsdev,0,sizeof(fsdev));
 
     dev_add_pack( &FSMClientProtocol_proto );
@@ -403,7 +497,7 @@ static int __init FSM_ClientModule_init(void)
     }
    //FSM_DeviceRegister(regp);
    //fsmset_class = class_create( THIS_MODULE, "fsmset" );
-   
+   fsmspar.config=&fsm_ds.setel[0][0];
    printk( KERN_INFO "FSMClientProtocol module loaded\n" ); 
    return 0;  
 }

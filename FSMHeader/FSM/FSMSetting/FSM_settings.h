@@ -27,7 +27,7 @@
 \brief ID сервера статистики
 */
 #define FSM_StatisicID 21
-#define FSM_SettingID 22
+#define FSM_SettingID setservid
 /*!
 \brief Размер дерева аудио потоков
 */

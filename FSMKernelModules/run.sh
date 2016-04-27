@@ -14,7 +14,7 @@ insmod FSM_E1Device.ko
 insmod FSM_PO06Device.ko
 insmod FSM_StatisticServer.ko
 insmod FSM_SettingServer.ko
-./FSMSendPack lo 1
-./FSMSendPack lo 3
-./FSMSendPack lo 4
+//./FSMSendPack lo 1
+//./FSMSendPack lo 3
+//./FSMSendPack lo 4
 //./FSMSendPack lo 2

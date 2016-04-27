@@ -102,7 +102,9 @@ EXPORT_SYMBOL(FSM_Setting_Set);
 
 void FSM_Setting_Applay(struct FSM_DeviceTree* fdt,void* set)
 {
+  if(fdt==0) return;
   memcpy(fdt->config,set,fdt->dt->config_len);
+ // printk( KERN_INFO "FSMAP %i\n", fdt->dt->aplayp); 
   if(fdt->dt->aplayp!=0) fdt->dt->aplayp(fdt);
 }
 EXPORT_SYMBOL(FSM_Setting_Applay);
@@ -132,6 +134,7 @@ unsigned char FSM_DeviceClassRegister(struct FSM_DeviceFunctionTree dft)
             fsm_dft[i].KodDevice=dft.KodDevice;
             fsm_dft[i].Proc=dft.Proc;
             fsm_dft[i].config_len=dft.config_len;
+            fsm_dft[i].aplayp=dft.aplayp;
              printk( KERN_INFO "DeviceClassRegistred: Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n", dft.type,dft.VidDevice,dft.PodVidDevice,dft.KodDevice ); 
             return 0;
         }

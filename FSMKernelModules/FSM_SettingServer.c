@@ -34,7 +34,7 @@
 #include "FSM/FSMSetting/FSM_settings.h"
 #include "FSM/FSMDevice/fsm_statusstruct.h"
 
-
+struct fsm_Setting_Setting fsmSSS;
 void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
     struct FSM_SendCmd scmdt;
@@ -42,6 +42,7 @@ void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
     struct FSM_DeviceTree* fsdt;
     int i,j;
     short hlen;
+    unsigned short tmp;
     struct FSM_SendCmdTS* fscts= data;    
     
 
@@ -49,6 +50,8 @@ void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
     {
          case RegDevice:
             FSM_Statstic_SetStatus(fsmdt,"ok");
+            fsmdt->config=&fsmSSS;
+            fsmSSS.fsmcs.id=fsmdt->IDDevice;
          break;
          case SendCmdToServer: ///< Отправка команды серверу
          fsmset=FSM_GetSetting();
@@ -78,11 +81,27 @@ void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
                }
            }
            break;
+           case SetSetting:
+          //  printk( KERN_INFO "FSM_Setting_Applay\n" ); 
+           FSM_Setting_Applay(FSM_FindDevice(((struct fsm_device_config*)fscts->Data)->IDDevice),((struct fsm_device_config*)fscts->Data)->config);
+           break;
         
          }
     break;
     }
      
+}
+void ApplaySetting(struct FSM_DeviceTree* df)
+{
+     struct FSM_SendCmd scmdt;
+    // printk( KERN_INFO "FSM_Set\n" ); 
+      scmdt.cmd=SetSettingClient;
+          scmdt.countparam=1;
+          scmdt.IDDevice=df->IDDevice;
+          scmdt.CRC=0;
+          scmdt.opcode=SendCmdToDevice;
+          memcpy(&scmdt.Data,&fsmSSS.fsmcs,sizeof(struct fsm_Setting_Setting ));
+          (FSM_FindDevice(FSM_EthernetID))->dt->Proc(&scmdt,sizeof(struct FSM_SendCmd),df);
 }
 struct FSM_DeviceFunctionTree dft;
 static int __init FSM_Setting_Server_init(void)
@@ -92,7 +111,8 @@ static int __init FSM_Setting_Server_init(void)
    dft.PodVidDevice=(unsigned char)ComputerStatistic;
    dft.KodDevice=(unsigned char)PCx86;
    dft.Proc=FSM_SettingRecive;
-   dft.config_len=0;
+   dft.config_len=sizeof(struct fsm_Setting_Setting);
+   dft.aplayp=ApplaySetting;
    FSM_DeviceClassRegister(dft);
    printk( KERN_INFO "FSM Setting Server loaded\n" ); 
    return 0;  
