@@ -247,7 +247,7 @@ struct FSM_SendVideoData
    unsigned char opcode;///< Код операции
    unsigned short IDDevice;///< Ид устройства
    unsigned char codec;///< Кодек
-   unsigned char len;///< Длина
+   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
    unsigned char Data[250];///< Видео
 };

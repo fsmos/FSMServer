@@ -63,7 +63,7 @@ void FSM_AudioStreamToUser(int id,char* Data,short len)
     if(id==-1) return;
     if(((char*)&FSMASDB[id])[0]==0)
     { 
-     printk( KERN_INFO "NotStreamID TUn" ); 
+    // printk( KERN_INFO "NotStreamID TUn" ); 
     return;
     }
     if((((char*)&FSMASDB[id])[0]!=0)&&(FSMASDB[id].ToUser!=0)) FSMASDB[id].ToUser(Data,len, FSMASDB[id].TransportDevice);
@@ -75,7 +75,7 @@ void FSM_AudioStreamToProcess(int id,char* Data,short len)
     if(id==-1) return;
     if(((char*)&FSMASDB[id])[0]==0) 
         {
-               printk( KERN_INFO "NotStreamID TP\n" ); 
+               //printk( KERN_INFO "NotStreamID TP\n" ); 
             return;
         }
       FSMASDB[id].ToProcess(Data,len);
