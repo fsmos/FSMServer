@@ -5,16 +5,26 @@ rmmod FSM_E1Device.ko
 rmmod FSM_AudioStream.ko
 rmmod FSMClientProtocol.ko
 rmmod FSM_DeviceProcess.ko
-
+path=""
 
 insmod FSM_DeviceProcess.ko
+
+a+=""
+a+="add-symbol-file $path FSM_DeviceProcess.ko $(cat /sys/module/FSM_DeviceProcess/sections/.text) \n"
 insmod FSMClientProtocol.ko
+a+="add-symbol-file $path FSMClientProtocol.ko $(cat /sys/module/FSMClientProtocol/sections/.text) \n"
 insmod FSM_AudioStream.ko
+a+="add-symbol-file $path FSM_AudioStream.ko $(cat /sys/module/FSM_AudioStream/sections/.text) \n"
 insmod FSM_E1Device.ko
+a+="add-symbol-file $path FSM_E1Device.ko $(cat /sys/module/FSM_E1Device/sections/.text) \n"
 insmod FSM_PO06Device.ko
+a+="add-symbol-file $path FSM_PO06Device.ko $(cat /sys/module/FSM_PO06Device/sections/.text) \n"
 insmod FSM_StatisticServer.ko
+a+="add-symbol-file $path FSM_StatisticServer.ko $(cat /sys/module/FSM_StatisticServer/sections/.text) \n"
 insmod FSM_SettingServer.ko
+a+="add-symbol-file $path FSM_SettingServer.ko $(cat /sys/module/FSM_SettingServer/sections/.text) \n"
 //./FSMSendPack lo 1
 //./FSMSendPack lo 3
 //./FSMSendPack lo 4
 //./FSMSendPack lo 2
+echo -e $a > runs.prog

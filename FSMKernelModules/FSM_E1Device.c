@@ -78,7 +78,7 @@ void FSM_E1SendPacket(char* Data1,unsigned char len)
        }
      }
      //printk( KERN_INFO "FSME1 Data %u \n",size); 
-     memcpy(sad.Data,fsme1pkt2.Data,size);
+     memcpy(sad.Data,&fsme1pkt2,size+2);
      
      sad.len=size+2;
      FSM_AudioStreamToUser(1,(char*)&sad,sizeof(struct FSM_SendAudioData)-sizeof(sad.Data)+sad.len); 

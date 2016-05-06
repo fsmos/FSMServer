@@ -69,6 +69,20 @@
   <VirtualDirectory Name="FSM_E1Device">
     <File Name="FSM_E1Device.c"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="FSMAudioStream">
+    <File Name="FSM_AudioStream.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FSM_PO06">
+    <File Name="FSM_PO06Device.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FSM_Statistic">
+    <File Name="FSM_StatisticServer.c"/>
+    <File Name="FSM_ClientModule.c"/>
+    <File Name="FSM_SettingServer.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FSM_crypt">
+    <File Name="FSM_Crypt.c"/>
+  </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>
       <Compiler Options="" C_Options="" Assembler="">
@@ -87,12 +101,14 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="/usr/src/linux-source-4.2.0/vmlinux" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
       <Debugger IsRemote="yes" RemoteHostName="localhost" RemoteHostPort="1234" DebuggerPath="" IsExtended="no">
         <DebuggerSearchPaths>/usr/src/linux-source-4.2.0</DebuggerSearchPaths>
-        <PostConnectCommands>load /usr/src/linux-source-4.2.0/vmlinux</PostConnectCommands>
+        <PostConnectCommands>load /usr/src/linux-source-4.2.0/vmlinux
+source runs.prog</PostConnectCommands>
         <StartupCommands>file /usr/src/linux-source-4.2.0/vmlinux</StartupCommands>
       </Debugger>
       <PreBuild/>
@@ -125,6 +141,7 @@
       <Linker Options="-O2" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Release" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -157,18 +174,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="FSMAudioStream">
-    <File Name="FSM_AudioStream.c"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="FSM_PO06">
-    <File Name="FSM_PO06Device.c"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="FSM_Statistic">
-    <File Name="FSM_StatisticServer.c"/>
-    <File Name="FSM_ClientModule.c"/>
-    <File Name="FSM_SettingServer.c"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="FSM_crypt">
-    <File Name="FSM_Crypt.c"/>
-  </VirtualDirectory>
 </CodeLite_Project>

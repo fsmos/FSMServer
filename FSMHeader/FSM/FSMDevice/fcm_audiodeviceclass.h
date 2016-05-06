@@ -61,8 +61,8 @@ struct FSME1Pkt
 {
     char channels;
     char count;
-    char Data[1024];
-};
+    char Data[1024]; 
+}__attribute__((__packed__ ));
 struct FSME1Buff
 {
     unsigned short count;
