@@ -33,12 +33,18 @@ enum FSMAD_RodDevice
     PO06=5,///< PO06
     MN524=6,///< MN524
 };
+struct FSME1Buff
+{
+    unsigned short count;
+    char Data[31][320];
+};
 struct FSM_E1Device
 {
     char reg;
     unsigned short iddev;
     int idstream;
     struct fsm_ethernet_dev* ethdev;
+    struct FSME1Buff E1buffs;
 };
 struct FSM_PO06Device
 {
@@ -63,11 +69,6 @@ struct FSME1Pkt
     char count;
     char Data[1024]; 
 }__attribute__((__packed__ ));
-struct FSME1Buff
-{
-    unsigned short count;
-    char Data[31][320];
-};
 void FSM_E1SendPacket(char* Data1,unsigned char len);
 #endif	/* FCM_AUDIODEVICECLASS_H */
 

@@ -35,6 +35,8 @@ int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas)
            
             FSMASDB[i].TransportDevice=fsmas.TransportDevice;
             FSMASDB[i].TransportDeviceType=fsmas.TransportDeviceType;
+            FSMASDB[i].Data=fsmas.Data;
+            FSMASDB[i].IDConnection=0xffff;
             FSM_sendpkt=FSM_GetAudioStreamCallback();
             switch(fsmas.TransportDeviceType)
             {
@@ -57,6 +59,25 @@ void  FSM_AudioStreamUnRegistr(int id)
     FSMASDB[id].reg=0;
 }
 EXPORT_SYMBOL(FSM_AudioStreamUnRegistr);
+
+unsigned short FSM_AudioStreamGETIDConnect(int id)
+{
+    return FSMASDB[id].IDConnection;
+}
+EXPORT_SYMBOL(FSM_AudioStreamGETIDConnect);
+
+void FSM_AudioStreamSetIDConnect(int id,unsigned short idcon,char type)
+{
+    FSMASDB[id].IDConnection=idcon;
+    FSMASDB[id].typcon=type;
+}
+EXPORT_SYMBOL(FSM_AudioStreamSetIDConnect);
+
+char FSM_AudioStreamGETTypeConnect(int id)
+{
+    return FSMASDB[id].typcon;
+}
+EXPORT_SYMBOL(FSM_AudioStreamGETTypeConnect);
 
 void FSM_AudioStreamToUser(int id,char* Data,short len)
 {
@@ -94,6 +115,11 @@ FSMASDB[id].TransportDevice=edev;
 FSMASDB[id].TransportDeviceType=FSM_EthernetID;
 }
 EXPORT_SYMBOL(FSM_AudioStreamSetEthernetDevice);
+void* FSM_AudioStreamData(int id)
+{
+    return FSMASDB[id].Data;
+}
+EXPORT_SYMBOL(FSM_AudioStreamData);
 
 static int __init FSM_AudioStream_init(void)
 {

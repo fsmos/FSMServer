@@ -102,8 +102,10 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
              //fsmas.ToUser=FSM_E1SendPacket;
              fsmas.TransportDevice= FSMPO06Dev[i].ethdev->numdev;
              fsmas.TransportDeviceType=FSM_EthernetID;
+             fsmas.Data=&FSMPO06Dev[i];
              FSMPO06Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
              FSMPO06Dev[i].iddev=fsmdt->IDDevice;
+             fsmdt->data=&FSMPO06Dev[i];
              FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream,fsmdt);
              printk( KERN_INFO "FSMPO06 Device Added %u \n",fsmdt->IDDevice); 
         

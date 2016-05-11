@@ -21,12 +21,18 @@ struct FSM_AudioStream
     FSM_StreamProcessProcess ToProcess;
     int TransportDevice;
     char TransportDeviceType;
+    unsigned short IDConnection;
+    char typcon;
+    void * Data;
 };
 
 int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas);
 void  FSM_AudioStreamUnRegistr(int id);
 void FSM_AudioStreamToUser(int id,char* Data,short len);
 void FSM_AudioStreamToProcess(int id,char* Data,short len);
-
+void* FSM_AudioStreamData(int id);
+unsigned short FSM_AudioStreamGETIDConnect(int id);
+void FSM_AudioStreamSetIDConnect(int id,unsigned short idcon,char type);
+char FSM_AudioStreamGETTypeConnect(int id);
 
 #endif

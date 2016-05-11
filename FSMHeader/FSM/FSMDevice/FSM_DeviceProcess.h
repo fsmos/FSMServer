@@ -20,7 +20,7 @@ struct FSM_DeviceTree
    struct FSM_DeviceFunctionTree* dt;///< Информации о виде устройства
    char state[32];
    void * config;
-  
+   void * data;
 };
 /*!
 \brief Прототип функции обратной связи

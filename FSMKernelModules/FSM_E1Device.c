@@ -16,7 +16,7 @@
 #include "FSM/FSMAudio/FSM_AudioStream.h"
 #include <FSM/FSMEthernet/FSMEthernetHeader.h> 
 
-struct FSME1Buff E1buffs;
+
 
 
 struct FSM_DeviceFunctionTree dft;
@@ -26,10 +26,10 @@ struct FSME1Pkt fsme1pkt2;
 struct FSM_SendAudioData sad;
 void FSM_SendToStream(void)
 {
-      
+      struct FSME1Buff* E1buffs = &(((struct FSM_E1Device*)FSM_AudioStreamData(1))->E1buffs);
       sad.IDDevice=0;
       sad.len=160;
-      memcpy(sad.Data,E1buffs.Data[0],sad.len);
+      memcpy(sad.Data,E1buffs->Data[0],sad.len);
       FSM_AudioStreamToUser(0,(char*)&sad,sizeof(struct FSM_SendAudioData)-sizeof(sad.Data)+sad.len); 
       
      // printk( KERN_INFO "Stream Recived %u \n",E1buffs.count); 
@@ -39,6 +39,7 @@ void FSM_E1RecivePacket(char* data,short len)
 {
     struct FSM_SendAudioData * FSMAPk=(struct FSM_SendAudioData * )data;
     struct FSME1Pkt * pkt= (struct FSME1Pkt *)FSMAPk->Data;
+     struct FSME1Buff* E1buffs = &(((struct FSM_E1Device*)FSM_AudioStreamData(1))->E1buffs);
    int i=0;
    int j=0;
    
@@ -47,14 +48,14 @@ void FSM_E1RecivePacket(char* data,short len)
    {
         for(j=0;j<pkt->channels;j++)
         {
-            E1buffs.Data[j][E1buffs.count]=(pkt->Data+(pkt->channels*i))[j];
+            E1buffs->Data[j][E1buffs->count]=(pkt->Data+(pkt->channels*i))[j];
         }
-        E1buffs.count++;
+        E1buffs->count++;
         //printk( KERN_INFO "Stream Recived %u \n",E1buffs.count); 
-        if( E1buffs.count>=160)
+        if( E1buffs->count>=160)
         {
             FSM_SendToStream();
-            E1buffs.count=0;
+            E1buffs->count=0;
             
         }
    }
@@ -132,8 +133,11 @@ void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
              //fsmas.ToUser=FSM_E1SendPacket;
              fsmas.TransportDevice=FSME1Dev[i].ethdev->numdev;
              fsmas.TransportDeviceType=FSM_EthernetID;
+             fsmas.Data=&FSME1Dev[i];
              FSME1Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
              FSME1Dev[i].iddev=fsmdt->IDDevice;
+             fsmdt->data=&FSME1Dev[i];
+                
              FSM_E1SendStreaminfo(FSME1Dev[i].idstream,fsmdt);
              printk( KERN_INFO "FSME1 Device Added %u \n",fsmdt->IDDevice); 
              
@@ -181,7 +185,7 @@ EXPORT_SYMBOL(FSM_E1Recive);
 
 static int __init FSME1Protocol_init(void)
 {
-   memset(&E1buffs,0,sizeof(struct FSME1Buff));
+   //memset(&E1buffs,0,sizeof(struct FSME1Buff));
    sad.codec=0;
    sad.CRC=0;
    sad.len=180;
@@ -193,7 +197,7 @@ static int __init FSME1Protocol_init(void)
    dft.Proc=FSM_E1Recive;
    dft.config_len=0;
    FSM_DeviceClassRegister(dft);
-   fsme1pkt2.channels=3;
+   fsme1pkt2.channels=7;
    FSME1Ethernet = FSM_FindDevice(FSM_EthernetID);
    if(FSME1Ethernet == 0 )
    {

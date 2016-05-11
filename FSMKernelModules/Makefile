@@ -9,6 +9,7 @@ TARGET6 =FSM_StatisticServer
 TARGET7 =FSM_PO06Device
 TARGET8 =FSM_Crypt
 TARGET9 =FSM_SettingServer
+TARGET10 =FSM_Commutator
 
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
@@ -19,6 +20,8 @@ obj-m   += ${TARGET6}.o
 obj-m   += ${TARGET7}.o
 obj-m   += ${TARGET8}.o
 obj-m   += ${TARGET9}.o
+obj-m   += ${TARGET10}.o
+
 all:
 	make -C $(KDIR) M=$(PWD) modules
 

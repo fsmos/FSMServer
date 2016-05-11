@@ -58,6 +58,9 @@
     <VirtualDirectory Name="FSMCrypt">
       <File Name="../FSMHeader/FSM/FSMCrypto/FSM_crypt.h"/>
     </VirtualDirectory>
+    <VirtualDirectory Name="FSM_Commutator">
+      <File Name="../FSMHeader/FSM/FSM_Commutator/FSM_Commutator.h"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Make">
     <File Name="Makefile"/>
@@ -174,4 +177,7 @@ source runs.prog</PostConnectCommands>
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="FSM_Commutator">
+    <File Name="FSM_Commutator.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>

@@ -42,5 +42,15 @@
 #define FSM_CryptoAlgoritmNum 6
 
 #define FSM_InterfaceID "esp4"
+
+#define FSM_Conferenc_num 10
+
+#define FSM_Circular_num 10
+
+#define FSM_P2P_abonent_count 2
+
+#define FSM_Conferenc_abonent_count 2
+
+#define FSM_Circulac_abonent_count 2
 #endif	/* FSM_SETTINGS_H */
 
