@@ -43,6 +43,9 @@ int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas)
             case FSM_EthernetID: 
             FSMASDB[i].ToUser=FSM_sendpkt;
             break;
+            case FSM_FifoID: 
+            FSMASDB[i].ToUser=fsmas.ToUser;
+            break;
             }
             printk( KERN_INFO "Registred Stream %u",i ); 
 
@@ -89,8 +92,13 @@ void FSM_AudioStreamToUser(int id,char* Data,short len)
     }
     if((((char*)&FSMASDB[id])[0]!=0)&&(FSMASDB[id].ToUser!=0)) FSMASDB[id].ToUser(Data,len, FSMASDB[id].TransportDevice);
 }
-
 EXPORT_SYMBOL(FSM_AudioStreamToUser);
+void FSM_AudioStreamSetToProcess(int id,FSM_StreamProcessProcess fsmtu)
+{
+    FSMASDB[id].ToProcess=fsmtu;
+}
+EXPORT_SYMBOL(FSM_AudioStreamSetToProcess);
+
 void FSM_AudioStreamToProcess(int id,char* Data,short len)
 {
     if(id==-1) return;
@@ -99,7 +107,8 @@ void FSM_AudioStreamToProcess(int id,char* Data,short len)
                //printk( KERN_INFO "NotStreamID TP\n" ); 
             return;
         }
-      FSMASDB[id].ToProcess(Data,len);
+        if(FSMASDB[id].ToProcess==0) return;
+        FSMASDB[id].ToProcess(Data,len);
 }
 EXPORT_SYMBOL(FSM_AudioStreamToProcess);
 
@@ -115,6 +124,20 @@ FSMASDB[id].TransportDevice=edev;
 FSMASDB[id].TransportDeviceType=FSM_EthernetID;
 }
 EXPORT_SYMBOL(FSM_AudioStreamSetEthernetDevice);
+
+void FSM_AudioStreamSetFIFODevice(int id,struct FSM_FIFOAS* edev)
+{
+FSMASDB[id].TransportDevice=edev;
+FSMASDB[id].TransportDeviceType=FSM_FifoID;
+}
+EXPORT_SYMBOL(FSM_AudioStreamSetFIFODevice);
+
+struct FSM_FIFOAS* FSM_AudioStreamGetFIFODevice(int id)
+{
+return FSMASDB[id].TransportDevice;
+}
+EXPORT_SYMBOL(FSM_AudioStreamGetFIFODevice);
+
 void* FSM_AudioStreamData(int id)
 {
     return FSMASDB[id].Data;

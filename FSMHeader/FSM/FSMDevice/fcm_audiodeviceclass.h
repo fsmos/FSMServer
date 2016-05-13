@@ -44,7 +44,8 @@ struct FSM_E1Device
     unsigned short iddev;
     int idstream;
     struct fsm_ethernet_dev* ethdev;
-    struct FSME1Buff E1buffs;
+    unsigned short streams_id[32];
+    //struct FSME1Buff E1buffs;
 };
 struct FSM_PO06Device
 {

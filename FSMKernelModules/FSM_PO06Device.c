@@ -40,6 +40,7 @@
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
 #include "FSM/FSMAudio/FSM_AudioStream.h"
+#include "FSM/FSM_Commutator/FSM_Commutator.h"
 
 
 struct FSM_DeviceFunctionTree dft;
@@ -98,7 +99,7 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
              FSMPO06Dev[i].reg=1;
              FSMPO06Dev[i].ethdev=FSM_FindEthernetDevice(fsmdt->IDDevice);
              fsmas.iddev=fsmdt->IDDevice;
-             fsmas.ToProcess=FSM_PO06RecivePacket;
+             //fsmas.ToProcess=FSM_PO06RecivePacket;
              //fsmas.ToUser=FSM_E1SendPacket;
              fsmas.TransportDevice= FSMPO06Dev[i].ethdev->numdev;
              fsmas.TransportDeviceType=FSM_EthernetID;
@@ -108,7 +109,9 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
              fsmdt->data=&FSMPO06Dev[i];
              FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream,fsmdt);
              printk( KERN_INFO "FSMPO06 Device Added %u \n",fsmdt->IDDevice); 
-        
+             FSM_P2P_Connect(FSMPO06Dev[i].idstream, FSM_FIFOAudioStreamGetAS(((struct FSM_E1Device*)(FSM_FindDevice(12)->data))->streams_id[0]));
+             
+             
    //datas[0]=0xd0;
    //datas[1]=0xd1;
    //FSM_AudioStreamToUser(0,datas,2); 

@@ -27,5 +27,8 @@ enum FSMComType
     Conferenc,
     Circular
 };
+unsigned short  FSM_P2P_Connect(unsigned short id1,unsigned short id2);
+void FSM_P2P_Disconnect(unsigned short idcon);
+void FSM_Commutator_Process(char* data,short len);
 
 #endif

@@ -74,6 +74,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="FSMAudioStream">
     <File Name="FSM_AudioStream.c"/>
+    <File Name="FSMFIFOAudioStream.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_PO06">
     <File Name="FSM_PO06Device.c"/>

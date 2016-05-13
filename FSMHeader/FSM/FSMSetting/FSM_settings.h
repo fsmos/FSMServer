@@ -23,6 +23,7 @@
 \brief ID Ethernet передатчика
 */
 #define FSM_EthernetID 1
+#define FSM_FifoID 0
 /*!
 \brief ID сервера статистики
 */
@@ -32,6 +33,8 @@
 \brief Размер дерева аудио потоков
 */
 #define FSM_AudioStreamDeviceTreeSize 100
+
+#define FSM_FIFOAudioStreamDeviceTreeSize 100
 /*!
 \brief Размер дерева E1 устройств потоков
 */
