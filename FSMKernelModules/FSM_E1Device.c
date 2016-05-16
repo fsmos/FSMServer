@@ -17,8 +17,6 @@
 #include <FSM/FSMEthernet/FSMEthernetHeader.h> 
 
 
-
-
 struct FSM_DeviceFunctionTree dft;
 struct FSM_DeviceTree* FSME1Ethernet;
 struct FSM_E1Device FSME1Dev[FSM_E1DeviceTreeSize];
@@ -131,7 +129,7 @@ void FSM_E1SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 
 void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
-    int i;
+    int i,j;
     struct FSM_AudioStream fsmas;
 
     switch(data[0])
@@ -166,9 +164,10 @@ void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
              fsmas.TransportDevice=0;
              fsmas.TransportDeviceType=FSM_FifoID;
              fsmdt->data=&FSME1Dev[i];
-             for(i=0;i<32;i++)
+             for(j=0;j<32;j++)
              {
-             FSM_FIFOAudioStreamRegistr(fsmas,&FSME1Dev[i].streams_id[i]);
+             FSM_FIFOAudioStreamRegistr(fsmas,&(FSME1Dev[i].streams_id[j]));
+              //printk( KERN_INFO "FSM %u \n",FSME1Dev[i].streams_id[j]); 
              }
              FSM_E1SendStreaminfo(FSME1Dev[i].idstream,fsmdt);
              printk( KERN_INFO "FSME1 Device Added %u \n",fsmdt->IDDevice); 

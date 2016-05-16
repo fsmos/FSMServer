@@ -44,7 +44,7 @@ int FSM_FIFOAudioStreamRegistr(struct FSM_AudioStream fsmas,unsigned short* idfi
                fsmfifoas[i].reg=1;
                fsmfifoas[i].streamid=fsmstream;
                FSM_AudioStreamSetFIFODevice(fsmstream,&fsmfifoas[i]);
-               idfifo=i;
+               *idfifo=i;
                return fsmstream;
            }
        }
@@ -90,7 +90,7 @@ int FSM_FIFOAudioStreamRead(char* Data,unsigned short count,unsigned short idfif
         }
         else
         {
-             Data[i]=0xd5;
+             Data[i]=0xff;
         }
     }
     return count;
@@ -105,6 +105,7 @@ EXPORT_SYMBOL(FSM_FIFOAudioStreamGetAS);
 static int __init FSM_FIFOAudioStream_init(void)
 {
    memset(fsmfifoas,0,sizeof(fsmfifoas));
+   sad.opcode=SendAudio;
    printk( KERN_INFO "FSM FIFO Audio Stream Module loaded\n" ); 
    return 0;  
 }

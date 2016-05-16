@@ -109,7 +109,8 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
              fsmdt->data=&FSMPO06Dev[i];
              FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream,fsmdt);
              printk( KERN_INFO "FSMPO06 Device Added %u \n",fsmdt->IDDevice); 
-             FSM_P2P_Connect(FSMPO06Dev[i].idstream, FSM_FIFOAudioStreamGetAS(((struct FSM_E1Device*)(FSM_FindDevice(12)->data))->streams_id[0]));
+             
+             FSM_P2P_Connect(FSMPO06Dev[i].idstream, 1);
              
              
    //datas[0]=0xd0;
