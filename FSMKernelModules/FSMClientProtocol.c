@@ -42,6 +42,8 @@ struct sock *nl_sk = NULL;
 struct FSM_DeviceFunctionTree dft;
 struct FSM_DeviceTree* dt;
 struct fsm_ethernet_dev fsdev[FSM_EthernetDeviceTreeSize];
+struct FSM_SendCmd fsmsc;
+struct fsm_ethernet_dev fsdev2;
 FSM_StreamProcessSend FSM_AudioStreamCallback;
 
  unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
@@ -140,7 +142,7 @@ void FSM_RegisterAudioStreamCallback(FSM_StreamProcessSend FSM_ASC)
 }
 EXPORT_SYMBOL(FSM_RegisterAudioStreamCallback);
 
-FSM_ADSendEthPack* FSM_GetAudioStreamCallback(void)
+FSM_ADSendEthPack FSM_GetAudioStreamCallback(void)
 {
     return FSM_Send_Ethernet_Package2;
 }
@@ -150,8 +152,7 @@ EXPORT_SYMBOL(FSM_GetAudioStreamCallback);
 int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev, 
                    struct packet_type *pt, struct net_device *odev ) { 
      struct FSM_DeviceTree* dftv;
-     struct FSM_SendCmd fsmsc;
-     struct fsm_ethernet_dev fsdev2;
+
      char dats= ((char*)skb->data)[0];
      struct ethhdr *eth=eth_hdr(skb);
     
@@ -201,7 +202,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           case AnsPing:///< Пинг
           break;
           case SendCmdToDevice:///< Отправка команды устройству
-          return;
+          return 0;
           break;
           case AnsSendCmdToDevice: ///< Подтверждение приёма команды устройством
           break;
@@ -243,7 +244,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           case SendAudio:///< Передача аудио данных
           //printk( KERN_INFO "FSM ID %u\n",((struct FSM_SendAudioData*)skb->data)->IDDevice); 
           if((FSM_AudioStreamCallback!=0)&&(((struct FSM_SendAudioData*)skb->data)->IDDevice<FSM_AudioStreamDeviceTreeSize) )FSM_AudioStreamCallback(((struct FSM_SendAudioData*)skb->data)->IDDevice,skb->data,skb->len);
-            return;         
+            return 0;         
           break;
           case SendVideo:///< Передача видео данных
            break;

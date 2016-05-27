@@ -34,6 +34,6 @@ struct fsm_ethernet_dev
 unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev);
 unsigned int FSM_Send_Ethernet_Package2(void * data, int len, int id);
 void FSM_RegisterAudioStreamCallback(FSM_StreamProcessSend FSM_ASC);
-FSM_ADSendEthPack* FSM_GetAudioStreamCallback(void);
+FSM_ADSendEthPack FSM_GetAudioStreamCallback(void);
 struct fsm_ethernet_dev*  FSM_FindEthernetDevice(unsigned short id);
 #endif

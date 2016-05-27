@@ -20,7 +20,7 @@ FSM_ADSendEthPack FSM_sendpkt;
 struct FSM_AudioStream FSMASDB[FSM_AudioStreamDeviceTreeSize];
  unsigned int FSM_AudioStrean_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
  {
-     FSM_Send_Ethernet_Package2(data,len,fsmdev);
+     return FSM_Send_Ethernet_Package2(data,len,fsmdev);
  }
 int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas)
 {

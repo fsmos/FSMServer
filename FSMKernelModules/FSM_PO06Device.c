@@ -46,7 +46,7 @@
 struct FSM_DeviceFunctionTree dft;
 struct FSM_DeviceTree* FSMPO06Ethernet;
 struct FSM_PO06Device FSMPO06Dev[FSM_PO06DeviceTreeSize];
-
+struct FSM_SendCmd sendcmd;
 
 void FSM_PO06RecivePacket(char* data,short len)
 {
@@ -59,7 +59,7 @@ void FSM_PO06RecivePacket(char* data,short len)
 void FSM_PO06SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 {
     short plen;
-    struct FSM_SendCmd sendcmd;
+  
     memset(&sendcmd,0,sizeof(struct FSM_SendCmd));
     sendcmd.opcode=SendCmdToDevice;
     sendcmd.IDDevice=fsmdt->IDDevice;
@@ -77,6 +77,7 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
     int i;
     struct FSM_AudioStream fsmas;
+    struct FSM_SendCmdTS* scmd=data;
         // char datas[2];
          
     switch(data[0])
@@ -107,10 +108,11 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
              FSMPO06Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
              FSMPO06Dev[i].iddev=fsmdt->IDDevice;
              fsmdt->data=&FSMPO06Dev[i];
+             fsmdt->config=&FSMPO06Dev[i].po06set;
              FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream,fsmdt);
              printk( KERN_INFO "FSMPO06 Device Added %u \n",fsmdt->IDDevice); 
              
-             FSM_P2P_Connect(FSMPO06Dev[i].idstream, 1);
+             FSM_P2P_Connect(FSMPO06Dev[i].idstream, 2);
              
              
    //datas[0]=0xd0;
@@ -138,6 +140,20 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           case AnsPing:///< Пинг
           break;
           case SendCmdToServer: ///< Отправка команды серверу
+          switch(scmd->cmd)
+          {
+              case FSMPO06ConnectToDevE1:
+             // ((struct FSM_PO06Device*)((FSM_FindDevice(scmd->IDDevice))->data))->idcon=FSM_P2P_Connect(((struct FSM_PO06Device*)((FSM_FindDevice(scmd->IDDevice))->data))->idstream, ((struct FSM_E1Device*)(FSM_FindDevice(((struct FSMPO06CommCons*)scmd->Data)->id)->data))->streams_id[((struct FSMPO06CommCons*)scmd->Data)->channel]);
+              break;
+              case FSMPO06DisConnectToDevE1:
+              FSM_P2P_Disconnect(((struct FSM_PO06Device*)((FSM_FindDevice(scmd->IDDevice))->data))->idcon);
+              break;
+              case AnsGetSettingClientPo06:
+              printk( KERN_INFO "FSM_Set Recv %i\n",scmd->IDDevice);
+              memcpy(&((struct fsm_po06_setting*)(FSM_FindDevice(scmd->IDDevice)->config))->fsm_p006_su_s,scmd->Data,FSM_FindDevice(scmd->IDDevice)->dt->config_len);
+              break;
+          }
+          
            break;
           case SendTxtMassage: ///< Отправка текстового сообщения
            break;
@@ -157,15 +173,27 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
     printk( KERN_INFO "RPack %u \n" ,len); 
 }
 EXPORT_SYMBOL(FSM_PO06Recive);
+void ApplaySettingPO06(struct FSM_DeviceTree* df)
+{
+    printk( KERN_INFO "FSM_Set\n" ); 
+    sendcmd.cmd=SetSettingClientPo06;
+    sendcmd.countparam=1;
+    sendcmd.IDDevice=df->IDDevice;
+    sendcmd.CRC=0;
+    sendcmd.opcode=SendCmdToDevice;
+    memcpy(&sendcmd.Data,&(((struct FSM_PO06Device*)df->data)->po06set.fsm_p006_su_s),sizeof(struct fsm_po06_subscriber));
+    (FSM_FindDevice(FSM_EthernetID))->dt->Proc(&sendcmd,sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+sizeof(struct fsm_po06_subscriber),df);
+}
 
 static int __init FSM_PO06_init(void)
 {
+   dft.aplayp=ApplaySettingPO06;
    dft.type=(unsigned char)AudioDevice;
    dft.VidDevice=(unsigned char)CommunicationDevice;
    dft.PodVidDevice=(unsigned char)CCK;
    dft.KodDevice=(unsigned char)PO06;
    dft.Proc=FSM_PO06Recive;
-   dft.config_len=0;
+   dft.config_len=sizeof(struct fsm_po06_setting);
    FSM_DeviceClassRegister(dft);
    FSMPO06Ethernet = FSM_FindDevice(FSM_EthernetID);
    if(FSMPO06Ethernet == 0 )

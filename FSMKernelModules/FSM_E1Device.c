@@ -21,6 +21,7 @@ struct FSM_DeviceFunctionTree dft;
 struct FSM_DeviceTree* FSME1Ethernet;
 struct FSM_E1Device FSME1Dev[FSM_E1DeviceTreeSize];
 struct FSM_SendAudioData sade1;
+struct FSM_SendCmd sendcmd;
 void FSM_SendToStream(void)
 {
      /* struct FSME1Buff* E1buffs = &(((struct FSM_E1Device*)FSM_AudioStreamData(1))->E1buffs);
@@ -73,10 +74,12 @@ void FSM_E1RecivePacket(char* data,short len)
      for(i=0;i<pktout->count;i++)
      {
        for(j=0;j<pktout->channels;j++)  
-       {
+       { 
+           if(size>=1024) break; 
            FSM_FIFOAudioStreamRead(datar,1,E1SI[j]);
            datar++;
            size++;
+          
        }
      }
     sade1.len=size+2;
@@ -114,7 +117,7 @@ EXPORT_SYMBOL(FSM_E1SendPacket);
 void FSM_E1SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 {
     short plen;
-    struct FSM_SendCmd sendcmd;
+    
     memset(&sendcmd,0,sizeof(struct FSM_SendCmd));
     sendcmd.opcode=SendCmdToDevice;
     sendcmd.IDDevice=fsmdt->IDDevice;
@@ -216,8 +219,8 @@ EXPORT_SYMBOL(FSM_E1Recive);
 
 static int __init FSME1Protocol_init(void)
 {
-    int i;
-    struct FSM_AudioStream fsmas;
+    //int i;
+   // struct FSM_AudioStream fsmas;
    memset(&FSME1Dev,0,sizeof(FSME1Dev));
    sade1.codec=0;
    sade1.CRC=0;

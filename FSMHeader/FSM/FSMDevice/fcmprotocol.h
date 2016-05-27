@@ -181,7 +181,7 @@ struct FSM_SendCmdTS
    unsigned char cmd;///< Команда
    unsigned char countparam;///< Количество параметров
    unsigned char CRC;///< CRC
-   unsigned char Data[1500];///< Параметры
+   unsigned char Data[1500] __attribute__((aligned(4)));///< Параметры
 };
 /*!
 \brief Отправка текстового сообщения

@@ -9,7 +9,7 @@
 #ifndef FSM_DEVICEPROCESS_H
 #define	FSM_DEVICEPROCESS_H
 
-typedef void (*ApplayProcess)(struct FSM_DeviceTree*);
+
 /*!
 \brief Информации о  устройстве
 */
@@ -25,6 +25,8 @@ struct FSM_DeviceTree
 /*!
 \brief Прототип функции обратной связи
 */
+typedef void (*ApplayProcess)(struct FSM_DeviceTree*);
+
 typedef void (*DeviceProcess)(char*,short, struct FSM_DeviceTree*);
 /*!
 \brief Информации о виде устройства

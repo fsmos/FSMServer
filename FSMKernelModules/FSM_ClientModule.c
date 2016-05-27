@@ -50,7 +50,7 @@ static struct class *cl; // Global variable for the device class
 static dev_t firstset; // Global variable for the first device number
 static struct cdev c_devset; // Global variable for the character device structure
 static struct class *clset; // Global variable for the device class
-char is_device_open;
+char is_device_open,is_device_openset;
 char *dthw="Hello World";
 struct fsm_statusstruct fsm_ss;
 struct fsm_devices_config fsm_ds;
@@ -329,17 +329,17 @@ static ssize_t device_read( struct file *filp, /* include/linux/fs.h */
 
 static int deviceset_open( struct inode *inode, struct file *file )
 {
- if ( is_device_open )
+ if ( is_device_openset )
   return -EBUSY;
   printk(KERN_INFO "%s",file->f_path.dentry->d_name.name);
- is_device_open++;
+ is_device_openset++;
 
  return SUCCESS;
 }
 
 static int deviceset_release( struct inode *inode, struct file *file )
 {
- is_device_open--;
+ is_device_openset--;
  return SUCCESS;
 }
 

@@ -104,7 +104,7 @@ void FSM_Setting_Applay(struct FSM_DeviceTree* fdt,void* set)
 {
   if(fdt==0) return;
   memcpy(fdt->config,set,fdt->dt->config_len);
- // printk( KERN_INFO "FSMAP %i\n", fdt->dt->aplayp); 
+  printk( KERN_INFO "FSMAP %i\n", fdt->IDDevice); 
   if(fdt->dt->aplayp!=0) fdt->dt->aplayp(fdt);
 }
 EXPORT_SYMBOL(FSM_Setting_Applay);

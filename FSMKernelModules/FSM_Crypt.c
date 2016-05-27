@@ -40,6 +40,13 @@ void FSMSetKey(char id,void* key)
     if(FSMCA[id].reg==1) FSMCA[id].Keys=key;
 }
 EXPORT_SYMBOL(FSMSetKey);
+void* FSMGetKey(char id)
+{
+    if(FSMCA[id].reg==1) return FSMCA[id].Keys;
+    else return 0;
+    
+}
+EXPORT_SYMBOL(FSMGetKey);
 
 static int __init FSMCrypto_init(void)
 {
