@@ -175,6 +175,7 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 EXPORT_SYMBOL(FSM_PO06Recive);
 void ApplaySettingPO06(struct FSM_DeviceTree* df)
 {
+    memset(&sendcmd,0,sizeof(sendcmd));
     printk( KERN_INFO "FSM_Set\n" ); 
     sendcmd.cmd=SetSettingClientPo06;
     sendcmd.countparam=1;

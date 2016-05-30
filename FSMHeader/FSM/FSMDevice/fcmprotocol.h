@@ -283,7 +283,10 @@ struct FSM_SendEncMessage_Header
    unsigned short IDDevice;///< Ид устройства
    
    unsigned short alg;///< Алгоритм
+   unsigned short pin;///< Алгоритм
+   
    unsigned short len;///< Длина
+   unsigned char lang[2]; ///< Язык
   
 } __attribute__((aligned(4)));
 
@@ -294,7 +297,11 @@ struct FSM_SendEncMessage
    unsigned short IDDevice;///< Ид устройства
    
    unsigned short alg;///< Алгоритм
+   unsigned short pin;///< Алгоритм
+   
    unsigned short len;///< Длина
+   unsigned char lang[2]; ///< Язык
+   
   
    unsigned char Data[FSMCountDATA];///< Текст
 } __attribute__((aligned(4)));
