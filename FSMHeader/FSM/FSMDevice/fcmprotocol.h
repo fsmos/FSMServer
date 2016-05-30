@@ -7,6 +7,8 @@
 */
 #ifndef FCMPROTOCOL
 #define FCMPROTOCOL
+#define FSMCountDATASlot 375
+#define FSMCountDATA FSMCountDATASlot * 4
 
 /*!
 \brief Коды операци
@@ -76,540 +78,1001 @@ enum FSM_TypeDevice
 /*!
 \brief Регистрация устроства
 */
+#define FSMH_Header_Size_DeviceRegistr  8 
 struct FSM_DeviceRegistr
 {
    unsigned char opcode; ///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства 
+  
    unsigned char type;///< Тип устройства
    unsigned char VidDevice;///< Вид устройства
-   unsigned  char PodVidDevice;///< Подвид устройства
+   unsigned char PodVidDevice;///< Подвид устройства  
    unsigned char KodDevice;///<Код устройства
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char CRC;///< CRC
-};
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение регистрации
 */
+#define FSMH_Header_Size_AnsDeviceRegistr  8 
 struct FSM_AnsDeviceRegistr
 {
    unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
    unsigned char type;///< Тип устройства
    unsigned char VidDevice;///< Вид устройства
    unsigned char PodVidDevice;///< Подвид устройства
    unsigned char KodDevice;///<Код устройства
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char CRC;///< CRC
-};
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Удаление устройства из списка
 */
+#define FSMH_Header_Size_FSM_DeviceDelete  4 
 struct FSM_DeviceDelete
 {
    unsigned char opcode;///< Код операции
-   unsigned  short IDDevice;///< Ид устройства
    unsigned char CRC;///< CRC
-};
+   unsigned  short IDDevice;///< Ид устройства
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение удаления устройства из списка
 */
+#define FSMH_Header_Size_AnsDeviceDelete  4 
 struct FSM_AnsDeviceDelete
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Пинг
 */
+#define FSMH_Header_Size_Ping 4 
 struct FSM_Ping
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+} __attribute__((aligned(4)));
 /*!
 \brief Отправка команды устройству
 */
+#define FSMH_Header_Size_SendCmd  8 
+struct FSM_SendCmd_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short cmd;///< Команда
+   unsigned short countparam;///< Количество параметров
+   
+} __attribute__((aligned(4)));
 struct FSM_SendCmd
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char cmd;///< Команда
-   unsigned char countparam;///< Количество параметров
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-   unsigned char Data[1500] __attribute__((aligned(4)));///< Параметры
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short cmd;///< Команда
+   unsigned short countparam;///< Количество параметров
+   
+   unsigned char Data[FSMCountDATA];///< Параметры
+} __attribute__((aligned(4)));
 /*!
 \brief  Подтверждение приёма команды устройством
 */
+#define FSMH_Header_Size_AnsSendCmd  8 
 struct FSM_AnsSendCmd
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char cmd;///< Команда
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short cmd;///< Команда
+   unsigned short countparam;///< Количество параметров
+} __attribute__((aligned(4)));
 /*!
 \brief Ответ на команду устройством
 */
+#define FSMH_Header_Size_AnsCmd  8 
 struct FSM_AnsCmd
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char cmd;///< Команда
-   unsigned char countparam;///< Количество параметров
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Параметры
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short cmd;///< Команда
+   unsigned short countparam;///< Количество параметров
+  
+   unsigned char Data[FSMCountDATA];///< Параметры
+} __attribute__((aligned(4)));
 /*!
 \brief  Подтверждение приёма команды сервером
 */
+#define FSMH_Header_Size_AnsAnsCmd  8 
 struct FSM_AnsAnsCmd
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char cmd;///< Команда
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short cmd;///< Команда
+   unsigned short countparam;///< Количество параметров
+} __attribute__((aligned(4)));
 
 /*!
 \brief Отправка команды серверу
 */
+#define FSMH_Header_Size_SendCmdTS  8 
+struct FSM_SendCmdTS_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short cmd;///< Команда
+   unsigned short countparam;///< Количество параметров
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendCmdTS
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char cmd;///< Команда
-   unsigned char countparam;///< Количество параметров
    unsigned char CRC;///< CRC
-   unsigned char Data[1500] __attribute__((aligned(4)));///< Параметры
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short cmd;///< Команда
+   unsigned short countparam;///< Количество параметров
+   
+   unsigned char Data[FSMCountDATA];///< Параметры
+} __attribute__((aligned(4)));
 /*!
 \brief Отправка текстового сообщения
 */
+#define FSMH_Header_Size_SendMessage 8 
+struct FSM_SendMessage_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short len;///< Длина
+   unsigned char lang[2]; ///< Язык
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendMessage
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned short len;///< Длина
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short len;///< Длина
+   unsigned char lang[2]; ///< Язык
+  
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение приёма текстового сообщения
 */
+#define FSMH_Header_Size_AnsSendMessage  8 
 struct FSM_AnsSendMessage
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   
+   unsigned short len;///< Длина
+   unsigned char lang[2]; ///< Язык
+   
+}__attribute__((aligned(4)));
 /*!
 \brief Отправка зашифрованного текстового сообщения
 */
+#define FSMH_Header_Size_SendEncMessage  8 
+struct FSM_SendEncMessage_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short alg;///< Алгоритм
+   unsigned short len;///< Длина
+  
+} __attribute__((aligned(4)));
+
 struct FSM_SendEncMessage
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char alg;///< Алгоритм
-   unsigned char len;///< Длина
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short alg;///< Алгоритм
+   unsigned short len;///< Длина
+  
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение приёма зашифрованного текстового сообщения
 */
+#define FSMH_Header_Size_AnsSendEncMessage  8 
 struct FSM_AnsSendEncMessage
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char alg;///< Алгоритм
-   unsigned char len;///< Длина
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short alg;///< Алгоритм
+   unsigned short len;///< Длина
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Передача аудио данных
 */
+#define FSMH_Header_Size_SendAudioData  8 
+struct FSM_SendAudioData_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short codec;///< Кодек
+   unsigned short len;///< Длина
+  
+} __attribute__((aligned(4)))  ;
+
 struct FSM_SendAudioData
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char codec;///< Кодек
-   unsigned short len;///< Длина
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-   unsigned char Data[1480];///< Аудио
-}  ;
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short codec;///< Кодек
+   unsigned short len;///< Длина
+  
+   unsigned char Data[FSMCountDATA];///< Аудио
+} __attribute__((aligned(4)))  ;
 /*!
 \brief Передача видео данных
 */
+#define FSMH_Header_Size_SendVideoData  8 
+struct FSM_SendVideoData_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short codec;///< Кодек
+   unsigned short len;///< Длина
+} __attribute__((aligned(4)));
+
 struct FSM_SendVideoData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char codec;///< Кодек
-   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Видео
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short codec;///< Кодек
+   unsigned short len;///< Длина
+   
+   unsigned char Data[FSMCountDATA];///< Видео
+} __attribute__((aligned(4)));
 /*!
 \brief Передача бинарных данных
 */
+#define FSMH_Header_Size_SendBinData  8 
+struct FSM_SendBinData_Header
+{
+   unsigned char opcode;///< Код операцииu
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short len;///< Длина
+   unsigned short datatype;///< Тип данных
+
+} __attribute__((aligned(4)));
+
 struct FSM_SendBinData
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned short len;///< Длина
+   unsigned char opcode;///< Код операцииu
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Данные
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short len;///< Длина
+   unsigned short datatype;///< Тип данных
+   
+   unsigned char Data[FSMCountDATA];///< Данные
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение приёма бинарных данных
 */
+#define FSMH_Header_Size_AnsSendBinData  8 
 struct FSM_AnsSendBinData
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned short len;///< Длина
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short len;///< Длина
+   unsigned short datatype;///< Тип данных
+  
+}__attribute__((aligned(4))) ;
 /*!
 \brief Отправить СМС
 */
+#define FSMH_Header_Size_SendSmsData  24 
+struct FSM_SendSmsData_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short len;///< Длина
+   
+   unsigned char number[16];///< Номера телефона
+
+} __attribute__((aligned(4)));
+
 struct FSM_SendSmsData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lennumber;///< Длина номера телефона
-   unsigned char number[15];///< Номера телефона
-   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short len;///< Длина
+   
+   unsigned char number[16];///< Номера телефона
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение СМС
 */
+#define FSMH_Header_Size_ansSendSmsData  24 
 struct FSM_ansSendSmsData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lennumber;///< Длина номера телефона
-   unsigned char number[15];///< Номера телефона
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short len;
+   unsigned short lennumber;///< Длина номера телефона
+   
+   unsigned char number[16];///< Номера телефона
+} __attribute__((aligned(4)));
 /*!
 \brief Передача СМС устройству
 */
+#define FSMH_Header_Size_SendSmsDatatoDev  24 
+struct FSM_SendSmsDatatoDev_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short len;///< Длина
+   
+   unsigned char number[16];///< Номера телефона
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendSmsDatatoDev
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lennumber;///< Длина номера телефона
-   unsigned char number[15];///< Номера телефона
-   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short len;///< Длина
+   
+   unsigned char number[16];///< Номера телефона
+   
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение СМС устройством
 */
+#define FSMH_Header_Size_ansSendSmsDatatoDev  24 
 struct FSM_ansSendSmsDatatoDev
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lennumber;///< Длина номера телефона
-   unsigned char number[15];///< Номера телефона
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short len;///< Длина
+   
+   unsigned char number[16];///< Номера телефона
+  
+} __attribute__((aligned(4)));
 /*!
 \brief Отправить зашифрованного СМС
 */
+#define FSMH_Header_Size_SendEncSmsData  28 
+struct FSM_SendEncSmsData_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+   
+   unsigned char number[16];///< Номера телефона
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendEncSmsData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lennumber;///< Длина номера телефона
-   unsigned char number[15];///< Номера телефона
-   unsigned char alg;///<Алгоритм
-   unsigned char len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+   
+   unsigned char number[16];///< Номера телефона
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение зашифрованного СМС
 */
+#define FSMH_Header_Size_ansSendEncSmsData  24
 struct FSM_ansSendEncSmsData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lennumber;///< Длина номера телефона
-   unsigned char number[15];///< Номера телефона
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short alg;///<Алгоритм
+   
+   unsigned char number[16];///< Номера телефона
+  
+} __attribute__((aligned(4)));
 /*!
 \brief Отправить зашифрованного СМС устройству
 */
+#define FSMH_Header_Size_SendEncSmsDatatoDev  28
+struct FSM_SendEncSmsDatatoDev_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+     
+   unsigned char number[16];///< Номера телефона
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendEncSmsDatatoDev
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lennumber;///< Длина номера телефона
-   unsigned char number[15];///< Номера телефона
-   unsigned char alg;///<Алгоритм
-   unsigned char len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+     
+   unsigned char number[16];///< Номера телефона
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение зашифрованного СМС  устройства
 */
+#define FSMH_Header_Size_ansSendEncSmsDatatoDev  24
 struct FSM_ansSendEncSmsDatatoDev
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lennumber;///< Длина номера телефона
-   unsigned char number[15];///< Номера телефона
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lennumber;///< Длина номера телефона
+   unsigned short alg;///<Алгоритм
+   
+   unsigned char number[16];///< Номера телефона
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Отправка email
 */
+#define FSMH_Header_Size_SendEmailData  40
+struct FSM_SendEmailData_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+  
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+   
+   unsigned char email[32];///< email
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendEmailData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenemail;///< Длина email
-   unsigned char email[25];///< email
-   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+  
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+   
+   unsigned char email[32];///< email
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение email
 */
+#define FSMH_Header_Size_AnsSendEmailData  40
 struct FSM_AnsSendEmailData
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenemail;///< Длина email
-   unsigned char email[25];///< email
+   unsigned char opcode;///< Код операции   
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+   
+   unsigned char email[32];///< email
+
+} __attribute__((aligned(4)));
 /*!
 \brief Передача email устройству
 */
+#define FSMH_Header_Size_SendEmailDatatoDev  40
+struct FSM_SendEmailDatatoDev_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+   
+   unsigned char email[32];///< email
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendEmailDatatoDev
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenemail;///< Длина email
-   unsigned char email[25];///< email
-   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+   
+   unsigned char email[32];///< email
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение email устройством
 */
+#define FSMH_Header_Size_AnsSendEmailDatatoDev  40
 struct FSM_AnsSendEmailDatatoDev
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenemail;///< Длина email
-   unsigned char email[25];///< email
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+   
+   unsigned char email[32];///< email
+  
+} __attribute__((aligned(4)));
 /*!
 \brief Отправить зашифрованного email
 */
+#define FSMH_Header_Size_SendEncEmailData  44
+
+struct FSM_SendEncEmailData_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+    
+   unsigned char email[32];///< email
+  
+} __attribute__((aligned(4)));
+
 struct FSM_SendEncEmailData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenemail;///< Длина email
-   unsigned char email[25];///< email
-   unsigned char alg;///<Алгоритм
-   unsigned char len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+    
+   unsigned char email[32];///< email
+  
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение зашифрованного email
 */
+#define FSMH_Header_Size_AnsSendEncEmailData 40
 struct FSM_AnsSendEncEmailData
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenemail;///< Длина email
-   unsigned char email[25];///< email
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short alg;///<Алгоритм
+   
+   unsigned char email[32];///< email
+  
+} __attribute__((aligned(4)));
 /*!
 \brief Отправить зашифрованного email устройству
 */
+#define FSMH_Header_Size_SendEncEmailDatatoDev  44
+struct FSM_SendEncEmailDatatoDev_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+  
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+   
+   unsigned char email[32];///< email
+
+} __attribute__((aligned(4)));
+
 struct FSM_SendEncEmailDatatoDev
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenemail;///< Длина email
-   unsigned char email[25];///< email
-   unsigned char alg;///<Алгоритм
-   unsigned char len;///< Длина
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short len;///< Длина
+  
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+   
+   unsigned char email[32];///< email
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение зашифрованного email   устройства
 */
+#define FSMH_Header_Size_AnsSendEncEmailDatatoDev  40
 struct FSM_AnsSendEncEmailDatatoDev
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenemail;///< Длина email
-   unsigned char email[25];///< email
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenemail;///< Длина email
+   unsigned short alg;///<Алгоритм
+   
+   unsigned char email[32];///< email
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Отправка сообщение в социальную сеть
 */
+#define FSMH_Header_Size_SendSocData  44
+struct FSM_SendSocData_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short len;///< Длина
+   
+   unsigned short sctype;///<Тип социально сети
+   unsigned short num_zap;///<Номер записи
+   
+   unsigned char login[32];///< login
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendSocData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenlogin;///< Длина login
-   unsigned char login[25];///< login
-   unsigned char sctype;///<Тип социально сети
-   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short len;///< Длина
+   
+   unsigned short sctype;///<Тип социально сети
+   unsigned short num_zap;///<Номер записи
+   
+   unsigned char login[32];///< login
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение сообщения в социальную сеть
 */
+#define FSMH_Header_Size_AnsSendSocData  40
 struct FSM_AnsSendSocData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenlogin;///< Длина login
-   unsigned char login[25];///< login
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short sctype;///<Тип социально сети
+   
+   unsigned char login[32];///< login
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Передача   сообщения в социальную сеть устройству
 */
+#define FSMH_Header_Size_SendSocDatatoDev  44
+
+struct FSM_SendSocDatatoDev_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short len;///< Длина
+   
+   unsigned short sctype;///<Тип социально сети
+   unsigned short num_zap;///<Номер записи
+   
+   unsigned char login[32];///< login
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendSocDatatoDev
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenlogin;///< Длина login
-   unsigned char login[25];///< login
-   unsigned char sctype;///<Тип социально сети
-   unsigned short len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short len;///< Длина
+   
+   unsigned short sctype;///<Тип социально сети
+   unsigned short num_zap;///<Номер записи
+   
+   unsigned char login[32];///< login
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение  сообщения в социальную сеть устройством
 */
+#define FSMH_Header_Size_AnsSendSocDatatoDev  40 
 struct FSM_AnsSendSocDatatoDev
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenlogin;///< Длина login
-   unsigned char login[25];///< login
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short sctype;///<Тип социально сети
+   
+   unsigned char login[32];///< login
+   
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Отправить зашифрованного сообщения в социальную сеть
 */
+#define FSMH_Header_Size_SendEncSocData  48 
+struct FSM_SendEncSocData_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+  
+   unsigned short sctype;///<Тип социально сети
+   unsigned short num_zap;///<Номер записи
+    
+   unsigned char login[32];///< login
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendEncSocData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenlogin;///< Длина login
-   unsigned char login[25];///< login
-   unsigned char sctype;///<Тип социально сети
-   unsigned char alg;///<Алгоритм
-   unsigned char len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+  
+   unsigned short sctype;///<Тип социально сети
+   unsigned short num_zap;///<Номер записи
+    
+   unsigned char login[32];///< login
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение зашифрованного сообщения в социальную сеть
 */
+#define FSMH_Header_Size_AnsSendEncSocData 40
 struct FSM_AnsSendEncSocData
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenlogin;///< Длина login
-   unsigned char login[25];///< login
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short sctype;///<Тип социально сети
+   
+   unsigned char login[32];///< login
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Отправить зашифрованного сообщения в социальную сеть устройству
 */
+#define FSMH_Header_Size_SendEncSocDatatoDev  48
+struct FSM_SendEncSocDatatoDev_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+  
+   unsigned short sctype;///<Тип социально сети
+   unsigned short num_zap;///<Номер записи
+   
+  
+   unsigned char login[32];///< login
+   
+} __attribute__((aligned(4)));
+
 struct FSM_SendEncSocDatatoDev
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenlogin;///< Длина login
-   unsigned char login[25];///< login
-   unsigned char sctype;///<Тип социально сети
-   unsigned char alg;///<Алгоритм
-   unsigned char len;///< Длина
    unsigned char CRC;///< CRC
-   unsigned char Data[250];///< Текст
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short len;///< Длина
+   
+   unsigned short alg;///<Алгоритм
+   unsigned short pin;///<Пин код
+  
+   unsigned short sctype;///<Тип социально сети
+   unsigned short num_zap;///<Номер записи
+   
+  
+   unsigned char login[32];///< login
+   
+   unsigned char Data[FSMCountDATA];///< Текст
+} __attribute__((aligned(4)));
 /*!
 \brief Подтверждение зашифрованного сообщения в социальную сеть   устройства
 */
+#define FSMH_Header_Size_AnsSendEncSocDatatoDev  40
 struct FSM_AnsSendEncSocDatatoDev
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned char lenlogin;///< Длина login
-   unsigned char login[25];///< login
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned short lenlogin;///< Длина login
+   unsigned short sctype;///<Тип социально сети
+   
+   unsigned char login[32];///< login
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Тревога
 */
+#define FSMH_Header_Size_AlernSignal  8 
 struct FSM_AlernSignal
 {
-   unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned short ID;///< Ид Тревоги
+   unsigned char opcode;///< Код операции 
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned int ID;///< Ид Тревоги
+  
+} __attribute__((aligned(4)));
 /*!
 \brief Предупреждение
 */
+#define FSMH_Header_Size_WarningSignal 8 
 struct FSM_WarningSignal
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned short ID;///< Ид Предупреждения
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned int ID;///< Ид Предупреждения
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Сбой
 */
+#define FSMH_Header_Size_TroubleSignal  8 
 struct FSM_TroubleSignal
 {
    unsigned char opcode;///< Код операции
-   unsigned short IDDevice;///< Ид устройства
-   unsigned short ID;///< Ид Предупреждения
    unsigned char CRC;///< CRC
-};
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned int ID;///< Ид Предупреждения
+   
+} __attribute__((aligned(4)));
 /*!
 \brief Звуковой сигнал
 */
+#define FSMH_Header_Size_BeepSignal  8 
 struct FSM_BeepSignal
 {
    unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CR
    unsigned short IDDevice;///< Ид устройства
+   
    unsigned short ID;///< Ид Звукового сигнала
-   unsigned char CRC;///< CRC
-};
+} __attribute__((aligned(4)));
 
 #endif // FCMPROTOCOL
 
