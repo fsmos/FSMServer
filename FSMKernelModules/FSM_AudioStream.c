@@ -18,10 +18,12 @@
 FSM_ADSendEthPack FSM_sendpkt;
 
 struct FSM_AudioStream FSMASDB[FSM_AudioStreamDeviceTreeSize];
- unsigned int FSM_AudioStrean_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
+ /*
+  *unsigned int FSM_AudioStrean_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
  {
      return FSM_Send_Ethernet_Package2(data,len,fsmdev);
  }
+  */
 int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas)
 {
     int i;
@@ -41,7 +43,7 @@ int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas)
             switch(fsmas.TransportDeviceType)
             {
             case FSM_EthernetID: 
-            FSMASDB[i].ToUser=FSM_sendpkt;
+            FSMASDB[i].ToUser=(FSM_StreamProcessUser)FSM_sendpkt;
             break;
             case FSM_FifoID: 
             FSMASDB[i].ToUser=fsmas.ToUser;
@@ -112,27 +114,27 @@ void FSM_AudioStreamToProcess(int id,char* Data,short len)
 }
 EXPORT_SYMBOL(FSM_AudioStreamToProcess);
 
-struct fsm_ethernet_dev* FSM_AudioStreamGetEthernetDevice(int id)
+int FSM_AudioStreamGetEthernetDevice(int id)
 {
-    return (struct fsm_ethernet_dev* )FSMASDB[id].TransportDevice;
+    return FSMASDB[id].TransportDevice;
 }
 EXPORT_SYMBOL(FSM_AudioStreamGetEthernetDevice);
 
 void FSM_AudioStreamSetEthernetDevice(int id,struct fsm_ethernet_dev* edev)
 {
-FSMASDB[id].TransportDevice=edev;
+FSMASDB[id].TransportDevice=edev->numdev;
 FSMASDB[id].TransportDeviceType=FSM_EthernetID;
 }
 EXPORT_SYMBOL(FSM_AudioStreamSetEthernetDevice);
 
-void FSM_AudioStreamSetFIFODevice(int id,struct FSM_FIFOAS* edev)
+void FSM_AudioStreamSetFIFODevice(int id,int edev)
 {
 FSMASDB[id].TransportDevice=edev;
 FSMASDB[id].TransportDeviceType=FSM_FifoID;
 }
 EXPORT_SYMBOL(FSM_AudioStreamSetFIFODevice);
 
-struct FSM_FIFOAS* FSM_AudioStreamGetFIFODevice(int id)
+int FSM_AudioStreamGetFIFODevice(int id)
 {
 return FSMASDB[id].TransportDevice;
 }
@@ -146,7 +148,7 @@ EXPORT_SYMBOL(FSM_AudioStreamData);
 
 static int __init FSM_AudioStream_init(void)
 {
-    FSM_RegisterAudioStreamCallback(FSM_AudioStreamToProcess);
+    FSM_RegisterAudioStreamCallback((FSM_StreamProcessSend)FSM_AudioStreamToProcess);
    memset(FSMASDB,0,sizeof(FSMASDB));
    printk( KERN_INFO "FSM Audio Stream Module loaded\n" ); 
    return 0;  

@@ -18,6 +18,7 @@ int FSMCrypt_UnRegister(FunctionEncDec Encode,FunctionEncDec Decode,char id);
 void FSMEncrypt(char id,char* dst,char * src,short len);
 void FSMDecrypt(char id,char* dst,char * src,short len);
 void* FSMGetKey(char id);
+void FSMSetKey(char id,void* key);
 
 enum FSMEncAlgList
 {

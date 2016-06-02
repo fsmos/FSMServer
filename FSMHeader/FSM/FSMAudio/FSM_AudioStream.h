@@ -46,13 +46,13 @@ void* FSM_AudioStreamData(int id);
 unsigned short FSM_AudioStreamGETIDConnect(int id);
 void FSM_AudioStreamSetIDConnect(int id,unsigned short idcon,char type);
 char FSM_AudioStreamGETTypeConnect(int id);
-void FSM_AudioStreamSetFIFODevice(int id,struct FSM_FIFOAS* edev);
-struct FSM_FIFOAS* FSM_AudioStreamGetFIFODevice(int id);
+int FSM_AudioStreamGetFIFODevice(int id);
 void FSM_FIFOAudioStreamTobuffer(char* Data,short len,int id);
 int FSM_FIFOAudioStreamRegistr(struct FSM_AudioStream fsmas,unsigned short* idfifo);
 void FSM_FIFOAudioStreamWrite(char* Data,short len,unsigned short idfifo);
 int FSM_FIFOAudioStreamRead(char* Data,unsigned short count,unsigned short idfifo);
 void FSM_AudioStreamSetToProcess(int id,FSM_StreamProcessProcess fsmtu);
 unsigned short FSM_FIFOAudioStreamGetAS(unsigned short idfifo);
+void FSM_AudioStreamSetFIFODevice(int id,int edev);
 
 #endif

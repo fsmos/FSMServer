@@ -15,8 +15,8 @@ struct FSM_SendAudioData sad;
 void FSM_FIFOAudioStreamTobuffer(char* Data,short len,int id)
 {
     int i=0; 
-    struct FSM_SendAudioData * FSMAPk =Data;
-     struct FSM_FIFOAS* devfifo=FSM_AudioStreamGetFIFODevice(FSMAPk->IDDevice);
+    struct FSM_SendAudioData * FSMAPk =(struct FSM_SendAudioData *) Data;
+struct FSM_FIFOAS* devfifo=&fsmfifoas[FSM_AudioStreamGetFIFODevice(FSMAPk->IDDevice)];
      for(i=0;i<FSMAPk->len;i++)
      {
          if(devfifo->in_count<1024)
@@ -43,7 +43,7 @@ int FSM_FIFOAudioStreamRegistr(struct FSM_AudioStream fsmas,unsigned short* idfi
            {
                fsmfifoas[i].reg=1;
                fsmfifoas[i].streamid=fsmstream;
-               FSM_AudioStreamSetFIFODevice(fsmstream,&fsmfifoas[i]);
+               FSM_AudioStreamSetFIFODevice(fsmstream,i);
                *idfifo=i;
                return fsmstream;
            }

@@ -33,17 +33,16 @@
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
 #include "FSM/FSMDevice/fsm_statusstruct.h"
-
+struct FSM_SendCmd scmdt;
 struct fsm_Setting_Setting fsmSSS;
 void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
-    struct FSM_SendCmd scmdt;
     struct fsm_devices_config* fsmset;
     struct FSM_DeviceTree* fsdt;
     int i,j;
     short hlen;
-    unsigned short tmp;
-    struct FSM_SendCmdTS* fscts= data;    
+  //  unsigned short tmp;
+    struct FSM_SendCmdTS* fscts= (struct FSM_SendCmdTS*)data;    
     
 
     switch(data[0])
@@ -74,7 +73,7 @@ void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
                    if(fsmset->setel[i][j].IDDevice!=0)
                    {
                    memcpy(scmdt.Data,&fsmset->setel[i][j],sizeof(struct fsm_device_config));
-                   fsmdt->dt->Proc(&scmdt,hlen,fsdt);
+                   fsmdt->dt->Proc((char*)&scmdt,hlen,fsdt);
                       //printk( KERN_INFO "FSM Send %u %s\n",fsmstate->statel[i][j].devid,fsmstate->statel[i][j].fsmdevcode);
                    }
 
@@ -93,7 +92,7 @@ void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 }
 void ApplaySetting(struct FSM_DeviceTree* df)
 {
-     struct FSM_SendCmd scmdt;
+     
     // printk( KERN_INFO "FSM_Set\n" ); 
       scmdt.cmd=SetSettingClient;
           scmdt.countparam=1;
@@ -101,7 +100,7 @@ void ApplaySetting(struct FSM_DeviceTree* df)
           scmdt.CRC=0;
           scmdt.opcode=SendCmdToDevice;
           memcpy(&scmdt.Data,&fsmSSS.fsmcs,sizeof(struct fsm_Setting_Setting ));
-          (FSM_FindDevice(FSM_EthernetID))->dt->Proc(&scmdt,sizeof(struct FSM_SendCmd),df);
+          (FSM_FindDevice(FSM_EthernetID))->dt->Proc((char*)&scmdt,sizeof(struct FSM_SendCmd),df);
 }
 struct FSM_DeviceFunctionTree dft;
 static int __init FSM_Setting_Server_init(void)

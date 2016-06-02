@@ -47,6 +47,7 @@ struct FSM_DeviceFunctionTree dft;
 struct FSM_DeviceTree* FSMPO06Ethernet;
 struct FSM_PO06Device FSMPO06Dev[FSM_PO06DeviceTreeSize];
 struct FSM_SendCmd sendcmd;
+ struct FSM_AudioStream fsmas;
 
 void FSM_PO06RecivePacket(char* data,short len)
 {
@@ -76,8 +77,8 @@ void FSM_PO06SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
     int i;
-    struct FSM_AudioStream fsmas;
-    struct FSM_SendCmdTS* scmd=data;
+   
+    struct FSM_SendCmdTS* scmd=(struct FSM_SendCmdTS*)data;
         // char datas[2];
          
     switch(data[0])
@@ -183,7 +184,7 @@ void ApplaySettingPO06(struct FSM_DeviceTree* df)
     sendcmd.CRC=0;
     sendcmd.opcode=SendCmdToDevice;
     memcpy(&sendcmd.Data,&(((struct FSM_PO06Device*)df->data)->po06set.fsm_p006_su_s),sizeof(struct fsm_po06_subscriber));
-    (FSM_FindDevice(FSM_EthernetID))->dt->Proc(&sendcmd,sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+sizeof(struct fsm_po06_subscriber),df);
+    (FSM_FindDevice(FSM_EthernetID))->dt->Proc((char*)&sendcmd,sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+sizeof(struct fsm_po06_subscriber),df);
 }
 
 static int __init FSM_PO06_init(void)

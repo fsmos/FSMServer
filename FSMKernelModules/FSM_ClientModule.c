@@ -58,6 +58,7 @@ struct FSM_DeviceRegistr regp;
 struct FSM_DeviceRegistr regset;
 struct FSMSSetconfigParam fsmspar;
 unsigned short setservid;
+struct  FSM_SendCmdTS regpcmdts;
 /*
 static ssize_t fsmset_show(struct class *class, struct class_attribute *attr,char *buf)
 {
@@ -114,11 +115,12 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
                    struct packet_type *pt, struct net_device *odev ) { 
      char dats= ((char*)skb->data)[0];
      struct ethhdr *eth=eth_hdr(skb);
-     struct FSM_DeviceDelete delp;
+     struct FSM_DeviceDelete delp; 
+     struct FSM_SendCmd* fscts= (struct FSM_SendCmd*)skb->data;  
+     struct FSM_AnsDeviceRegistr* fscar= (struct FSM_AnsDeviceRegistr*)skb->data;  
      if (skb->pkt_type == PACKET_OTHERHOST || skb->pkt_type == PACKET_LOOPBACK) return 0;
      //printk( KERN_ERR "RegDev %u\n",dats);
-     struct FSM_SendCmd* fscts= skb->data;  
-     struct FSM_AnsDeviceRegistr* fscar= skb->data;  
+    
      switch(dats)
       {
           case RegDevice: ///< Регистрация устройства
@@ -297,7 +299,7 @@ static int device_release( struct inode *inode, struct file *file )
 
 static int device_write( struct file *filp, const char *buff, size_t len, loff_t * off )
 {
-    struct  FSM_SendCmdTS regpcmdts;
+  
 memset(&fsm_ss,0,sizeof(fsm_ss));
 regpcmdts.opcode=SendCmdToServer;
 regpcmdts.countparam=1;
@@ -348,8 +350,8 @@ static int deviceset_write( struct file *filp, const char *buff, size_t len, lof
 {
     int i;
     int j;
-struct FSMSSetconfig* scp=buff;
-struct  FSM_SendCmdTS regpcmdts;
+struct FSMSSetconfig* scp=(struct FSMSSetconfig*)buff;
+
     fsmspar.cmd=scp->cmd;
     fsmspar.IDDevice=scp->IDDevice;
     for(i=0;i<srow_cnt;i++)

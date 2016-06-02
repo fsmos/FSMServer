@@ -6,9 +6,10 @@ rmmod FSM_E1Device.ko
 rmmod FSM_Commutator.ko
 rmmod FSMFIFOAudioStream.ko
 rmmod FSM_AudioStream.ko
-
+rmmod FSM_Crypt.ko
 rmmod FSMClientProtocol.ko
 rmmod FSM_DeviceProcess.ko
+
 path=""
 
 insmod FSM_DeviceProcess.ko
@@ -38,6 +39,9 @@ a+="add-symbol-file $path FSM_StatisticServer.ko $(cat /sys/module/FSM_Statistic
 
 insmod FSM_SettingServer.ko
 a+="add-symbol-file $path FSM_SettingServer.ko $(cat /sys/module/FSM_SettingServer/sections/.text) -s .bss $(cat /sys/module/FSM_SettingServer/sections/.bss)\n"
+
+//insmod FSM_Crypt.ko
+//a+="add-symbol-file $path FSM_Crypt.ko $(cat /sys/module/FSM_Crypt/sections/.text) -s .bss $(cat /sys/module/FSM_Crypt/sections/.bss)\n"
 
 //./FSMSendPack lo 1
 //./FSMSendPack lo 3

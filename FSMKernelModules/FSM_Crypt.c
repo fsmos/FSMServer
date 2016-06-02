@@ -9,9 +9,9 @@ struct FSM_cryptalg FSMCA[FSM_CryptoAlgoritmNum];
 
 int FSMCrypt_Register(FunctionEncDec Encode,FunctionEncDec Decode,char id)
 {
-    FSMCA[id].reg=1;
-    FSMCA[id].Encode=Encode;
-    FSMCA[id].Decode=Decode;
+    FSMCA[(int)id].reg=1;
+    FSMCA[(int)id].Encode=Encode;
+    FSMCA[(int)id].Decode=Decode;
     return 0;
 }
 EXPORT_SYMBOL(FSMCrypt_Register);
@@ -19,30 +19,30 @@ EXPORT_SYMBOL(FSMCrypt_Register);
 
 int FSMCrypt_UnRegister(FunctionEncDec Encode,FunctionEncDec Decode,char id)
 {
-    FSMCA[id].reg=0;
-    FSMCA[id].Encode=0;
-    FSMCA[id].Decode=0;
+    FSMCA[(int)id].reg=0;
+    FSMCA[(int)id].Encode=0;
+    FSMCA[(int)id].Decode=0;
     return 0;
 }
 EXPORT_SYMBOL(FSMCrypt_UnRegister);
 void FSMEncrypt(char id,char* dst,char * src,short len)
 {
-    if(FSMCA[id].reg==1) FSMCA[id].Encode(dst,src,len);
+    if(FSMCA[(int)id].reg==1) FSMCA[(int)id].Encode(dst,src,len);
 }
 EXPORT_SYMBOL(FSMEncrypt);
 void FSMDecrypt(char id,char* dst,char * src,short len)
 {
-    if(FSMCA[id].reg==1) FSMCA[id].Decode(dst,src,len);
+    if(FSMCA[(int)id].reg==1) FSMCA[(int)id].Decode(dst,src,len);
 }
 EXPORT_SYMBOL(FSMDecrypt);
 void FSMSetKey(char id,void* key)
 {
-    if(FSMCA[id].reg==1) FSMCA[id].Keys=key;
+    if(FSMCA[(int)id].reg==1) FSMCA[(int)id].Keys=key;
 }
 EXPORT_SYMBOL(FSMSetKey);
 void* FSMGetKey(char id)
 {
-    if(FSMCA[id].reg==1) return FSMCA[id].Keys;
+    if(FSMCA[(int)id].reg==1) return FSMCA[(int)id].Keys;
     else return 0;
     
 }

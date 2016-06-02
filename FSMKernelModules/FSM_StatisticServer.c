@@ -34,15 +34,16 @@
 #include "FSM/FSMSetting/FSM_settings.h"
 #include "FSM/FSMDevice/fsm_statusstruct.h"
 
+struct FSM_SendCmd scmdt;
 
 void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
-    struct FSM_SendCmd scmdt;
+   
     struct fsm_statusstruct* fsmstate;
     struct FSM_DeviceTree* fsdt;
     int i,j;
     short hlen;
-    struct FSM_SendCmdTS* fscts= data;    
+    struct FSM_SendCmdTS* fscts= (struct FSM_SendCmdTS*)data;    
     
 
     switch(data[0])
@@ -71,7 +72,7 @@ void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
                    if(fsmstate->statel[i][j].devid!=0)
                    {
                    memcpy(scmdt.Data,&fsmstate->statel[i][j],sizeof(struct fsm_status_element));
-                   fsmdt->dt->Proc(&scmdt,hlen,fsdt);
+                   fsmdt->dt->Proc((char*)&scmdt,hlen,fsdt);
                       //printk( KERN_INFO "FSM Send %u %s\n",fsmstate->statel[i][j].devid,fsmstate->statel[i][j].fsmdevcode);
                    }
 
