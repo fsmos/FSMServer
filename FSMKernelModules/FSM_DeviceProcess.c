@@ -25,18 +25,82 @@ struct FSM_DeviceTree fsm_dt[FSM_DeviceTreeSize];
 struct fsm_statusstruct fsm_str;
 struct fsm_devices_config fsm_set;
 
+
+#ifdef  DEBUG_CALL_STACK 
+uint64_t debug_this;
+uint64_t debug_global;
+#define DEBUG_CALL_STACK_SetStack (debug_this<<8) 
+#define DEBUG_CALL_STACK_THIS 1
+#define DEBUG_CALL_STACK_GLOBSET debug_global =(debug_global<<8)|(DEBUG_CALL_STACK_THIS);
+
+typedef enum debug_function
+{
+    init_on=0x00,
+    init_off=0x01,
+    exit_on=0x02,
+    exit_off=0x03,
+    get_statis_init=0x04,
+    get_statis_exit=0x05,
+    get_setting_init=0x06,
+    get_setting_exit=0x07,
+    get_setting_set_init=0x08,
+    get_setting_set_exit=0x09,
+    get_setting_applay_init=0x10,
+    get_setting_applay_exit=0x11,
+    get_set_status_init=0x12,
+    get_set_status_exit=0x13,
+    get_dev_class_init=0x14,
+    get_dev_class_exit=0x15,
+    get_dev_reg_init=0x16,
+    get_dev_reg_exit=0x17,
+    get_finddc_init=0x18,
+    get_finddc_exit=0x19,
+    get_finddc2_init=0x20,
+    get_finddc2_exit=0x21,
+    get_findd_init=0x22,
+    get_findd_exit=0x23,
+    get_dcdr_init=0x24,
+    get_dcdr_exit=0x25,
+    get_ddr_init=0x26,
+    get_ddr_exit=0x27,
+    
+}debug_fun ;
+#endif 
+EXPORT_SYMBOL(debug_global);
+
 static int __init FSMDeviceProcess_init(void)
 {
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    debug_this=DEBUG_CALL_STACK_SetStack|(init_on);
+#endif
+    
     memset(fsm_dft,0,sizeof(fsm_dft));
     memset(fsm_dt,0,sizeof(fsm_dt));
+    
+#ifdef  DEBUG_CALL_STACK 
+    debug_this=DEBUG_CALL_STACK_SetStack|(init_off);
+#endif
+
     printk( KERN_INFO "FSMDeviceProcess module loaded\n" ); 
     return 0;
 }
 static void __exit FSMDeviceProcess_exit(void)
 {
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    debug_this=DEBUG_CALL_STACK_SetStack|(exit_on);
+#endif
+    
     memset(fsm_dft,0,sizeof(fsm_dft));
     memset(fsm_dt,0,sizeof(fsm_dt));
     printk( KERN_INFO "FSMDeviceProcess module unloaded\n" ); 
+    
+#ifdef  DEBUG_CALL_STACK 
+    debug_this=DEBUG_CALL_STACK_SetStack|(exit_off);
+#endif
 }
 /*!
 \brief Получение статистики
@@ -46,6 +110,12 @@ struct fsm_statusstruct *FSM_GetStatistic(void)
 {
    int i,j;
    int m=0;
+   
+#ifdef  DEBUG_CALL_STACK 
+   DEBUG_CALL_STACK_GLOBSET
+   debug_this=DEBUG_CALL_STACK_SetStack|(get_statis_init);
+#endif
+
    memset(&fsm_str,0,sizeof(fsm_str));
    for(i=0;i<srow_cnt;i++)
    {
@@ -62,8 +132,13 @@ struct fsm_statusstruct *FSM_GetStatistic(void)
        m++;
        
 
-   } 
- }
+    } 
+   }
+   
+#ifdef  DEBUG_CALL_STACK 
+   debug_this=DEBUG_CALL_STACK_SetStack|(get_statis_exit);
+#endif
+
    return &fsm_str;
 }
 EXPORT_SYMBOL(FSM_GetStatistic);
@@ -72,6 +147,12 @@ struct fsm_devices_config *FSM_GetSetting(void)
 {
    int i,j;
    int m=0;
+   
+#ifdef  DEBUG_CALL_STACK 
+   DEBUG_CALL_STACK_GLOBSET
+   debug_this=DEBUG_CALL_STACK_SetStack|(get_setting_init);
+#endif
+
    memset(&fsm_set,0,sizeof(fsm_set));
    for(i=0;i<srow_cnt;i++)
    {
@@ -86,32 +167,66 @@ struct fsm_devices_config *FSM_GetSetting(void)
        fsm_set.setel[i][j].column=j;
        m++;
        }
-       
-
    } 
  }
+ 
+#ifdef  DEBUG_CALL_STACK 
+ debug_this=DEBUG_CALL_STACK_SetStack|(get_setting_exit);
+#endif
+   
    return &fsm_set;
 }
 EXPORT_SYMBOL(FSM_GetSetting);
 
 void FSM_Setting_Set(struct FSM_DeviceTree* fdt,void* set)
 {
+    
+#ifdef  DEBUG_CALL_STACK 
+   DEBUG_CALL_STACK_GLOBSET
+   debug_this=DEBUG_CALL_STACK_SetStack|(get_setting_set_init);
+#endif
+
   fdt->config=set;
+  
+#ifdef  DEBUG_CALL_STACK 
+    debug_this=DEBUG_CALL_STACK_SetStack|(get_setting_set_exit);
+#endif
+
 }
 EXPORT_SYMBOL(FSM_Setting_Set);
 
 void FSM_Setting_Applay(struct FSM_DeviceTree* fdt,void* set)
 {
+    
+#ifdef  DEBUG_CALL_STACK 
+   DEBUG_CALL_STACK_GLOBSET
+   debug_this=DEBUG_CALL_STACK_SetStack|(get_setting_applay_init);
+#endif
+
   if(fdt==0) return;
   memcpy(fdt->config,set,fdt->dt->config_len);
   printk( KERN_INFO "FSMAP %i\n", fdt->IDDevice); 
   if(fdt->dt->aplayp!=0) fdt->dt->aplayp(fdt);
+
+#ifdef  DEBUG_CALL_STACK 
+    debug_this=DEBUG_CALL_STACK_SetStack|(get_setting_applay_exit);
+#endif
+
 }
 EXPORT_SYMBOL(FSM_Setting_Applay);
 
 void FSM_Statstic_SetStatus(struct FSM_DeviceTree* fdt,char* status)
 {
+#ifdef  DEBUG_CALL_STACK 
+   DEBUG_CALL_STACK_GLOBSET
+   debug_this=DEBUG_CALL_STACK_SetStack|(get_set_status_init);
+#endif
+
   strcpy(fdt->state,status);
+  
+#ifdef  DEBUG_CALL_STACK 
+  debug_this=DEBUG_CALL_STACK_SetStack|(get_set_status_exit);
+#endif
 }
 EXPORT_SYMBOL(FSM_Statstic_SetStatus);
 /*!
@@ -122,6 +237,12 @@ EXPORT_SYMBOL(FSM_Statstic_SetStatus);
 unsigned char FSM_DeviceClassRegister(struct FSM_DeviceFunctionTree dft)
 {
     int i;
+    
+    #ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    debug_this=DEBUG_CALL_STACK_SetStack|(get_dev_class_init);
+    #endif
+    
     if(FSM_FindDeviceClass2(dft)!=0) return 2;
     for(i=0;i<FSM_DeviceFunctionTreeSize;i++)
     {
@@ -140,6 +261,9 @@ unsigned char FSM_DeviceClassRegister(struct FSM_DeviceFunctionTree dft)
         }
     }
     
+    #ifdef  DEBUG_CALL_STACK 
+        debug_this=DEBUG_CALL_STACK_SetStack|(get_dev_class_exit);
+    #endif
     return 1;
 }
 EXPORT_SYMBOL(FSM_DeviceClassRegister);
@@ -152,6 +276,12 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
 {
     int i;
     struct FSM_DeviceFunctionTree* classf;
+    
+    #ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    debug_this=DEBUG_CALL_STACK_SetStack|(get_dev_reg_init);
+    #endif
+
     if(FSM_FindDevice(dt.IDDevice)!=0) return 2;
     for(i=0;i<FSM_DeviceTreeSize;i++)
     {
@@ -170,6 +300,11 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
             }
         }
     }
+    
+#ifdef  DEBUG_CALL_STACK 
+   debug_this=DEBUG_CALL_STACK_SetStack|(get_dev_reg_exit);
+#endif
+
     return 1;
 }
 EXPORT_SYMBOL(FSM_DeviceRegister);
@@ -181,6 +316,12 @@ EXPORT_SYMBOL(FSM_DeviceRegister);
 struct FSM_DeviceFunctionTree* FSM_FindDeviceClass(struct FSM_DeviceRegistr dt)
 {
     int i;
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    debug_this=DEBUG_CALL_STACK_SetStack|(get_finddc_init);
+#endif
+    
     for(i=0;i<FSM_DeviceFunctionTreeSize;i++)
     {
         if((fsm_dft[i].KodDevice==dt.KodDevice)&&(fsm_dft[i].VidDevice==dt.VidDevice)&&(fsm_dft[i].PodVidDevice==dt.PodVidDevice)&&(fsm_dft[i].type==dt.type)&&(fsm_dft[i].registr==1))
@@ -188,6 +329,11 @@ struct FSM_DeviceFunctionTree* FSM_FindDeviceClass(struct FSM_DeviceRegistr dt)
             return &fsm_dft[i];
         }
     } 
+    
+#ifdef  DEBUG_CALL_STACK 
+  debug_this=DEBUG_CALL_STACK_SetStack|(get_finddc_exit);
+#endif
+
     return 0;
 }
 EXPORT_SYMBOL(FSM_FindDeviceClass);
@@ -199,6 +345,12 @@ EXPORT_SYMBOL(FSM_FindDeviceClass);
 struct FSM_DeviceFunctionTree* FSM_FindDeviceClass2(struct FSM_DeviceFunctionTree dft)
 {
     int i;
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    debug_this=DEBUG_CALL_STACK_SetStack|(get_finddc2_init);
+#endif
+    
     for(i=0;i<FSM_DeviceFunctionTreeSize;i++)
     {
         if((fsm_dft[i].KodDevice==dft.KodDevice)&&(fsm_dft[i].VidDevice==dft.VidDevice)&&(fsm_dft[i].PodVidDevice==dft.PodVidDevice)&&(fsm_dft[i].type==dft.type)&&(fsm_dft[i].registr==1))
@@ -206,6 +358,11 @@ struct FSM_DeviceFunctionTree* FSM_FindDeviceClass2(struct FSM_DeviceFunctionTre
             return &fsm_dft[i];
         }
     } 
+    
+#ifdef  DEBUG_CALL_STACK 
+    debug_this=DEBUG_CALL_STACK_SetStack|(get_finddc2_exit);
+#endif
+
     return 0;
 }
 EXPORT_SYMBOL(FSM_FindDeviceClass2);
@@ -217,6 +374,12 @@ EXPORT_SYMBOL(FSM_FindDeviceClass2);
 struct FSM_DeviceTree* FSM_FindDevice(unsigned short id)
 {
     int i;
+    
+#ifdef  DEBUG_CALL_STACK 
+   DEBUG_CALL_STACK_GLOBSET
+   debug_this=DEBUG_CALL_STACK_SetStack|(get_findd_init);
+#endif
+   
     for(i=0;i<FSM_DeviceTreeSize;i++)
     {
         //if(fsm_dt[i].IDDevice!=0) printk( KERN_INFO "DeviceNotFindScan: ID: %u - %u \n", fsm_dt[i].IDDevice,fsm_dt[i].registr);
@@ -227,6 +390,11 @@ struct FSM_DeviceTree* FSM_FindDevice(unsigned short id)
         }
     } 
     printk( KERN_INFO "DeviceNotFind: ID: %u \n", id);
+
+#ifdef  DEBUG_CALL_STACK 
+  debug_this=DEBUG_CALL_STACK_SetStack|(get_findd_exit);
+#endif
+
     return 0;
 }
 EXPORT_SYMBOL(FSM_FindDevice);
@@ -237,9 +405,21 @@ EXPORT_SYMBOL(FSM_FindDevice);
 */
 void FSM_DeRegister(struct FSM_DeviceDelete fdd)
 {
-    struct FSM_DeviceTree* dt= FSM_FindDevice(fdd.IDDevice);
+  
+    
+    struct FSM_DeviceTree* dt= FSM_FindDevice(fdd.IDDevice);  
+    
+#ifdef  DEBUG_CALL_STACK 
+DEBUG_CALL_STACK_GLOBSET
+debug_this=DEBUG_CALL_STACK_SetStack|(get_ddr_init);
+#endif
+    
     if(dt!=0) dt->registr=0; 
     printk( KERN_INFO "DeviceDeRegistred: ID: %u \n", fdd.IDDevice);
+    
+#ifdef  DEBUG_CALL_STACK 
+  debug_this=DEBUG_CALL_STACK_SetStack|(get_ddr_exit);
+#endif
     
 }
 EXPORT_SYMBOL(FSM_DeRegister);
@@ -249,9 +429,21 @@ EXPORT_SYMBOL(FSM_DeRegister);
 */
 void FSM_ClassDeRegister(struct FSM_DeviceFunctionTree dfti)
 {
-    struct FSM_DeviceFunctionTree* dft =FSM_FindDeviceClass2(dfti);
+  struct FSM_DeviceFunctionTree* dft =FSM_FindDeviceClass2(dfti);  
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    debug_this=DEBUG_CALL_STACK_SetStack|(get_dcdr_init);
+#endif
+    
     if(dft!=0) dft->registr=0; 
     printk( KERN_INFO "DeviceClassDeregistred: Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n", dfti.type,dfti.VidDevice,dfti.PodVidDevice,dfti.KodDevice );
+
+
+#ifdef  DEBUG_CALL_STACK 
+     debug_this=DEBUG_CALL_STACK_SetStack|(get_dcdr_exit);
+#endif
+
 }
 EXPORT_SYMBOL(FSM_ClassDeRegister);
 

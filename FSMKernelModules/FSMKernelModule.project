@@ -61,6 +61,9 @@
     <VirtualDirectory Name="FSM_Commutator">
       <File Name="../FSMHeader/FSM/FSM_Commutator/FSM_Commutator.h"/>
     </VirtualDirectory>
+    <VirtualDirectory Name="FSMSwitch">
+      <File Name="../FSMHeader/FSM/FSM_Switch/fsm_switch.h"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Make">
     <File Name="Makefile"/>
@@ -180,5 +183,8 @@ source runs.prog</PostConnectCommands>
   </Settings>
   <VirtualDirectory Name="FSM_Commutator">
     <File Name="FSM_Commutator.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FSM_SkyNet">
+    <File Name="FSM_SkyNet.c"/>
   </VirtualDirectory>
 </CodeLite_Project>

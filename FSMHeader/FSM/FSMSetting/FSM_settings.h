@@ -55,5 +55,8 @@
 #define FSM_Conferenc_abonent_count 2
 
 #define FSM_Circulac_abonent_count 2
+
+#define FSM_SkyNetDeviceTreeSize 12
 #endif	/* FSM_SETTINGS_H */
 
+#define DEBUG_CALL_STACK

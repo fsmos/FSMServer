@@ -22,18 +22,30 @@ struct FSM_DeviceTree* FSME1Ethernet;
 struct FSM_E1Device FSME1Dev[FSM_E1DeviceTreeSize];
 struct FSM_SendAudioData sade1;
 struct FSM_SendCmd sendcmd;
-void FSM_SendToStream(void)
+
+#ifdef  DEBUG_CALL_STACK 
+uint64_t debug_this6;
+extern uint64_t debug_global;
+#define DEBUG_CALL_STACK_SetStack debug_this6=(debug_this6<<8) 
+#define DEBUG_CALL_STACK_THIS 6
+#define DEBUG_CALL_STACK_GLOBSET debug_global =(debug_global<<8)|(DEBUG_CALL_STACK_THIS);
+
+typedef enum debug_function
 {
-     /* struct FSME1Buff* E1buffs = &(((struct FSM_E1Device*)FSM_AudioStreamData(1))->E1buffs);
-      sad.IDDevice=0;
-      sad.len=160;
-      memcpy(sad.Data,E1buffs->Data[0],sad.len);
-      FSM_AudioStreamToUser(0,(char*)&sad,sizeof(struct FSM_SendAudioData)-sizeof(sad.Data)+sad.len); 
-      
-     // printk( KERN_INFO "Stream Recived %u \n",E1buffs.count); 
-      * */
-  
-}
+    init_on=0x00,
+    init_off=0x01,
+    exit_on=0x02,
+    exit_off=0x03,
+    get_ssi_init=0x04,
+    get_ssi_exit=0x05,
+    get_e1r_init=0x06,
+    get_e1r_exit=0x07,
+    get_e1rp_init=0x08,
+    get_e1rp_exit=0x09,
+    
+}debug_fun ;
+#endif 
+
 void FSM_E1RecivePacket(char* data,short len)
 { 
    int i=0;
@@ -47,6 +59,10 @@ void FSM_E1RecivePacket(char* data,short len)
    unsigned short size=0;
    struct FSM_E1Device* fsmdat=FSM_AudioStreamData(FSMAPk->IDDevice);
    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_e1rp_init);
+#endif
   
    if(fsmdat!=0)
    {
@@ -84,40 +100,22 @@ void FSM_E1RecivePacket(char* data,short len)
      }
     sade1.len=size+2;
     FSM_AudioStreamToUser(FSMAPk->IDDevice,(char*)&sade1,sizeof(struct FSM_SendAudioData)-sizeof(sade1.Data)+sade1.len);
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_e1rp_exit);
+#endif
 }
-void FSM_E1SendPacket(char* Data1,unsigned char len)
-{
-    /*int i,j;
-    char* sb=fsme1pkt2.Data;
-    unsigned short size=0;
-    struct FSM_SendAudioData * FSMAPk =Data1;
-   
-    sad.IDDevice=1;
-     fsme1pkt2.count=len;
-     for(i=0;i<len;i++)
-     {
-       for(j=0;j<fsme1pkt2.channels;j++)  
-       {
-           sb[0]=FSMAPk->Data[i];
-           sb++;
-           size++;
-       }
-     }
-     //printk( KERN_INFO "FSME1 Data %u \n",size); 
-     memcpy(sad.Data,&fsme1pkt2,size+2);
-     
-     sad.len=size+2;
-     FSM_AudioStreamToUser(1,(char*)&sad,sizeof(struct FSM_SendAudioData)-sizeof(sad.Data)+sad.len); 
-      *
-      */
-}
-EXPORT_SYMBOL(FSM_E1SendPacket);
 
 
 void FSM_E1SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 {
     short plen;
-    
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_ssi_init);
+#endif
+
     memset(&sendcmd,0,sizeof(struct FSM_SendCmd));
     sendcmd.opcode=SendCmdToDevice;
     sendcmd.IDDevice=fsmdt->IDDevice;
@@ -127,13 +125,21 @@ void FSM_E1SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
     sendcmd.CRC=0;
      plen=sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+2;
    if(FSME1Ethernet!=0)  FSME1Ethernet->dt->Proc((char*)&sendcmd,plen,fsmdt);
-                
+   
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_ssi_exit);
+#endif       
 }
 
 void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
     int i,j;
     struct FSM_AudioStream fsmas;
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_e1r_init);
+#endif
 
     switch(data[0])
       {
@@ -212,6 +218,9 @@ void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           break;
       }                 
     
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_e1r_exit);
+#endif
     
     printk( KERN_INFO "RPack %u \n" ,len); 
 }
@@ -219,8 +228,12 @@ EXPORT_SYMBOL(FSM_E1Recive);
 
 static int __init FSME1Protocol_init(void)
 {
-    //int i;
-   // struct FSM_AudioStream fsmas;
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(init_on);
+#endif
+
    memset(&FSME1Dev,0,sizeof(FSME1Dev));
    sade1.codec=0;
    sade1.CRC=0;
@@ -242,13 +255,27 @@ static int __init FSME1Protocol_init(void)
           return 1;
    }
    printk( KERN_INFO "FSME1Protocol module loaded\n" ); 
+   
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(init_off);
+#endif
+
    return 0;  
 }
 
 static void __exit FSME1Protocol_exit(void)
 {
+   #ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(exit_on);
+#endif
+
     FSM_ClassDeRegister(dft);
    printk( KERN_INFO "FSME1Protocol module unloaded\n" );  
+   
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(exit_off);
+#endif
 }
 
 module_init(FSME1Protocol_init);

@@ -46,15 +46,56 @@ struct FSM_SendCmd fsmsc;
 struct fsm_ethernet_dev fsdev2;
 FSM_StreamProcessSend FSM_AudioStreamCallback;
 
+#ifdef  DEBUG_CALL_STACK 
+uint64_t debug_this2;
+extern uint64_t debug_global;
+#define DEBUG_CALL_STACK_SetStack debug_this2=(debug_this2<<8) 
+#define DEBUG_CALL_STACK_THIS 2
+#define DEBUG_CALL_STACK_GLOBSET debug_global =(debug_global<<8)|(DEBUG_CALL_STACK_THIS);
+
+typedef enum debug_function
+{
+    init_on=0x00,
+    init_off=0x01,
+    exit_on=0x02,
+    exit_off=0x03,
+    get_sendethpack_init=0x04,
+    get_sendethpack_exit=0x05,
+    get_regeth_init=0x06,
+    get_regeth_exit=0x07,
+    get_findeth_init=0x08,
+    get_findeth_exit=0x09,
+    get_deleth_init=0x10,
+    get_deleth_exit=0x11,
+    get_esp_init=0x12,
+    get_esp_exit=0x13,
+    get_prcv_init=0x14,
+    get_prcv_exit=0x15,
+    get_sendethpack_exit_eror=0x16,
+    
+}debug_fun ;
+#endif 
+
  unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
 {
 
   struct net_device *dev = fsmdev->dev;
   struct sk_buff *skb;
   int hlen = LL_RESERVED_SPACE(dev);
-  int tlen = dev->needed_tailroom; 
+  int tlen = dev->needed_tailroom;
+
+  #ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_sendethpack_init);
+  #endif
+ 
   if(fsmdev==0) return 1;
   skb = alloc_skb(len + hlen + tlen, GFP_ATOMIC);
+  if(skb==NULL)
+  {
+       printk( KERN_INFO "SKB Eror\n"); 
+       return 0;
+  }
   skb_reserve(skb, hlen);
   skb->dev = dev;
   //skb->protocol = fsmdev.eth.h_proto;
@@ -62,9 +103,19 @@ FSM_StreamProcessSend FSM_AudioStreamCallback;
   memcpy(skb_put(skb, len),data,len);
   if(dev_hard_header(skb, dev, __constant_htons(FSM_PROTO_ID_R), fsmdev->destmac, dev->dev_addr, skb->len)<0) goto out;
   if(dev_queue_xmit(skb)<0) goto out;
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_sendethpack_exit);
+#endif
   return 0;
 
  out:
+ 
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_sendethpack_exit_eror);
+#endif
+
 	kfree_skb(skb);
 	return 0;
 }
@@ -80,6 +131,14 @@ EXPORT_SYMBOL(FSM_Send_Ethernet_Package2);
 int FSM_RegisterEthernetDevice(struct FSM_DeviceRegistr *fsmrg, struct net_device *dev, char* mac)
 {
     int i=0;
+    
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_regeth_init);
+#endif
+  
+  
     for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
     {
         if((fsmrg->IDDevice==fsdev[i].id)&&(fsdev[i].reg==1)) return 1;
@@ -97,21 +156,47 @@ int FSM_RegisterEthernetDevice(struct FSM_DeviceRegistr *fsmrg, struct net_devic
             return 0;
         }
     }
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_regeth_exit);
+#endif
+
     return 2;
 }
 struct fsm_ethernet_dev*  FSM_FindEthernetDevice(unsigned short id)
 {
     int i;
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_findeth_init);
+#endif
+
     for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
     {
         if((id==fsdev[i].id)&&(fsdev[i].reg==1)) return &fsdev[i];
     }
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_findeth_exit);
+#endif
+
     return 0;
+    
+
 }
 EXPORT_SYMBOL(FSM_FindEthernetDevice);
+
 int  FSM_DeleteEthernetDevice(unsigned short id)
 {
+
     int i;
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_deleth_init);
+#endif
+
     for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
     {
         if((id==fsdev[i].id)&&(fsdev[i].reg==1)) 
@@ -121,11 +206,22 @@ int  FSM_DeleteEthernetDevice(unsigned short id)
                 return 0;
         }
     }
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_deleth_exit);
+#endif
+   
     return 1;
 }
 void FSM_EthernetSendPckt(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
     struct fsm_ethernet_dev* fsmsd=FSM_FindEthernetDevice(fsmdt->IDDevice);
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_esp_init);
+#endif
+
     if(fsmsd==0) 
         {
             printk( KERN_INFO "FSM Ethernet Not Registred %u \n",fsmdt->IDDevice); 
@@ -134,6 +230,10 @@ void FSM_EthernetSendPckt(char* data,short len, struct FSM_DeviceTree* fsmdt)
       //  printk( KERN_INFO "FSM Send %u \n",len); 
 
     FSM_Send_Ethernet_Package(data,len,fsmsd);
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_esp_exit);
+#endif
 }
 
 void FSM_RegisterAudioStreamCallback(FSM_StreamProcessSend FSM_ASC)
@@ -156,6 +256,11 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
      char dats= ((char*)skb->data)[0];
      struct ethhdr *eth=eth_hdr(skb);
     
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_prcv_init);
+#endif
+
      if (skb->pkt_type == PACKET_OTHERHOST || skb->pkt_type == PACKET_LOOPBACK) return 0;
       
        //printk( KERN_ERR "RegDev %u\n",dats);
@@ -328,6 +433,9 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
    
    
    //FSM_Send_Ethernet_Package(odev,dts,3,fsdev);
+   #ifdef  DEBUG_CALL_STACK 
+   DEBUG_CALL_STACK_SetStack|(get_prcv_exit);
+   #endif
    return skb->len; 
 }; 
 
@@ -344,6 +452,12 @@ static struct packet_type FSMClientProtocol_proto = {
 static int __init FSMClientProtocol_init(void)
 {
     struct FSM_DeviceRegistr regp;
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(init_on);
+#endif
+
    dev_add_pack( &FSMClientProtocol_proto ); 
    dft.type=(unsigned char)Network;
    dft.VidDevice=(unsigned char)Ethernet;
@@ -366,19 +480,34 @@ static int __init FSMClientProtocol_init(void)
    if(dt==0) return 1;
    memset(fsdev,0,sizeof(fsdev));
    printk( KERN_INFO "FSMClientProtocol module loaded\n" ); 
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(init_off);
+#endif
+
    return 0;  
 }
 
 static void __exit FSMClientProtocol_exit(void)
 {  
     struct FSM_DeviceDelete delp;
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(exit_on);
+#endif
+
     dev_remove_pack( &FSMClientProtocol_proto ); 
     delp.IDDevice=FSM_EthernetID;
     delp.opcode=DelLisr;
     delp.CRC=0;
     FSM_DeRegister(delp);
     FSM_ClassDeRegister(dft);
-   printk( KERN_INFO "FSMClientProtocol module unloaded\n" );  
+   printk( KERN_INFO "FSMClientProtocol module unloaded\n" ); 
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(exit_off);
+#endif 
 }
 
 module_init(FSMClientProtocol_init);

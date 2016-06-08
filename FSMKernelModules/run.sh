@@ -1,4 +1,4 @@
-
+rmmod FSM_SkyNet.ko
 rmmod FSM_SettingServer.ko
 rmmod FSM_StatisticServer.ko
 rmmod FSM_PO06Device.ko
@@ -39,6 +39,9 @@ a+="add-symbol-file $path FSM_StatisticServer.ko $(cat /sys/module/FSM_Statistic
 
 insmod FSM_SettingServer.ko
 a+="add-symbol-file $path FSM_SettingServer.ko $(cat /sys/module/FSM_SettingServer/sections/.text) -s .bss $(cat /sys/module/FSM_SettingServer/sections/.bss)\n"
+
+insmod FSM_SkyNet.ko
+a+="add-symbol-file $path FSM_SkyNet.ko $(cat /sys/module/FSM_SkyNet/sections/.text) -s .bss $(cat /sys/module/FSM_SkyNet/sections/.bss)\n"
 
 //insmod FSM_Crypt.ko
 //a+="add-symbol-file $path FSM_Crypt.ko $(cat /sys/module/FSM_Crypt/sections/.text) -s .bss $(cat /sys/module/FSM_Crypt/sections/.bss)\n"

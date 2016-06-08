@@ -87,6 +87,7 @@ static struct class *fsmset_class;
  * */
 //CLASS_ATTR(fsmsetc,0666,&fsmset_show,&fsmset_store);
 
+
  unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
 {
   //if(fsdev.dev==0) fsdev.dev = find_mergeable_anon_vma(); 

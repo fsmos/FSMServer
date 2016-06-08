@@ -7,6 +7,7 @@
 
 struct FSM_cryptalg FSMCA[FSM_CryptoAlgoritmNum];
 
+
 int FSMCrypt_Register(FunctionEncDec Encode,FunctionEncDec Decode,char id)
 {
     FSMCA[(int)id].reg=1;

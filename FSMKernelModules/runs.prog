@@ -1,10 +1,11 @@
-add-symbol-file FSM_DeviceProcess.ko 0xffffffffc022e000 -s .bss 0xffffffffc0230380 
-add-symbol-file FSMClientProtocol.ko 0xffffffffc0253000 -s .bss 0xffffffffc02553c0 
-add-symbol-file FSM_AudioStream.ko 0xffffffffc0259000 -s .bss 0xffffffffc025b380 
-add-symbol-file FSMFIFOAudioStream.ko 0xffffffffc0263000 -s .bss 0xffffffffc0265380
-add-symbol-file FSM_Commutator.ko 0xffffffffc0285000 -s .bss 0xffffffffc0287380
-add-symbol-file FSM_E1Device.ko 0xffffffffc028a000 -s .bss 0xffffffffc028c380 
-add-symbol-file FSM_PO06Device.ko 0xffffffffc0290000 -s .bss 0xffffffffc0292380
-add-symbol-file FSM_StatisticServer.ko 0xffffffffc0295000 -s .bss 0xffffffffc0297380
-add-symbol-file FSM_SettingServer.ko 0xffffffffc029a000 -s .bss 0xffffffffc029c380
+add-symbol-file FSM_DeviceProcess.ko 0xffffffffc0201000 -s .bss 0xffffffffc0203380 
+add-symbol-file FSMClientProtocol.ko 0xffffffffc0222000 -s .bss 0xffffffffc02243c0 
+add-symbol-file FSM_AudioStream.ko 0xffffffffc0228000 -s .bss 0xffffffffc022a380 
+add-symbol-file FSMFIFOAudioStream.ko 0xffffffffc022e000 -s .bss 0xffffffffc0230380
+add-symbol-file FSM_Commutator.ko 0xffffffffc0182000 -s .bss 0xffffffffc0184380
+add-symbol-file FSM_E1Device.ko 0xffffffffc0250000 -s .bss 0xffffffffc0252380 
+add-symbol-file FSM_PO06Device.ko 0xffffffffc0256000 -s .bss 0xffffffffc0258380
+add-symbol-file FSM_StatisticServer.ko 0xffffffffc025b000 -s .bss 0xffffffffc025d380
+add-symbol-file FSM_SettingServer.ko 0xffffffffc0260000 -s .bss 0xffffffffc0262380
+add-symbol-file FSM_SkyNet.ko 0xffffffffc0265000 -s .bss 0xffffffffc0267380
 

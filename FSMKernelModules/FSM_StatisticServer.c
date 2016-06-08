@@ -36,6 +36,7 @@
 
 struct FSM_SendCmd scmdt;
 
+
 void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
    

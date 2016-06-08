@@ -35,6 +35,8 @@
 #include "FSM/FSMDevice/fsm_statusstruct.h"
 struct FSM_SendCmd scmdt;
 struct fsm_Setting_Setting fsmSSS;
+
+
 void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
     struct fsm_devices_config* fsmset;

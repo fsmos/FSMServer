@@ -48,19 +48,39 @@ struct FSM_DeviceTree* FSMPO06Ethernet;
 struct FSM_PO06Device FSMPO06Dev[FSM_PO06DeviceTreeSize];
 struct FSM_SendCmd sendcmd;
  struct FSM_AudioStream fsmas;
+ 
+#ifdef  DEBUG_CALL_STACK 
+uint64_t debug_this5;
+extern uint64_t debug_global;
+#define DEBUG_CALL_STACK_SetStack debug_this5=(debug_this5<<8) 
+#define DEBUG_CALL_STACK_THIS 5
+#define DEBUG_CALL_STACK_GLOBSET debug_global =(debug_global<<8)|(DEBUG_CALL_STACK_THIS);
 
-void FSM_PO06RecivePacket(char* data,short len)
+typedef enum debug_function
 {
-  //printk( KERN_INFO "Stream Recived %u \n",len); 
-  FSM_E1SendPacket(data,160);
-  //FSM_AudioStreamToUser(1,data,len); 
-  
-}
+    init_on=0x00,
+    init_off=0x01,
+    exit_on=0x02,
+    exit_off=0x03,
+    get_ssi_init=0x04,
+    get_ssi_exit=0x05,
+    get_por_init=0x06,
+    get_por_exit=0x07,
+    get_asp6_init=0x08,
+    get_asp6_exit=0x09,
+    
+}debug_fun ;
+#endif 
 
 void FSM_PO06SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 {
     short plen;
-  
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_ssi_init);
+#endif
+
     memset(&sendcmd,0,sizeof(struct FSM_SendCmd));
     sendcmd.opcode=SendCmdToDevice;
     sendcmd.IDDevice=fsmdt->IDDevice;
@@ -71,7 +91,11 @@ void FSM_PO06SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
     sendcmd.CRC=0;
     plen=sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+2;
    if(FSMPO06Ethernet!=0)  FSMPO06Ethernet->dt->Proc((char*)&sendcmd,plen,fsmdt);
-                
+  
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_ssi_exit);
+#endif
+              
 }
 
 void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
@@ -80,7 +104,11 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
    
     struct FSM_SendCmdTS* scmd=(struct FSM_SendCmdTS*)data;
         // char datas[2];
-         
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_por_init);
+#endif
+    
     switch(data[0])
       {
                         
@@ -170,12 +198,21 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           break;
       }                 
     
-    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_por_exit);
+#endif
+
     printk( KERN_INFO "RPack %u \n" ,len); 
 }
 EXPORT_SYMBOL(FSM_PO06Recive);
 void ApplaySettingPO06(struct FSM_DeviceTree* df)
 {
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(get_asp6_init);
+#endif
+
     memset(&sendcmd,0,sizeof(sendcmd));
     printk( KERN_INFO "FSM_Set\n" ); 
     sendcmd.cmd=SetSettingClientPo06;
@@ -185,10 +222,20 @@ void ApplaySettingPO06(struct FSM_DeviceTree* df)
     sendcmd.opcode=SendCmdToDevice;
     memcpy(&sendcmd.Data,&(((struct FSM_PO06Device*)df->data)->po06set.fsm_p006_su_s),sizeof(struct fsm_po06_subscriber));
     (FSM_FindDevice(FSM_EthernetID))->dt->Proc((char*)&sendcmd,sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+sizeof(struct fsm_po06_subscriber),df);
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(get_asp6_exit);
+#endif
 }
 
 static int __init FSM_PO06_init(void)
 {
+    
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(init_on);
+#endif
+
    dft.aplayp=ApplaySettingPO06;
    dft.type=(unsigned char)AudioDevice;
    dft.VidDevice=(unsigned char)CommunicationDevice;
@@ -204,12 +251,28 @@ static int __init FSM_PO06_init(void)
           return 1;
    }
    printk( KERN_INFO "FSM PO06 Module loaded\n" ); 
+   
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(init_off);
+#endif
+
    return 0;  
 }
 
 static void __exit FSM_PO06_exit(void)
 {
-   printk( KERN_INFO "FSM PO06 Module unloaded\n" );  
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_GLOBSET
+    DEBUG_CALL_STACK_SetStack|(exit_on);
+#endif
+
+   FSM_ClassDeRegister(dft);  
+   printk( KERN_INFO "FSM PO06 Module unloaded\n" );
+   
+
+#ifdef  DEBUG_CALL_STACK 
+    DEBUG_CALL_STACK_SetStack|(exit_off);
+#endif
 }
 
 module_init(FSM_PO06_init);

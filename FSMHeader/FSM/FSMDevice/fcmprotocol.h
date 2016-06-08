@@ -73,7 +73,8 @@ enum FSM_TypeDevice
     SmartPhone=3, ///< Смартфон
     AudioDevice=4, ///< Устройство аудио связи
     Network=5, ///< Сеть
-    StatisticandConfig=6 ///< Модуль статистики и конфигурации
+    StatisticandConfig=6, ///< Модуль статистики и конфигурации
+    Switch=7
 };
 /*!
 \brief Регистрация устроства
