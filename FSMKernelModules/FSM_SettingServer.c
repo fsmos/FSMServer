@@ -5,27 +5,9 @@
 \version 0.0.1_rc1
 \date 30.12.2015
 */
-#include <linux/fs.h>
+
 #include <linux/init.h>
 #include <linux/module.h>
-#include <linux/cdev.h>
-#include <linux/device.h>
-#include <linux/netdevice.h>
-#include <asm/uaccess.h>
-#include <linux/poll.h>
-#include <linux/sched.h>
-#include <linux/miscdevice.h> 
-#include <linux/if_arp.h>
-#include <linux/kernel.h>
-#include <net/sock.h>
-#include <linux/net.h>
-#include <asm/types.h>
-#include <linux/netlink.h>
-#include <linux/skbuff.h> 
-#include <linux/socket.h>
-#include <linux/net.h>
-#include <net/sock.h>
-#include <linux/etherdevice.h> 
 #include "FSM/FSMAudio/FSM_AudioStream.h"
 #include <FSM/FSMEthernet/FSMEthernetHeader.h> 
 #include "FSM/FSMDevice/fcmprotocol.h"
@@ -33,6 +15,7 @@
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
 #include "FSM/FSMDevice/fsm_statusstruct.h"
+
 struct FSM_SendCmd scmdt;
 struct fsm_Setting_Setting fsmSSS;
 

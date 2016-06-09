@@ -6,33 +6,16 @@
 \date 30.12.2015
 */
 
-#include <linux/fs.h>
 #include <linux/init.h>
 #include <linux/module.h>
-#include <linux/cdev.h>
-#include <linux/device.h>
 #include <linux/netdevice.h>
-#include <asm/uaccess.h>
-#include <linux/poll.h>
-#include <linux/sched.h>
-#include <linux/miscdevice.h> 
-#include <linux/if_arp.h>
-#include <linux/kernel.h>
-#include <net/sock.h>
-#include <linux/net.h>
-#include <asm/types.h>
-#include <linux/netlink.h>
-#include <linux/skbuff.h> 
-#include <linux/socket.h>
-#include <linux/net.h>
-#include <net/sock.h>
-#include <linux/etherdevice.h> 
 #include "FSM/FSMAudio/FSM_AudioStream.h"
 #include <FSM/FSMEthernet/FSMEthernetHeader.h> 
 #include "FSM/FSMDevice/fcmprotocol.h"
 #include "FSM/FSMDevice/fcm_audiodeviceclass.h"
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
+#include <linux/netfilter.h>
 
 
 
@@ -76,6 +59,43 @@ typedef enum debug_function
 }debug_fun ;
 #endif 
 
+static int packet_direct_xmit(struct sk_buff *skb)
+{
+	struct net_device *dev = skb->dev;
+	netdev_features_t features;
+	struct netdev_queue *txq;
+	int ret = NETDEV_TX_BUSY;
+
+	if (unlikely(!netif_running(dev) ||
+		     !netif_carrier_ok(dev)))
+		goto drop;
+
+	features = netif_skb_features(skb);
+	if (skb_needs_linearize(skb, features) &&
+	    __skb_linearize(skb))
+		goto drop;
+
+	txq = skb_get_tx_queue(dev, skb);
+
+	local_bh_disable();
+
+	HARD_TX_LOCK(dev, txq, smp_processor_id());
+	if (!netif_xmit_frozen_or_drv_stopped(txq))
+		ret = netdev_start_xmit(skb, dev, txq, false);
+	HARD_TX_UNLOCK(dev, txq);
+
+	local_bh_enable();
+
+	if (!dev_xmit_complete(ret))
+		kfree_skb(skb);
+
+	return ret;
+drop:
+	atomic_long_inc(&dev->tx_dropped);
+	kfree_skb(skb);
+	return NET_XMIT_DROP;
+}
+
  unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
 {
 
@@ -90,11 +110,12 @@ typedef enum debug_function
   #endif
  
   if(fsmdev==0) return 1;
-  skb = alloc_skb(len + hlen + tlen, GFP_ATOMIC);
+  //skb = alloc_skb(len + hlen + tlen, GFP_ATOMIC);
+  skb = dev_alloc_skb(len + hlen + tlen);
   if(skb==NULL)
   {
        printk( KERN_INFO "SKB Eror\n"); 
-       return 0;
+       goto out;
   }
   skb_reserve(skb, hlen);
   skb->dev = dev;
@@ -102,8 +123,9 @@ typedef enum debug_function
   skb_reset_network_header(skb);
   memcpy(skb_put(skb, len),data,len);
   if(dev_hard_header(skb, dev, __constant_htons(FSM_PROTO_ID_R), fsmdev->destmac, dev->dev_addr, skb->len)<0) goto out;
-  if(dev_queue_xmit(skb)<0) goto out;
-
+  packet_direct_xmit(skb);
+  //надо чистить буфер
+ 
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(get_sendethpack_exit);
 #endif
@@ -261,7 +283,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
     DEBUG_CALL_STACK_SetStack|(get_prcv_init);
 #endif
 
-     if (skb->pkt_type == PACKET_OTHERHOST || skb->pkt_type == PACKET_LOOPBACK) return 0;
+     if (skb->pkt_type == PACKET_OTHERHOST || skb->pkt_type == PACKET_LOOPBACK) goto clear;
       
        //printk( KERN_ERR "RegDev %u\n",dats);
      switch(dats)
@@ -270,13 +292,13 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
     
           if(FSM_RegisterEthernetDevice((struct FSM_DeviceRegistr *)skb->data,dev,eth->h_source)==0) 
           {
-          if(FSM_DeviceRegister(*((struct FSM_DeviceRegistr *)skb->data))!=0) return 1; 
+          if(FSM_DeviceRegister(*((struct FSM_DeviceRegistr *)skb->data))!=0) goto clear; 
           }
            dftv=FSM_FindDevice(((struct FSM_DeviceRegistr *)skb->data)->IDDevice);
            if(dftv==0) 
             {
                 printk( KERN_INFO "Eror \n"); 
-                 return 5;
+                 goto clear; 
             }
            //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
            dftv->dt->Proc((char*)skb->data,sizeof(struct FSM_DeviceRegistr),dftv);
@@ -292,7 +314,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
            if(dftv==0) 
             {
                 printk( KERN_INFO "Eror \n"); 
-                 return 5;
+                 goto clear; 
             }
            //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
            dftv->dt->Proc((char*)skb->data,sizeof(struct FSM_DeviceDelete),dftv);
@@ -307,7 +329,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           case AnsPing:///< Пинг
           break;
           case SendCmdToDevice:///< Отправка команды устройству
-          return 0;
+          goto clear; 
           break;
           case AnsSendCmdToDevice: ///< Подтверждение приёма команды устройством
           break;
@@ -331,7 +353,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
                  fsdev2.dev = dev; 
                 FSM_Send_Ethernet_Package(&fsmsc,sizeof(struct FSM_SendCmd)-sizeof(fsmsc.Data),&fsdev2);
 
-                 return 5;
+                  goto clear; 
             }
            //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
            dftv->dt->Proc((char*)skb->data,skb->len,dt);
@@ -349,7 +371,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           case SendAudio:///< Передача аудио данных
           //printk( KERN_INFO "FSM ID %u\n",((struct FSM_SendAudioData*)skb->data)->IDDevice); 
           if((FSM_AudioStreamCallback!=0)&&(((struct FSM_SendAudioData*)skb->data)->IDDevice<FSM_AudioStreamDeviceTreeSize) )FSM_AudioStreamCallback(((struct FSM_SendAudioData*)skb->data)->IDDevice,skb->data,skb->len);
-            return 0;         
+         goto clear;        
           break;
           case SendVideo:///< Передача видео данных
            break;
@@ -436,6 +458,9 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
    #ifdef  DEBUG_CALL_STACK 
    DEBUG_CALL_STACK_SetStack|(get_prcv_exit);
    #endif
+   
+clear:
+   kfree_skb(skb);  
    return skb->len; 
 }; 
 
@@ -457,7 +482,6 @@ static int __init FSMClientProtocol_init(void)
     DEBUG_CALL_STACK_GLOBSET
     DEBUG_CALL_STACK_SetStack|(init_on);
 #endif
-
    dev_add_pack( &FSMClientProtocol_proto ); 
    dft.type=(unsigned char)Network;
    dft.VidDevice=(unsigned char)Ethernet;
