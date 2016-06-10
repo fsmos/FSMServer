@@ -45,6 +45,10 @@ struct FSM_E1Device
     int idstream;
     struct fsm_ethernet_dev* ethdev;
     unsigned short streams_id[32];
+    unsigned char bit_ch;
+    uint64_t e1_eror_ch;
+    uint64_t pkg_count;
+    uint8_t cht;
     //struct FSME1Buff E1buffs;
 };
 struct fsm_po06_serversetting

@@ -46,6 +46,53 @@ typedef enum debug_function
 }debug_fun ;
 #endif 
 
+char E1AnalisPAcket(char ch0,struct FSM_E1Device* e1dev)
+{
+e1dev->pkg_count++;
+//printk( KERN_INFO "E1 Test: %u\n",ch0); 
+if((ch0&0x40)==0)
+{
+    if(e1dev->bit_ch==0)
+    {
+        printk( KERN_INFO "E1 Analiz: Error SH C: %i - %i -%x \n",e1dev->e1_eror_ch,e1dev->pkg_count,ch0); 
+        e1dev->e1_eror_ch++;
+    }
+    e1dev->bit_ch=0;
+    //чётный
+    if((ch0&0x3f)==0x1b)
+    {
+        return 0; 
+    }
+    else
+    {
+        printk( KERN_INFO "E1 Analiz: Error C \n"); 
+        return -1;
+    }
+}
+else
+{
+    if(e1dev->bit_ch==1)
+    {
+        printk( KERN_INFO "E1 Analiz: Error SH NC: %i - %i -%x \n",e1dev->e1_eror_ch,e1dev->pkg_count,ch0); 
+        e1dev->e1_eror_ch++;
+    }
+    e1dev->bit_ch=1;
+    if((ch0&0x20)==0x20) 
+    {
+        printk( KERN_INFO "E1 Analiz: Error NC Avaria CS\n"); 
+        return -2;
+         
+    }
+    if((ch0&0x04)==0x04) 
+    {
+        //printk( KERN_INFO "E1 Analiz: Error NC Ostatohnie Zatuchania\n"); 
+        return 0;
+    }
+    //нечётны
+}
+return 0;
+}
+
 void FSM_E1RecivePacket(char* data,short len)
 { 
    int i=0;
@@ -77,10 +124,11 @@ void FSM_E1RecivePacket(char* data,short len)
    
    for(i=0;i<pkt->count;i++)
    {
-        for(j=0;j<pkt->channels;j++)
+        E1AnalisPAcket(*(pkt->Data+(pkt->channels*i)),fsmdat);
+        for(j=0;j<pkt->channels-1;j++)
         {
             st=E1SI[j];
-           FSM_FIFOAudioStreamWrite((pkt->Data+(pkt->channels*i)+j),1,st);
+           FSM_FIFOAudioStreamWrite((pkt->Data+(pkt->channels*i)+j+1),1,st);
         }
    }
 
@@ -89,7 +137,13 @@ void FSM_E1RecivePacket(char* data,short len)
      pktout->channels=pkt->channels;
      for(i=0;i<pktout->count;i++)
      {
-       for(j=0;j<pktout->channels;j++)  
+        
+       *datar=fsmdat->cht;
+       fsmdat->cht++;
+       datar++;
+       size++;
+       
+       for(j=0;j<pktout->channels-1;j++)  
        { 
            if(size>=1024) break; 
            FSM_FIFOAudioStreamRead(datar,1,E1SI[j]);
@@ -106,6 +160,8 @@ void FSM_E1RecivePacket(char* data,short len)
 #endif
 }
 
+
+ 
 
 void FSM_E1SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 {
@@ -151,6 +207,9 @@ void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
               if(FSME1Dev[i].iddev==fsmdt->IDDevice)
               {
                  FSM_E1SendStreaminfo(FSME1Dev[i].idstream,fsmdt);
+                  FSME1Dev[i].bit_ch=1;
+                  FSME1Dev[i].e1_eror_ch=0;
+                  FSME1Dev[i].cht=0;
                  return; 
               }
           }
@@ -169,6 +228,9 @@ void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
              fsmas.Data=&FSME1Dev[i];
              FSME1Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
              FSME1Dev[i].iddev=fsmdt->IDDevice;
+             FSME1Dev[i].bit_ch=1;
+             FSME1Dev[i].e1_eror_ch=0;
+             FSME1Dev[i].cht=0;
              fsmas.ToProcess=0;
              fsmas.TransportDevice=0;
              fsmas.TransportDeviceType=FSM_FifoID;
