@@ -12,6 +12,7 @@ TARGET9 =FSM_SettingServer
 TARGET10 =FSM_Commutator
 TARGET11 =FSMFIFOAudioStream
 TARGET12 =FSM_SkyNet
+TARGET13 =FSM_E1CAS1
 
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
@@ -25,6 +26,8 @@ obj-m   += ${TARGET9}.o
 obj-m   += ${TARGET10}.o
 obj-m   += ${TARGET11}.o
 obj-m   += ${TARGET12}.o
+obj-m   += ${TARGET13}.o
+
 
 all:
 	make -C $(KDIR) M=$(PWD) modules

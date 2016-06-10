@@ -48,6 +48,7 @@
       <File Name="../FSMHeader/FSM/FSMDevice/FSM_DeviceProcess.h"/>
       <File Name="../FSMHeader/FSM/FSMDevice/fsm_electrodevice.h"/>
       <File Name="../FSMHeader/FSM/FSMDevice/fsm_statusstruct.h"/>
+      <File Name="../FSMHeader/FSM/FSMDevice/FSME1Cas.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="FSMSetting">
       <File Name="../FSMHeader/FSM/FSMSetting/FSM_settings.h"/>
@@ -74,6 +75,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_E1Device">
     <File Name="FSM_E1Device.c"/>
+    <File Name="FSM_E1CAS1.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSMAudioStream">
     <File Name="FSM_AudioStream.c"/>

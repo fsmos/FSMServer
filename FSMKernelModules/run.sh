@@ -3,6 +3,7 @@ rmmod FSM_SettingServer.ko
 rmmod FSM_StatisticServer.ko
 rmmod FSM_PO06Device.ko
 rmmod FSM_E1Device.ko
+rmmod FSM_E1CAS1.ko
 rmmod FSM_Commutator.ko
 rmmod FSMFIFOAudioStream.ko
 rmmod FSM_AudioStream.ko
@@ -27,6 +28,9 @@ a+="add-symbol-file $path FSMFIFOAudioStream.ko $(cat /sys/module/FSMFIFOAudioSt
 
 insmod FSM_Commutator.ko
 a+="add-symbol-file $path FSM_Commutator.ko $(cat /sys/module/FSM_Commutator/sections/.text) -s .bss $(cat /sys/module/FSM_Commutator/sections/.bss)\n"
+
+insmod FSM_E1CAS1.ko
+a+="add-symbol-file $path FSM_E1CAS1.ko $(cat /sys/module/FSM_E1CAS1/sections/.text) -s .bss $(cat /sys/module/FSM_E1CAS1/sections/.bss)\n"
 
 insmod FSM_E1Device.ko
 a+="add-symbol-file $path FSM_E1Device.ko $(cat /sys/module/FSM_E1Device/sections/.text) -s .bss $(cat /sys/module/FSM_E1Device/sections/.bss) \n"

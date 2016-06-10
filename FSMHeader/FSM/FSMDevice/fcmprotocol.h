@@ -1082,5 +1082,12 @@ struct FSM_BeepSignal
    unsigned short ID;///< Ид Звукового сигнала
 } __attribute__((aligned(4)));
 
+struct FSM_Header
+{
+   unsigned char opcode;///< Код операции
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+} __attribute__((aligned(4)));
 #endif // FCMPROTOCOL
 
