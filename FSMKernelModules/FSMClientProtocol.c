@@ -435,6 +435,17 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           break;
           case Beep: ///<Звук
           break;
+          case PacketFromUserSpace: 
+          dftv=FSM_FindDevice(((struct FSM_SendCmdUserspace *)skb->data)->IDDevice);
+           if(dftv==0) 
+            {
+                  goto clear; 
+            }
+           //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
+           dftv->dt->Proc((char*)skb->data,skb->len,dt);
+           ((struct FSM_SendCmdUserspace *)skb->data)->opcode=PacketToUserSpace;
+          FSM_Send_Ethernet_Package(skb->data,FSMH_Header_Size_SendCmdUserspace,FSM_FindEthernetDevice(((struct FSM_SendCmdUserspace *)skb->data)->IDDevice));
+          break;
       }                 
                     
                        

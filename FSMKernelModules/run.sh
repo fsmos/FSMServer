@@ -9,6 +9,7 @@ rmmod FSMFIFOAudioStream.ko
 rmmod FSM_AudioStream.ko
 rmmod FSM_Crypt.ko
 rmmod FSMClientProtocol.ko
+rmmod FSMServerIODev.ko
 rmmod FSM_DeviceProcess.ko
 
 path=""
@@ -19,6 +20,9 @@ a+="add-symbol-file $path FSM_DeviceProcess.ko $(cat /sys/module/FSM_DeviceProce
 
 insmod FSMClientProtocol.ko
 a+="add-symbol-file $path FSMClientProtocol.ko $(cat /sys/module/FSMClientProtocol/sections/.text) -s .bss $(cat /sys/module/FSMClientProtocol/sections/.bss) \n"
+
+insmod FSMServerIODev.ko
+a+="add-symbol-file $path FSMServerIODev.ko $(cat /sys/module/FSMServerIODev/sections/.text) -s .bss $(cat /sys/module/FSMServerIODev/sections/.bss) \n"
 
 insmod FSM_AudioStream.ko
 a+="add-symbol-file $path FSM_AudioStream.ko $(cat /sys/module/FSM_AudioStream/sections/.text) -s .bss $(cat /sys/module/FSM_AudioStream/sections/.bss) \n"
@@ -50,8 +54,5 @@ a+="add-symbol-file $path FSM_SkyNet.ko $(cat /sys/module/FSM_SkyNet/sections/.t
 //insmod FSM_Crypt.ko
 //a+="add-symbol-file $path FSM_Crypt.ko $(cat /sys/module/FSM_Crypt/sections/.text) -s .bss $(cat /sys/module/FSM_Crypt/sections/.bss)\n"
 
-//./FSMSendPack lo 1
-//./FSMSendPack lo 3
-//./FSMSendPack lo 4
-//./FSMSendPack lo 2
+./FSMSendPack 
 echo -e $a > runs.prog

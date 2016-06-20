@@ -30,6 +30,7 @@
   <Dependencies/>
   <VirtualDirectory Name="FSMKernelModules">
     <File Name="FSMClientProtocol.c"/>
+    <File Name="FSMServerIODev.c"/>
   </VirtualDirectory>
   <Dependencies Name="Release"/>
   <Dependencies Name="Debug">

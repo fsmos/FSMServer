@@ -1,0 +1,7 @@
+Package: libfsmctl
+Version: 0.0.1
+Section: base
+Architecture: all
+Provides: libfsmctl
+Maintainer: Gusenkov S.V <gusenkovs@list.ru>
+Description: FSM Lib for Send Ctl command 
