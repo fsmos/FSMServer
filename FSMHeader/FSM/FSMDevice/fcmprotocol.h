@@ -76,7 +76,8 @@ enum FSM_TypeDevice
     AudioDevice=4, ///< Устройство аудио связи
     Network=5, ///< Сеть
     StatisticandConfig=6, ///< Модуль статистики и конфигурации
-    Switch=7
+    Switch=7,
+    ControlMachine=8
 };
 /*!
 \brief Регистрация устроства

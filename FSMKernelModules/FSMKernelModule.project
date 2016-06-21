@@ -31,6 +31,7 @@
   <VirtualDirectory Name="FSMKernelModules">
     <File Name="FSMClientProtocol.c"/>
     <File Name="FSMServerIODev.c"/>
+    <File Name="FSM_ControlDeviceClass.c"/>
   </VirtualDirectory>
   <Dependencies Name="Release"/>
   <Dependencies Name="Debug">
@@ -65,6 +66,9 @@
     </VirtualDirectory>
     <VirtualDirectory Name="FSMSwitch">
       <File Name="../FSMHeader/FSM/FSM_Switch/fsm_switch.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="FSM_Client">
+      <File Name="../FSMHeader/FSM/FSM_Client/FSM_client.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Make">
@@ -189,5 +193,11 @@ source runs.prog</PostConnectCommands>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_SkyNet">
     <File Name="FSM_SkyNet.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FSMClient">
+    <File Name="FSM_Client.c"/>
+    <File Name="FSM_ControlDevice.c"/>
+    <File Name="FSM_StatisticClient.c"/>
+    <File Name="FSM_SettingClient.c"/>
   </VirtualDirectory>
 </CodeLite_Project>

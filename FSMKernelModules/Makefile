@@ -14,6 +14,11 @@ TARGET11 =FSMFIFOAudioStream
 TARGET12 =FSM_SkyNet
 TARGET13 =FSM_E1CAS1
 TARGET14 =FSMServerIODev
+TARGET15 =FSM_Client
+TARGET16 =FSM_ControlDevice
+TARGET17 =FSM_ControlDeviceClass
+TARGET18 =FSM_StatisticClient
+TARGET19 =FSM_SettingClient
 
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
@@ -29,7 +34,11 @@ obj-m   += ${TARGET11}.o
 obj-m   += ${TARGET12}.o
 obj-m   += ${TARGET13}.o
 obj-m   += ${TARGET14}.o
-
+obj-m   += ${TARGET15}.o
+obj-m   += ${TARGET16}.o
+obj-m   += ${TARGET17}.o
+obj-m   += ${TARGET18}.o
+obj-m   += ${TARGET19}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules

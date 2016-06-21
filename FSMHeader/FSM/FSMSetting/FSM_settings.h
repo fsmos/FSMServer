@@ -58,7 +58,9 @@
 
 #define FSM_SkyNetDeviceTreeSize 12
 
+#define FSM_ClientTreeSize 12
+
 #define FSM_E1CasTreeSize 12
 #endif	/* FSM_SETTINGS_H */
 
-#define DEBUG_CALL_STACK
+//#define DEBUG_CALL_STACK

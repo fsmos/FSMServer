@@ -54,7 +54,7 @@ if((ch0&0x40)==0)
 {
     if(e1dev->bit_ch==0)
     {
-        printk( KERN_INFO "E1 Analiz: Error SH C: %i - %i -%x \n",e1dev->e1_eror_ch,e1dev->pkg_count,ch0); 
+      //  printk( KERN_INFO "E1 Analiz: Error SH C: %i - %i -%x \n",e1dev->e1_eror_ch,e1dev->pkg_count,ch0); 
         e1dev->e1_eror_ch++;
     }
     e1dev->bit_ch=0;
@@ -65,7 +65,7 @@ if((ch0&0x40)==0)
     }
     else
     {
-        printk( KERN_INFO "E1 Analiz: Error C \n"); 
+       // printk( KERN_INFO "E1 Analiz: Error C \n"); 
         return -1;
     }
 }
@@ -73,7 +73,7 @@ else
 {
     if(e1dev->bit_ch==1)
     {
-        printk( KERN_INFO "E1 Analiz: Error SH NC: %i - %i -%x \n",e1dev->e1_eror_ch,e1dev->pkg_count,ch0); 
+        //printk( KERN_INFO "E1 Analiz: Error SH NC: %i - %i -%x \n",e1dev->e1_eror_ch,e1dev->pkg_count,ch0); 
         e1dev->e1_eror_ch++;
     }
     e1dev->bit_ch=1;

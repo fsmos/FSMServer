@@ -1,2 +1,10 @@
-rmmod FSM_ClientModule.ko
-insmod FSM_ClientModule.ko
+rmmod FSM_StatisticClient.ko
+rmmod FSM_SettingClient.ko
+rmmod FSM_ControlDevice.ko
+rmmod FSM_Client.ko
+
+
+insmod FSM_Client.ko
+insmod FSM_ControlDevice.ko
+insmod FSM_SettingClient.ko
+insmod FSM_StatisticClient.ko

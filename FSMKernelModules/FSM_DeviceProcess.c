@@ -65,8 +65,9 @@ typedef enum debug_function
     get_ddr_exit=0x27,
     
 }debug_fun ;
-#endif 
 EXPORT_SYMBOL(debug_global);
+#endif 
+
 
 static int __init FSMDeviceProcess_init(void)
 {

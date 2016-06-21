@@ -15,6 +15,8 @@
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
 #include "FSM/FSMDevice/fsm_statusstruct.h"
+#include "FSM/FSMSetting/FSM_settings.h"
+#include "FSM/FSM_Client/FSM_client.h"
 
 struct FSM_SendCmd scmdt;
 struct fsm_Setting_Setting fsmSSS;
