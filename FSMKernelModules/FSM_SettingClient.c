@@ -147,7 +147,6 @@ int FSMSet_rcv(char* Data,short len, struct fsm_client_struct* dev)
                     
 }; 
 
- 
 static int __init FSM_Client_Setting_init(void)
 {
     setservid=22;

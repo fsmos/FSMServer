@@ -18,6 +18,7 @@
 #include <linux/netfilter.h>
 struct fsm_client_struct fsmlcs[FSM_ClientTreeSize];
 struct fsm_server_connection fsmcon;
+struct fsm_event_struct fsmes[FSM_EventTreeSize];
 
 #ifdef  DEBUG_CALL_STACK 
 uint64_t debug_this1;
@@ -177,6 +178,44 @@ int FSM_RegisterServer(unsigned short id,unsigned char type,unsigned char VidDev
 }
 EXPORT_SYMBOL(FSM_RegisterServer);
 
+struct fsm_event_struct* FSM_RegisterEvent(unsigned int id,EventClientProcess Handler)
+{
+    int i;
+    for(i=0;i<FSM_EventTreeSize;i++)
+    {
+    if(fsmes[i].reg==0)
+    {
+    fsmes[i].reg=1;
+    fsmes[i].id=id;
+    fsmes[i].Handler=Handler;
+    return &fsmes[i];
+    }
+    }
+    return 0;
+}
+EXPORT_SYMBOL(FSM_RegisterEvent);
+
+struct fsm_event_struct* FSM_FindEvent(unsigned int id)
+{
+    int i;
+    for(i=0;i<FSM_EventTreeSize;i++)
+    {
+    if((fsmes[i].reg==1)&&(fsmes[i].id==id))
+    {
+    return &fsmes[i];
+    }
+    }
+    return 0;
+}
+EXPORT_SYMBOL(FSM_FindEvent);
+
+void FSM_DeleteEvent(unsigned int id)
+{
+    struct fsm_event_struct* evnt=FSM_FindEvent(id);
+    if(evnt!=0) evnt->reg=0;
+}
+EXPORT_SYMBOL(FSM_DeleteEvent);
+
 int FSM_RegisterDevice(unsigned short id,unsigned char type,unsigned char VidDevice, unsigned char PodVidDevice,unsigned char KodDevice, DeviceClientProcess Handler)
 {
     int i;
@@ -318,6 +357,7 @@ int FSMClient_pack_rcv( struct sk_buff *skb, struct net_device *dev,
      char dats= ((char*)skb->data)[0];
      struct ethhdr *eth=eth_hdr(skb);
      struct fsm_client_struct* clstr;
+      struct fsm_event_struct* evstr;
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_GLOBSET
     DEBUG_CALL_STACK_SetStack|(get_prcv_init);
@@ -462,6 +502,11 @@ int FSMClient_pack_rcv( struct sk_buff *skb, struct net_device *dev,
              if(clstr==0) goto clear;
              clstr->Handler(skb->data,sizeof(struct FSM_SendCmdUserspace),clstr);
           }
+          break;
+          case SysEvent:
+          evstr = FSM_FindEvent(((struct FSM_EventSignal*)(skb->data))->ID);
+          if(evstr==0) goto clear;
+          evstr->Handler(skb->data,sizeof(struct FSM_SendCmdUserspace),evstr);
           break;
       }                 
                     

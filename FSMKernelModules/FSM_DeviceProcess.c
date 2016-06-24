@@ -79,7 +79,7 @@ static int __init FSMDeviceProcess_init(void)
     
     memset(fsm_dft,0,sizeof(fsm_dft));
     memset(fsm_dt,0,sizeof(fsm_dt));
-    
+    FSM_SendEventToAllDev(FSM_ServerStarted);
 #ifdef  DEBUG_CALL_STACK 
     debug_this=DEBUG_CALL_STACK_SetStack|(init_off);
 #endif
@@ -103,6 +103,24 @@ static void __exit FSMDeviceProcess_exit(void)
     debug_this=DEBUG_CALL_STACK_SetStack|(exit_off);
 #endif
 }
+
+void FSM_SendEventToDev(enum FSM_eventlist idevent, struct FSM_DeviceTree* TransportDevice)
+{
+   struct  FSM_EventSignal fsm_event;
+   fsm_event.ID=idevent;
+   fsm_event.opcode = SysEvent;
+   fsm_event.IDDevice=0;
+   fsm_event.CRC=0;
+   TransportDevice->dt->Proc((char*)&fsm_event,sizeof(struct FSM_EventSignal),0);
+}
+EXPORT_SYMBOL(FSM_SendEventToDev);
+void FSM_SendEventToAllDev(enum FSM_eventlist idevent)
+{
+    struct FSM_DeviceTree* TransportDevice;
+    TransportDevice=FSM_FindDevice(FSM_EthernetID);
+    if(TransportDevice!=0) FSM_SendEventToDev(idevent,TransportDevice);
+}
+EXPORT_SYMBOL(FSM_SendEventToAllDev);
 /*!
 \brief Получение статистики
 \return Структуру статистики
@@ -188,6 +206,7 @@ void FSM_Setting_Set(struct FSM_DeviceTree* fdt,void* set)
 #endif
 
   fdt->config=set;
+  FSM_SendEventToAllDev(FSM_ServerConfigChanged);
   
 #ifdef  DEBUG_CALL_STACK 
     debug_this=DEBUG_CALL_STACK_SetStack|(get_setting_set_exit);
@@ -208,7 +227,8 @@ void FSM_Setting_Applay(struct FSM_DeviceTree* fdt,void* set)
   memcpy(fdt->config,set,fdt->dt->config_len);
   printk( KERN_INFO "FSMAP %i\n", fdt->IDDevice); 
   if(fdt->dt->aplayp!=0) fdt->dt->aplayp(fdt);
-
+  
+   FSM_SendEventToAllDev(FSM_ServerConfigChanged);
 #ifdef  DEBUG_CALL_STACK 
     debug_this=DEBUG_CALL_STACK_SetStack|(get_setting_applay_exit);
 #endif
@@ -223,7 +243,8 @@ void FSM_Statstic_SetStatus(struct FSM_DeviceTree* fdt,char* status)
    debug_this=DEBUG_CALL_STACK_SetStack|(get_set_status_init);
 #endif
 
-  strcpy(fdt->state,status);
+    strcpy(fdt->state,status);
+    FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
   
 #ifdef  DEBUG_CALL_STACK 
   debug_this=DEBUG_CALL_STACK_SetStack|(get_set_status_exit);
@@ -257,10 +278,15 @@ unsigned char FSM_DeviceClassRegister(struct FSM_DeviceFunctionTree dft)
             fsm_dft[i].Proc=dft.Proc;
             fsm_dft[i].config_len=dft.config_len;
             fsm_dft[i].aplayp=dft.aplayp;
+            
+            FSM_SendEventToAllDev(FSM_ServerConfigChanged);
+            FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
              printk( KERN_INFO "DeviceClassRegistred: Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n", dft.type,dft.VidDevice,dft.PodVidDevice,dft.KodDevice ); 
             return 0;
         }
     }
+    
+    
     
     #ifdef  DEBUG_CALL_STACK 
         debug_this=DEBUG_CALL_STACK_SetStack|(get_dev_class_exit);
@@ -294,6 +320,9 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
             fsm_dt[i].registr=1;
             fsm_dt[i].IDDevice=dt.IDDevice;
             fsm_dt[i].dt=classf;
+            
+            FSM_SendEventToAllDev(FSM_ServerConfigChanged);
+            FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
             printk( KERN_INFO "DeviceRegistred: ID: %u Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n", dt.IDDevice,dt.type,dt.VidDevice,dt.PodVidDevice,dt.KodDevice );
 
             return 0;
@@ -416,6 +445,9 @@ debug_this=DEBUG_CALL_STACK_SetStack|(get_ddr_init);
 #endif
     
     if(dt!=0) dt->registr=0; 
+    
+    FSM_SendEventToAllDev(FSM_ServerConfigChanged);
+    FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
     printk( KERN_INFO "DeviceDeRegistred: ID: %u \n", fdd.IDDevice);
     
 #ifdef  DEBUG_CALL_STACK 
@@ -438,6 +470,9 @@ void FSM_ClassDeRegister(struct FSM_DeviceFunctionTree dfti)
 #endif
     
     if(dft!=0) dft->registr=0; 
+    
+    FSM_SendEventToAllDev(FSM_ServerConfigChanged);
+    FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
     printk( KERN_INFO "DeviceClassDeregistred: Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n", dfti.type,dfti.VidDevice,dfti.PodVidDevice,dfti.KodDevice );
 
 

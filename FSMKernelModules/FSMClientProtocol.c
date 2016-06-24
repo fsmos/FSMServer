@@ -99,10 +99,10 @@ drop:
  unsigned int FSM_Send_Ethernet_Package(void * data, int len, struct fsm_ethernet_dev *fsmdev)
 {
 
-  struct net_device *dev = fsmdev->dev;
+  struct net_device *dev;
   struct sk_buff *skb;
-  int hlen = LL_RESERVED_SPACE(dev);
-  int tlen = dev->needed_tailroom;
+  int hlen ;
+  int tlen;
 
   #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_GLOBSET
@@ -110,6 +110,9 @@ drop:
   #endif
  
   if(fsmdev==0) return 1;
+  dev =fsmdev->dev;
+  tlen = dev->needed_tailroom;
+  hlen = LL_RESERVED_SPACE(dev);
   //skb = alloc_skb(len + hlen + tlen, GFP_ATOMIC);
   skb = dev_alloc_skb(len + hlen + tlen);
   if(skb==NULL)
@@ -237,21 +240,32 @@ int  FSM_DeleteEthernetDevice(unsigned short id)
 }
 void FSM_EthernetSendPckt(char* data,short len, struct FSM_DeviceTree* fsmdt)
 {
-    struct fsm_ethernet_dev* fsmsd=FSM_FindEthernetDevice(fsmdt->IDDevice);
-    
+    struct fsm_ethernet_dev* fsmsd;
+    struct fsm_ethernet_dev fsdev2;
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_GLOBSET
     DEBUG_CALL_STACK_SetStack|(get_esp_init);
 #endif
-
+    fsmsd=0;
+    if(fsmdt!=0) fsmsd=FSM_FindEthernetDevice(fsmdt->IDDevice);
+    else fsmsd=0;
+    
     if(fsmsd==0) 
         {
-            printk( KERN_INFO "FSM Ethernet Not Registred %u \n",fsmdt->IDDevice); 
-            return;
+        fsdev2.numdev=1;
+        memset(fsdev2.destmac,0xFF,6);
+        fsdev2.dev = first_net_device( &init_net ); 
+        while (fsdev2.dev)
+        {
+        FSM_Send_Ethernet_Package(data,len,&fsdev2);
+        fsdev2.dev = next_net_device( fsdev2.dev );
+        }
+        printk(KERN_INFO "FSM Ethernet Not Registred. Use Broacast \n"); 
+        return;
         }
       //  printk( KERN_INFO "FSM Send %u \n",len); 
 
-    FSM_Send_Ethernet_Package(data,len,fsmsd);
+      FSM_Send_Ethernet_Package(data,len,fsmsd);
 
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(get_esp_exit);
@@ -435,17 +449,6 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           break;
           case Beep: ///<Звук
           break;
-          case PacketFromUserSpace: 
-          dftv=FSM_FindDevice(((struct FSM_SendCmdUserspace *)skb->data)->IDDevice);
-           if(dftv==0) 
-            {
-                  goto clear; 
-            }
-           //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
-           dftv->dt->Proc((char*)skb->data,skb->len,dt);
-           ((struct FSM_SendCmdUserspace *)skb->data)->opcode=PacketToUserSpace;
-          FSM_Send_Ethernet_Package(skb->data,FSMH_Header_Size_SendCmdUserspace,FSM_FindEthernetDevice(((struct FSM_SendCmdUserspace *)skb->data)->IDDevice));
-          break;
       }                 
                     
                        
@@ -514,6 +517,7 @@ static int __init FSMClientProtocol_init(void)
    FSM_Statstic_SetStatus(dt,"ok");
    if(dt==0) return 1;
    memset(fsdev,0,sizeof(fsdev));
+   FSM_SendEventToAllDev(FSM_EthernetStarted);
    printk( KERN_INFO "FSMClientProtocol module loaded\n" ); 
 
 #ifdef  DEBUG_CALL_STACK 

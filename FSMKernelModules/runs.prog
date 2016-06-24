@@ -1,14 +1,15 @@
-add-symbol-file FSM_DeviceProcess.ko 0xffffffffc0207000 -s .bss 0xffffffffc0209380 
-add-symbol-file FSMClientProtocol.ko 0xffffffffc017a000 -s .bss 0xffffffffc017c3c0 
-add-symbol-file FSMServerIODev.ko 0xffffffffc0228000 -s .bss 0xffffffffc022a480 
-add-symbol-file FSM_AudioStream.ko 0xffffffffc022d000 -s .bss 0xffffffffc022f380 
-add-symbol-file FSMFIFOAudioStream.ko 0xffffffffc0233000 -s .bss 0xffffffffc0235380
-add-symbol-file FSM_Commutator.ko 0xffffffffc0191000 -s .bss 0xffffffffc0193380
-add-symbol-file FSM_E1CAS1.ko -s .bss 
-add-symbol-file FSM_E1Device.ko 0xffffffffc0258000 -s .bss 0xffffffffc025a380 
-add-symbol-file FSM_PO06Device.ko 0xffffffffc025e000 -s .bss 0xffffffffc0260380
-add-symbol-file FSM_StatisticServer.ko 0xffffffffc0263000 -s .bss 0xffffffffc0265380
-add-symbol-file FSM_SettingServer.ko 0xffffffffc0268000 -s .bss 0xffffffffc026a380
-add-symbol-file FSM_SkyNet.ko 0xffffffffc0270000 -s .bss 0xffffffffc0272380
-add-symbol-file FSM_ControlDeviceClass.ko 0xffffffffc0275000 -s .bss 0xffffffffc0277380
+add-symbol-file FSM_DeviceProcess.ko 0xffffffffc0235000 -s .bss 0xffffffffc0237380 
+add-symbol-file FSMClientProtocol.ko 0xffffffffc01e8000 -s .bss 0xffffffffc01ea3c0 
+add-symbol-file FSMServerIODev.ko 0xffffffffc01f2000 -s .bss 0xffffffffc01f4480 
+add-symbol-file FSM_AudioStream.ko 0xffffffffc01f7000 -s .bss 0xffffffffc01f9380 
+add-symbol-file FSMFIFOAudioStream.ko 0xffffffffc0256000 -s .bss 0xffffffffc0258380
+add-symbol-file FSM_Commutator.ko 0xffffffffc0218000 -s .bss 0xffffffffc021a380
+add-symbol-file FSM_E1CAS1.ko 0xffffffffc021d000 -s .bss 0xffffffffc021f380
+add-symbol-file FSM_E1Device.ko 0xffffffffc0222000 -s .bss 0xffffffffc0224380 
+add-symbol-file FSM_PO06Device.ko 0xffffffffc0228000 -s .bss 0xffffffffc022a380
+add-symbol-file FSM_StatisticServer.ko 0xffffffffc022d000 -s .bss 0xffffffffc022f380
+add-symbol-file FSM_SettingServer.ko 0xffffffffc0278000 -s .bss 0xffffffffc027a380
+add-symbol-file FSM_SkyNet.ko 0xffffffffc027d000 -s .bss 0xffffffffc027f380
+add-symbol-file FSM_ControlDeviceClass.ko 0xffffffffc0282000 -s .bss 0xffffffffc0284380
+add-symbol-file FSM_Crypt.ko 0xffffffffc0287000 -s .bss 0xffffffffc0289380
 

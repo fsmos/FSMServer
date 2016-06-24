@@ -199,5 +199,7 @@ source runs.prog</PostConnectCommands>
     <File Name="FSM_ControlDevice.c"/>
     <File Name="FSM_StatisticClient.c"/>
     <File Name="FSM_SettingClient.c"/>
+    <File Name="FSM_SendSignalToPipe.c"/>
+    <File Name="FSMClientIOCtl.c"/>
   </VirtualDirectory>
 </CodeLite_Project>

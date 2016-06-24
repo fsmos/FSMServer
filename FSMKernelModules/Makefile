@@ -19,6 +19,8 @@ TARGET16 =FSM_ControlDevice
 TARGET17 =FSM_ControlDeviceClass
 TARGET18 =FSM_StatisticClient
 TARGET19 =FSM_SettingClient
+TARGET20 =FSM_SendSignalToPipe
+TARGET21 = FSMClientIOCtl
 
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
@@ -39,6 +41,8 @@ obj-m   += ${TARGET16}.o
 obj-m   += ${TARGET17}.o
 obj-m   += ${TARGET18}.o
 obj-m   += ${TARGET19}.o
+obj-m   += ${TARGET20}.o
+obj-m   += ${TARGET21}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules

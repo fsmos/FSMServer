@@ -160,6 +160,9 @@ typedef void (*FSM_FDeRegister)(struct FSM_DeviceDelete fdd);
 */
 typedef void (*FSM_FClassDeRegister)(struct FSM_DeviceFunctionTree dft);
 
+void FSM_SendEventToDev(enum FSM_eventlist idevent, struct FSM_DeviceTree* TransportDevice);
+void FSM_SendEventToAllDev(enum FSM_eventlist idevent);
+
 enum FSM_UK /*125 *** 254*/
 {
    FSMNotRegistred=125,

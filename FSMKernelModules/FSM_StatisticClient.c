@@ -133,13 +133,19 @@ int FSMStat_rcv(char* Data,short len, struct fsm_client_struct* dev)
           case Beep: ///<Звук
           break;
       }                 
-                    
+         return 0;           
 }; 
 
+void FSM_StatEventLoaded(char* Data,short len , struct fsm_event_struct* cl_str)
+{
+    printk( KERN_INFO "Event" );  
+    FSM_SendSignalToPipe("fsmstat",FSM_ServerStatisticChanged);
+}
  
 static int __init FSM_Client_Statistic_init(void)
 {
     FSM_RegisterDevice(FSM_StatisicID,StatisticandConfig,FSMDeviceStatistic,ComputerStatistic,PCx86,FSMStat_rcv);
+    FSM_RegisterEvent(FSM_ServerStatisticChanged,FSM_StatEventLoaded);
     printk( KERN_INFO "FSM Statistic module loaded\n" );  
     return 0;
 }
@@ -148,6 +154,7 @@ static int __init FSM_Client_Statistic_init(void)
 static void __exit FSM_Client_Statistic_exit(void)
 {  
    FSM_DeleteDevice(FSM_StatisicID);
+   FSM_DeleteEvent(FSM_ServerStatisticChanged);
    printk( KERN_INFO "FSM Statistic module unloaded\n" );  
 }
 module_init(FSM_Client_Statistic_init);

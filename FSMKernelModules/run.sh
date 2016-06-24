@@ -1,3 +1,4 @@
+rmmod FSM_ControlDeviceClass.ko
 rmmod FSM_SkyNet.ko
 rmmod FSM_SettingServer.ko
 rmmod FSM_StatisticServer.ko
@@ -54,8 +55,9 @@ a+="add-symbol-file $path FSM_SkyNet.ko $(cat /sys/module/FSM_SkyNet/sections/.t
 insmod FSM_ControlDeviceClass.ko
 a+="add-symbol-file $path FSM_ControlDeviceClass.ko $(cat /sys/module/FSM_ControlDeviceClass/sections/.text) -s .bss $(cat /sys/module/FSM_ControlDeviceClass/sections/.bss)\n"
 
-//insmod FSM_Crypt.ko
-//a+="add-symbol-file $path FSM_Crypt.ko $(cat /sys/module/FSM_Crypt/sections/.text) -s .bss $(cat /sys/module/FSM_Crypt/sections/.bss)\n"
+insmod FSM_Crypt.ko
+a+="add-symbol-file $path FSM_Crypt.ko $(cat /sys/module/FSM_Crypt/sections/.text) -s .bss $(cat /sys/module/FSM_Crypt/sections/.bss)\n"
 
-./FSMSendPack 
+
+//./FSMSendPack 
 echo -e $a > runs.prog

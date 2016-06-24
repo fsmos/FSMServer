@@ -61,6 +61,12 @@
 #define FSM_ClientTreeSize 12
 
 #define FSM_E1CasTreeSize 12
+
+#define FSM_EventTreeSize 12
+
+#define FSM_IOCTLTreeSize 12
+
+#define FSM_EventIOCtlId 1
 #endif	/* FSM_SETTINGS_H */
 
 //#define DEBUG_CALL_STACK
