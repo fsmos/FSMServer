@@ -202,4 +202,7 @@ source runs.prog</PostConnectCommands>
     <File Name="FSM_SendSignalToPipe.c"/>
     <File Name="FSMClientIOCtl.c"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="FSM_MN825">
+    <File Name="FSM_MN825Device.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>

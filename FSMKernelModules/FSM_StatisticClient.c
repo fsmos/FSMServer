@@ -46,6 +46,9 @@ int FSMStat_rcv(char* Data,short len, struct fsm_client_struct* dev)
             case AnsGetStatistic:
             memcpy(&fsm_ss.statel[((struct fsm_status_element*)fscts->Data)->row][((struct fsm_status_element*)fscts->Data)->column],fscts->Data,sizeof(struct fsm_status_element));
             break;
+            case SendSettingFull:
+            FSM_SendSignalToPipe("fsmstat",FSM_ServerStatisticChanged);
+            break;
             case FSMNotRegistred:
             FSM_RegisterDevice(FSM_StatisicID,FSMDeviceStatistic,ComputerStatistic,PCx86,StatisticandConfig,FSMStat_rcv);
             break;
@@ -135,17 +138,47 @@ int FSMStat_rcv(char* Data,short len, struct fsm_client_struct* dev)
       }                 
          return 0;           
 }; 
+void FSMStat_rcv_ioctl(char* Data,short len , struct fsm_ioctl_struct* ioctl)
+{
+    struct FSM_SendCmdUserspace* fsm_scus=(struct FSM_SendCmdUserspace*)Data;
+    switch(fsm_scus->cmd)
+    {
+        case FSMIOCTLStat_Requst:
+        memset(&fsm_ss,0,sizeof(fsm_ss));
+        regpcmdts.opcode=SendCmdToServer;
+        regpcmdts.countparam=1;
+        regpcmdts.CRC=0;
+        regpcmdts.IDDevice=FSM_StatisicID;  
+        regpcmdts.cmd=GetStatistic;
+        FSM_Send_Ethernet_TS(&regpcmdts,sizeof(struct FSM_SendCmdTS));
+        printk( KERN_INFO "Request" );  
+        break;
+        case FSMIOCTLStat_Read:
+        printk( KERN_INFO "Read %u - %u",fsm_scus->Data[0],fsm_scus->Data[1] );
+        memcpy(fsm_scus->Data,&(fsm_ss.statel[fsm_scus->Data[0]][fsm_scus->Data[1]]),sizeof(struct fsm_status_element));
+        
+        break;
+    }
+}
 
 void FSM_StatEventLoaded(char* Data,short len , struct fsm_event_struct* cl_str)
 {
     printk( KERN_INFO "Event" );  
-    FSM_SendSignalToPipe("fsmstat",FSM_ServerStatisticChanged);
+    memset(&fsm_ss,0,sizeof(fsm_ss));
+    regpcmdts.opcode=SendCmdToServer;
+    regpcmdts.countparam=1;
+    regpcmdts.CRC=0;
+    regpcmdts.IDDevice=FSM_StatisicID;  
+    regpcmdts.cmd=GetStatistic;
+    FSM_Send_Ethernet_TS(&regpcmdts,sizeof(struct FSM_SendCmdTS));
+    
 }
  
 static int __init FSM_Client_Statistic_init(void)
 {
     FSM_RegisterDevice(FSM_StatisicID,StatisticandConfig,FSMDeviceStatistic,ComputerStatistic,PCx86,FSMStat_rcv);
     FSM_RegisterEvent(FSM_ServerStatisticChanged,FSM_StatEventLoaded);
+    FSM_RegisterIOCtl(FSM_StatistickIOCtlId,FSMStat_rcv_ioctl);
     printk( KERN_INFO "FSM Statistic module loaded\n" );  
     return 0;
 }

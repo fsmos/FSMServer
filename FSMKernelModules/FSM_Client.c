@@ -135,9 +135,15 @@ unsigned int FSM_Send_Ethernet(void * data, int len, struct fsm_server_connectio
 	return 0;
 }
 EXPORT_SYMBOL(FSM_Send_Ethernet);
+
 unsigned int FSM_Send_Ethernet_TS(void * data, int len)
 {
+    if(fsmcon.coonect==1)
+    {
     FSM_Send_Ethernet(data,len,&fsmcon);
+    return 0;
+    }
+    return 1;
 }
 EXPORT_SYMBOL(FSM_Send_Ethernet_TS);
 
@@ -161,6 +167,11 @@ int FSM_RegisterServer(unsigned short id,unsigned char type,unsigned char VidDev
    regp.CRC=0;
    memset(fsmdev.destmac,0xFF,6);
    fsmcon.id=id;
+   fsmcon.VidDevice=VidDevice;
+   fsmcon.PodVidDevice=PodVidDevice;
+   fsmcon.KodDevice=KodDevice;
+   fsmcon.type=type;
+   
    fsmdev.dev=first_net_device( &init_net ); 
    
    while (fsmdev.dev)
@@ -241,6 +252,10 @@ int FSM_RegisterDevice(unsigned short id,unsigned char type,unsigned char VidDev
     fsmlcs[i].Handler=Handler;
     fsmlcs[i].reg=1;
     fsmlcs[i].id=id;
+    fsmlcs[i].VidDevice=VidDevice;
+    fsmlcs[i].PodVidDevice=PodVidDevice;
+    fsmlcs[i].KodDevice=KodDevice;
+    fsmlcs[i].type=type;
     break;
     }
     }
@@ -532,7 +547,11 @@ static struct packet_type FSMClient_proto = {
 }; 
 
 
-
+void FSM_EthernetEventLoaded(char* Data,short len , struct fsm_event_struct* cl_str)
+{
+    int i;
+    FSM_RegisterServer(fsmlcs[i].id,fsmlcs[i].type,fsmlcs[i].VidDevice,fsmlcs[i].PodVidDevice,fsmlcs[i].KodDevice);
+}
 
  
 static int __init FSMClient_init(void)
@@ -544,9 +563,10 @@ static int __init FSMClient_init(void)
     DEBUG_CALL_STACK_GLOBSET
     DEBUG_CALL_STACK_SetStack|(init_on);
 #endif
-
+   
    dev_add_pack( &FSMClient_proto ); 
    printk( KERN_INFO "FSMClient module loaded\n" ); 
+   FSM_RegisterEvent(FSM_EthernetStarted,FSM_EthernetEventLoaded);
 
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(init_off);

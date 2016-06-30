@@ -303,13 +303,15 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
 {
     int i;
     struct FSM_DeviceFunctionTree* classf;
-    
+    struct FSM_DeviceTree* dtsc;
     #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_GLOBSET
     debug_this=DEBUG_CALL_STACK_SetStack|(get_dev_reg_init);
     #endif
-
-    if(FSM_FindDevice(dt.IDDevice)!=0) return 2;
+     
+    dtsc=FSM_FindDevice(dt.IDDevice);
+    if(dtsc!=0) dtsc->registr=0;
+    
     for(i=0;i<FSM_DeviceTreeSize;i++)
     {
         if(fsm_dt[i].registr==0)

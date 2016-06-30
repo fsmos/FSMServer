@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>ico/elreleon.png</file>
+        <file>ico/elreleon.ico</file>
+        <file>ico/elreleoff.png</file>
+    </qresource>
+</RCC>

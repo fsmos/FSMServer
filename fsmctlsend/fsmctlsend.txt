@@ -1,1 +1,1 @@
-./Release/main.c.o
+./Debug/main.c.o

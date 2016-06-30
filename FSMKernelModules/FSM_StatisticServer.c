@@ -61,6 +61,9 @@ void FSM_StatisticRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
 
                }
            }
+           memset(scmdt.Data,0,sizeof(struct fsm_status_element));
+           scmdt.cmd=SendSettingFull;
+           fsmdt->dt->Proc((char*)&scmdt,hlen,fsdt);
            break;
         
          }

@@ -58,6 +58,8 @@ a+="add-symbol-file $path FSM_ControlDeviceClass.ko $(cat /sys/module/FSM_Contro
 insmod FSM_Crypt.ko
 a+="add-symbol-file $path FSM_Crypt.ko $(cat /sys/module/FSM_Crypt/sections/.text) -s .bss $(cat /sys/module/FSM_Crypt/sections/.bss)\n"
 
+insmod FSM_MN825Device.ko
+a+="add-symbol-file $path FSM_MN825Device.ko $(cat /sys/module/FSM_MN825Device/sections/.text) -s .bss $(cat /sys/module/FSM_MN825Device/sections/.bss)\n"
 
 //./FSMSendPack 
 echo -e $a > runs.prog

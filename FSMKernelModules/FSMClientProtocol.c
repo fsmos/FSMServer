@@ -166,7 +166,7 @@ int FSM_RegisterEthernetDevice(struct FSM_DeviceRegistr *fsmrg, struct net_devic
   
     for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
     {
-        if((fsmrg->IDDevice==fsdev[i].id)&&(fsdev[i].reg==1)) return 1;
+        if((fsmrg->IDDevice==fsdev[i].id)&&(fsdev[i].reg==1)) fsdev[i].reg=0;
     }
     for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
     {
@@ -260,7 +260,7 @@ void FSM_EthernetSendPckt(char* data,short len, struct FSM_DeviceTree* fsmdt)
         FSM_Send_Ethernet_Package(data,len,&fsdev2);
         fsdev2.dev = next_net_device( fsdev2.dev );
         }
-        printk(KERN_INFO "FSM Ethernet Not Registred. Use Broacast \n"); 
+        //printk(KERN_INFO "FSM Ethernet Not Registred. Use Broacast \n"); 
         return;
         }
       //  printk( KERN_INFO "FSM Send %u \n",len); 

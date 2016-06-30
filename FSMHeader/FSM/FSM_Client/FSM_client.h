@@ -7,7 +7,10 @@ struct fsm_client_struct
 {
     char reg;
     unsigned short id;
-  
+     unsigned char type;
+    unsigned char VidDevice;
+    unsigned char PodVidDevice;
+    unsigned char KodDevice;
     DeviceClientProcess Handler;
 };
 struct fsm_event_struct
@@ -28,6 +31,10 @@ struct fsm_ioctl_struct
 struct fsm_server_connection
 {
     unsigned short id;  
+    unsigned char type;
+    unsigned char VidDevice;
+    unsigned char PodVidDevice;
+    unsigned char KodDevice;
     char destmac[6];
     char coonect;
     struct net_device *dev;

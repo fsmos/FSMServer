@@ -1,0 +1,9 @@
+
+Name="el"
+[r1on]
+Name="ON"
+img="on.png"
+
+[r1off]
+Name="OFF"
+img="off.png"
