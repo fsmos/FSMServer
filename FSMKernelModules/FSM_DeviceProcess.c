@@ -104,6 +104,21 @@ static void __exit FSMDeviceProcess_exit(void)
 #endif
 }
 
+void FSM_ToProcess(int id, char* Data,short len, struct FSM_DeviceTree* pdt)
+{
+   if(fsm_dt[id].registr==1)
+   {
+    fsm_dt[id].dt->Proc(Data,len,pdt);
+   }
+}
+EXPORT_SYMBOL(FSM_ToProcess);
+
+int FSM_ToCmdStream(struct FSM_DeviceTree* pdt)
+{
+   return pdt->id;
+}
+EXPORT_SYMBOL(FSM_ToCmdStream);
+
 void FSM_SendEventToDev(enum FSM_eventlist idevent, struct FSM_DeviceTree* TransportDevice)
 {
    struct  FSM_EventSignal fsm_event;
@@ -322,7 +337,7 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
             fsm_dt[i].registr=1;
             fsm_dt[i].IDDevice=dt.IDDevice;
             fsm_dt[i].dt=classf;
-            
+            fsm_dt[i].id=i;
             FSM_SendEventToAllDev(FSM_ServerConfigChanged);
             FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
             printk( KERN_INFO "DeviceRegistred: ID: %u Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n", dt.IDDevice,dt.type,dt.VidDevice,dt.PodVidDevice,dt.KodDevice );

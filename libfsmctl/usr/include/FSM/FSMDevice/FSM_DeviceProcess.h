@@ -21,6 +21,7 @@ struct FSM_DeviceTree
    char state[32];
    void * config;
    void * data;
+   int id;
 };
 /*!
 \brief Прототип функции обратной связи
@@ -160,9 +161,18 @@ typedef void (*FSM_FDeRegister)(struct FSM_DeviceDelete fdd);
 */
 typedef void (*FSM_FClassDeRegister)(struct FSM_DeviceFunctionTree dft);
 
+void FSM_SendEventToDev(enum FSM_eventlist idevent, struct FSM_DeviceTree* TransportDevice);
+void FSM_SendEventToAllDev(enum FSM_eventlist idevent);
+
+void FSM_ToProcess(int id, char* Data,short len, struct FSM_DeviceTree* pdt);
+
+int FSM_ToCmdStream(struct FSM_DeviceTree* pdt);
+
 enum FSM_UK /*125 *** 254*/
 {
-   FSMNotRegistred=125,
+   FSMNotRegistred=0,
+   FSMGetCmdStream=1,
+   AnsFSMGetCmdStream=2
 };
 
 #endif	/* FSM_DEVICEPROCESS_H */

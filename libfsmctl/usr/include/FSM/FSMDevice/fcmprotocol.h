@@ -64,6 +64,14 @@ enum FSM_CodeOperation
   PacketFromUserSpace=47, ///<Пакет из пространства пользователя
   PacketToUserSpace=48, ///<Пакет в пространство пользователя
   PacketToDevice=49, ///<Пакет в пространство пользователя
+  SysEvent=50,
+  SendCmdGlobalcmdToClient=51,
+  SendCmdGlobalcmdToServer=52,
+  SendCmdToServerStream=53,
+  AnsSendCmdToServerStream=54,
+  SendCmdToClientStream=55,
+  AnsSendCmdToClientStream=56,
+  
 };
 /*!
 \brief Тип устройства
@@ -76,7 +84,8 @@ enum FSM_TypeDevice
     AudioDevice=4, ///< Устройство аудио связи
     Network=5, ///< Сеть
     StatisticandConfig=6, ///< Модуль статистики и конфигурации
-    Switch=7
+    Switch=7,
+    ControlMachine=8
 };
 /*!
 \brief Регистрация устроства
@@ -1120,10 +1129,27 @@ struct FSM_SendCmdUserspace_Header
    unsigned short countparam;///< Количество параметров
 } __attribute__((aligned(4)));
 
+struct FSM_EventSignal
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned int ID;///< Ид Предупреждения
+} __attribute__((aligned(4)));
+
 enum FSMIOCTL_Cmd
 {
     FSMIOCTL_SendData,
 };
 
+enum FSM_eventlist
+{
+    FSM_ServerStarted=0x00,
+    FSM_EthernetStarted=0x01,
+    FSM_ServerConfigChanged=0x02,
+    FSM_ServerStatisticChanged=0x03
+    /**CCK Event List 0x04 - 0x3F **/
+};
 #endif // FCMPROTOCOL
 

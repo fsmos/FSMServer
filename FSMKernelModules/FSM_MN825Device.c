@@ -160,10 +160,26 @@ void FSM_MN825Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           case SendTxtMassage: ///< Отправка текстового сообщения
            break;
           case Alern: ///<Тревога
+          switch(((struct FSM_AlernSignal*)data)->ID)
+          {
+              
+          }
           break;
           case Warning: ///<Предупреждение
+          switch(((struct FSM_WarningSignal*)data)->ID)
+          {
+               case FSM_CCK_Server_Connect_Error:
+              printk( KERN_WARNING "MN825 %u: Server Not Connect \n",((struct FSM_Header*)(data))->IDDevice); 
+              break;
+          }
           break;
           case Trouble: ///<Сбой
+          switch(((struct FSM_TroubleSignal*)data)->ID)
+          {
+              case FSM_CCK_Memory_Test_Filed:
+              printk( KERN_ERR "MN825 %u: Memory Eror \n",((struct FSM_Header*)(data))->IDDevice); 
+              break;
+          }
           break;
           case Beep: ///<Звук
           break;
@@ -224,6 +240,7 @@ static int __init FSM_MN825_init(void)
           return 1;
    }
    printk( KERN_INFO "FSM MN825 Module loaded\n" ); 
+   FSM_SendEventToAllDev(FSM_CCK_MN845_Started);
    
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(init_off);

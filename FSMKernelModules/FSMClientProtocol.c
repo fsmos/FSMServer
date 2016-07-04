@@ -360,7 +360,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
                 fsmsc.CRC=0;
                 fsmsc.countparam=0;
                 fsmsc.IDDevice=((struct FSM_SendCmdTS *)skb->data)->IDDevice;
-                fsmsc.opcode=SendCmdToDevice;
+                fsmsc.opcode=SendCmdGlobalcmdToClient;
                  memset(fsdev2.destmac,0xFF,6);
                  fsdev2.id=((struct FSM_SendCmdTS *)skb->data)->IDDevice;
                  fsdev2.numdev=1;
@@ -442,13 +442,61 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           case AnsSocEncSendtoDev: ///<	Подтверждение зашифрованного сообщения в социальную сеть   устройства
           break;
           case Alern: ///<Тревога
+           printk( KERN_ALERT "%u:Alerm\n",((struct FSM_Header*)(skb->data))->IDDevice); 
+           dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
+           if(dftv==0) 
+           {
+                printk( KERN_INFO "Eror \n"); 
+                 goto clear; 
+           }
+           //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
+           dftv->dt->Proc((char*)skb->data,FSMH_Header_Size_AlernSignal,dt);
           break;
           case Warning: ///<Предупреждение
+          printk(KERN_WARNING "%u:Warning\n",((struct FSM_Header*)(skb->data))->IDDevice);  
+            dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
+           if(dftv==0) 
+           {
+                printk( KERN_INFO "Eror \n"); 
+                 goto clear; 
+           }
+           //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
+           dftv->dt->Proc((char*)skb->data,FSMH_Header_Size_WarningSignal,dt);
           break;
+          
           case Trouble: ///<Сбой
+          printk(KERN_ERR "%u:Troubles\n",((struct FSM_Header*)(skb->data))->IDDevice); 
+          dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
+           if(dftv==0) 
+           {
+                printk( KERN_INFO "Eror \n"); 
+                 goto clear; 
+           }
+           //printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice); 
+           dftv->dt->Proc((char*)skb->data,FSMH_Header_Size_TroubleSignal,dt); 
           break;
           case Beep: ///<Звук
+          printk( KERN_ALERT "\a"); 
           break;
+          case SendCmdGlobalcmdToServer:
+          switch(((struct FSM_SendCmdTS *)skb->data)->cmd)
+          {
+            case FSMGetCmdStream:
+            dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
+           if(dftv!=0) 
+           {
+               ((struct FSM_SendCmdTS *)skb->data)->opcode=SendCmdGlobalcmdToClient;
+                ((struct FSM_SendCmdTS *)skb->data)->cmd=AnsFSMGetCmdStream;
+                ((int*)(((struct FSM_SendCmdTS *)skb->data)->Data))[0]=FSM_ToCmdStream(dftv);
+              FSM_Send_Ethernet_Package(skb->data,FSMH_Header_Size_AnsAnsCmd,FSM_FindEthernetDevice(((struct FSM_SendCmdTS *)skb->data)->IDDevice));
+              break;
+           }
+          }
+          break;
+           case SendCmdToServerStream: ///< Отправка команды серверу
+          FSM_ToProcess(((struct FSM_Header*)skb->data)->IDDevice,(char*)skb->data,skb->len,dftv);
+           break;
+          
       }                 
                     
                        

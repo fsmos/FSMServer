@@ -94,6 +94,32 @@ enum FSMS_Cmd /*0*****125*/
     SetSetting=3,
     AnsSetSetting=4,
     SetSettingClient=5,
-    AnsSetSettingClient=6
+    AnsSetSettingClient=6,
+    SendSettingFull=7
+};
+
+enum FSMCDPC_VidDevice
+{
+    Computer=1, ///<  Модуль Конфигурации
+};
+/*!
+\brief ПодВид устроства
+*/
+enum FSMCDPC_PodVidDevice
+{
+   PC=1 ///< ComputerStatistic
+};
+/*!
+\brief Род устроства
+*/
+enum FSMCDPC_RodDevice
+{
+    ARM=1,///< PCx86
+};
+
+enum FSMIOCTLStat_Cmd
+{
+    FSMIOCTLStat_Read,
+    FSMIOCTLStat_Requst
 };
 #endif // FSM_STATUSSTRUCT

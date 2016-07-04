@@ -64,7 +64,14 @@ enum FSM_CodeOperation
   PacketFromUserSpace=47, ///<Пакет из пространства пользователя
   PacketToUserSpace=48, ///<Пакет в пространство пользователя
   PacketToDevice=49, ///<Пакет в пространство пользователя
-  SysEvent=50
+  SysEvent=50,
+  SendCmdGlobalcmdToClient=51,
+  SendCmdGlobalcmdToServer=52,
+  SendCmdToServerStream=53,
+  AnsSendCmdToServerStream=54,
+  SendCmdToClientStream=55,
+  AnsSendCmdToClientStream=56,
+  
 };
 /*!
 \brief Тип устройства
@@ -1142,6 +1149,7 @@ enum FSM_eventlist
     FSM_EthernetStarted=0x01,
     FSM_ServerConfigChanged=0x02,
     FSM_ServerStatisticChanged=0x03
+    /**CCK Event List 0x04 - 0x3F **/
 };
 #endif // FCMPROTOCOL
 

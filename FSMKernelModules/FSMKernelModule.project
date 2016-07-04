@@ -33,10 +33,6 @@
     <File Name="FSMServerIODev.c"/>
     <File Name="FSM_ControlDeviceClass.c"/>
   </VirtualDirectory>
-  <Dependencies Name="Release"/>
-  <Dependencies Name="Debug">
-    <Project Name="FSMSendPack"/>
-  </Dependencies>
   <VirtualDirectory Name="FSMDeviceManager">
     <File Name="FSM_DeviceProcess.c"/>
   </VirtualDirectory>
@@ -205,4 +201,8 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_MN825">
     <File Name="FSM_MN825Device.c"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug">
+    <Project Name="FSMSendPack"/>
+  </Dependencies>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

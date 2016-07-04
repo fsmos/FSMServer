@@ -230,7 +230,15 @@ struct FSMPO06CommCons
     unsigned short channel;
 };
 
+enum FSM_CCK_Alert
+{
+	FSM_CCK_Server_Connect_Error=0,
+	FSM_CCK_Memory_Test_Filed=1
+};
 
-
+enum FSM_eventlist_CCK
+{
+    FSM_CCK_MN845_Started=0x04
+};
 
 #endif	/* FCM_AUDIODEVICECLASS_H */
