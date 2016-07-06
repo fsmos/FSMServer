@@ -19,7 +19,6 @@
 
 
 struct FSM_DeviceFunctionTree dft;
-struct FSM_DeviceTree* FSMPO06Ethernet;
 struct FSM_PO06Device FSMPO06Dev[FSM_PO06DeviceTreeSize];
 struct FSM_SendCmd sendcmd;
  struct FSM_AudioStream fsmas;
@@ -47,7 +46,7 @@ typedef enum debug_function
 }debug_fun ;
 #endif 
 
-void FSM_PO06SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
+void FSM_PO06SendStreaminfo(unsigned short id,struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     short plen;
     
@@ -58,14 +57,14 @@ void FSM_PO06SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 
     memset(&sendcmd,0,sizeof(struct FSM_SendCmd));
     sendcmd.opcode=SendCmdToDevice;
-    sendcmd.IDDevice=fsmdt->IDDevice;
+    sendcmd.IDDevice=from_dt->IDDevice;
     sendcmd.cmd=FSMPO06SendStream;
     sendcmd.countparam=1;
     ((unsigned short*)sendcmd.Data)[0]=id;
     printk( KERN_INFO "FSM Send %u ,%u \n",sendcmd.Data[0],sendcmd.Data[1]); 
     sendcmd.CRC=0;
     plen=sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+2;
-   if(FSMPO06Ethernet!=0)  FSMPO06Ethernet->dt->Proc((char*)&sendcmd,plen,fsmdt);
+   if(to_dt!=0)  to_dt->dt->Proc((char*)&sendcmd,plen,to_dt,from_dt);
   
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(get_ssi_exit);
@@ -73,7 +72,7 @@ void FSM_PO06SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
               
 }
 
-void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
+void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     int i;
    
@@ -88,12 +87,12 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
       {
                         
         case RegDevice: ///< Регистрация устройства
-        FSM_Statstic_SetStatus(fsmdt,"ok");
+        FSM_Statstic_SetStatus(to_dt,"ok");
         for(i=0;i<FSM_PO06DeviceTreeSize;i++)
           {
-              if(FSMPO06Dev[i].iddev==fsmdt->IDDevice)
+              if(FSMPO06Dev[i].iddev==to_dt->IDDevice)
               {
-                 FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream,fsmdt);
+                 FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream,from_dt,to_dt);
                  return; 
               }
           }
@@ -102,19 +101,19 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           if(FSMPO06Dev[i].reg==0)
           {
              FSMPO06Dev[i].reg=1;
-             FSMPO06Dev[i].ethdev=FSM_FindEthernetDevice(fsmdt->IDDevice);
-             fsmas.iddev=fsmdt->IDDevice;
+             FSMPO06Dev[i].ethdev=FSM_FindEthernetDevice(to_dt->IDDevice);
+             fsmas.iddev=to_dt->IDDevice;
              //fsmas.ToProcess=FSM_PO06RecivePacket;
              //fsmas.ToUser=FSM_E1SendPacket;
              fsmas.TransportDevice= FSMPO06Dev[i].ethdev->numdev;
-             fsmas.TransportDeviceType=FSM_EthernetID;
+             fsmas.TransportDeviceType=FSM_EthernetID2;
              fsmas.Data=&FSMPO06Dev[i];
              FSMPO06Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
-             FSMPO06Dev[i].iddev=fsmdt->IDDevice;
-             fsmdt->data=&FSMPO06Dev[i];
-             fsmdt->config=&FSMPO06Dev[i].po06set;
-             FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream,fsmdt);
-             printk( KERN_INFO "FSMPO06 Device Added %u \n",fsmdt->IDDevice); 
+             FSMPO06Dev[i].iddev=to_dt->IDDevice;
+             to_dt->data=&FSMPO06Dev[i];
+             to_dt->config=&FSMPO06Dev[i].po06set;
+             FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream,from_dt,to_dt);
+             printk( KERN_INFO "FSMPO06 Device Added %u \n",to_dt->IDDevice); 
              
              FSM_P2P_Connect(FSMPO06Dev[i].idstream, 2);
              
@@ -131,12 +130,12 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           case DelLisr:
           for(i=0;i<FSM_E1DeviceTreeSize;i++)
           {
-          if((FSMPO06Dev[i].reg==1)&&( FSMPO06Dev[i].iddev==fsmdt->IDDevice))
+          if((FSMPO06Dev[i].reg==1)&&( FSMPO06Dev[i].iddev==to_dt->IDDevice))
           {
           
              FSM_AudioStreamUnRegistr(FSMPO06Dev[i].idstream);
              FSMPO06Dev[i].reg=0;
-             printk( KERN_INFO "FSMPO06 Device Deleted %u \n",fsmdt->IDDevice); 
+             printk( KERN_INFO "FSMPO06 Device Deleted %u \n",to_dt->IDDevice); 
              break;
           }
           }
@@ -180,7 +179,7 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
     printk( KERN_INFO "RPack %u \n" ,len); 
 }
 EXPORT_SYMBOL(FSM_PO06Recive);
-void ApplaySettingPO06(struct FSM_DeviceTree* df)
+void ApplaySettingPO06(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     
 #ifdef  DEBUG_CALL_STACK 
@@ -192,11 +191,11 @@ void ApplaySettingPO06(struct FSM_DeviceTree* df)
     printk( KERN_INFO "FSM_Set\n" ); 
     sendcmd.cmd=SetSettingClientPo06;
     sendcmd.countparam=1;
-    sendcmd.IDDevice=df->IDDevice;
+    sendcmd.IDDevice=to_dt->IDDevice;
     sendcmd.CRC=0;
     sendcmd.opcode=SendCmdToDevice;
-    memcpy(&sendcmd.Data,&(((struct FSM_PO06Device*)df->data)->po06set.fsm_p006_su_s),sizeof(struct fsm_po06_subscriber));
-    (FSM_FindDevice(FSM_EthernetID))->dt->Proc((char*)&sendcmd,sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+sizeof(struct fsm_po06_subscriber),df);
+    memcpy(&sendcmd.Data,&(((struct FSM_PO06Device*)to_dt->data)->po06set.fsm_p006_su_s),sizeof(struct fsm_po06_subscriber));
+    from_dt->dt->Proc((char*)&sendcmd,sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+sizeof(struct fsm_po06_subscriber),from_dt,to_dt);
 
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(get_asp6_exit);
@@ -219,12 +218,6 @@ static int __init FSM_PO06_init(void)
    dft.Proc=FSM_PO06Recive;
    dft.config_len=sizeof(struct fsm_po06_setting);
    FSM_DeviceClassRegister(dft);
-   FSMPO06Ethernet = FSM_FindDevice(FSM_EthernetID);
-   if(FSMPO06Ethernet == 0 )
-   {
-          printk( KERN_INFO "FSME1Protocol module not loaded\n" ); 
-          return 1;
-   }
    printk( KERN_INFO "FSM PO06 Module loaded\n" ); 
    
 #ifdef  DEBUG_CALL_STACK 

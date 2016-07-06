@@ -12,6 +12,7 @@
 #include <FSM/FSMEthernet/FSMEthernetHeader.h> 
 #include "FSM/FSMDevice/fcmprotocol.h"
 #include "FSM/FSMDevice/fcm_audiodeviceclass.h"
+#include "FSM/FSMDevice/fsm_statusstruct.h"
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSMSetting/FSM_settings.h"
 #include "FSM/FSM_Client/FSM_client.h"
@@ -523,6 +524,23 @@ int FSMClient_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           if(evstr==0) goto clear;
           evstr->Handler(skb->data,sizeof(struct FSM_SendCmdUserspace),evstr);
           break;
+          case SendCmdGlobalcmdToClient:
+          switch(((struct FSM_SendCmdTS *)skb->data)->cmd)
+          {
+            case FSMNotRegistred:
+            if(((struct FSM_SendCmd *)skb->data)->IDDevice==fsmcon.id)
+            {
+                FSM_RegisterServer(fsmcon.id,fsmcon.type,fsmcon.VidDevice,fsmcon.PodVidDevice,fsmcon.KodDevice);
+            }
+            else
+            {
+                clstr= FSM_FindHandlerDevice(((struct FSM_SendCmd*)(skb->data))->IDDevice);
+                if(clstr==0) goto clear;
+                clstr->Handler(skb->data,sizeof(struct FSM_SendCmd),clstr);
+            }
+            break;
+          }
+          break;
       }                 
                     
                        
@@ -549,8 +567,7 @@ static struct packet_type FSMClient_proto = {
 
 void FSM_EthernetEventLoaded(char* Data,short len , struct fsm_event_struct* cl_str)
 {
-    int i;
-    FSM_RegisterServer(fsmlcs[i].id,fsmlcs[i].type,fsmlcs[i].VidDevice,fsmlcs[i].PodVidDevice,fsmlcs[i].KodDevice);
+    FSM_RegisterServer(fsmcon.id,fsmcon.type,fsmcon.VidDevice,fsmcon.PodVidDevice,fsmcon.KodDevice);
 }
 
  
@@ -566,7 +583,7 @@ static int __init FSMClient_init(void)
    
    dev_add_pack( &FSMClient_proto ); 
    printk( KERN_INFO "FSMClient module loaded\n" ); 
-   FSM_RegisterEvent(FSM_EthernetStarted,FSM_EthernetEventLoaded);
+   FSM_RegisterEvent(FSM_ControlDeviceRun,FSM_EthernetEventLoaded);
 
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(init_off);

@@ -22,7 +22,7 @@
 /*!
 \brief ID Ethernet передатчика
 */
-#define FSM_EthernetID 1
+#define FSM_EthernetID2 1
 #define FSM_FifoID 0
 /*!
 \brief ID сервера статистики

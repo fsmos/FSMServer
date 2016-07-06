@@ -122,4 +122,14 @@ enum FSMIOCTLStat_Cmd
     FSMIOCTLStat_Read,
     FSMIOCTLStat_Requst
 };
+enum FSM_eventlist_status
+{
+    
+    /**Statistick Event List 0x40 - 0x6F **/
+    FSM_ControlDeviceRun=0x40,
+    FSM_StaticServerRun=0x41,
+    FSM_SettingServerRun=0x42,
+    
+    
+};
 #endif // FSM_STATUSSTRUCT

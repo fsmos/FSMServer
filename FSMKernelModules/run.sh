@@ -1,4 +1,5 @@
 rmmod FSM_ControlDeviceClass.ko
+rmmod FSM_MN825Device.ko
 rmmod FSM_SkyNet.ko
 rmmod FSM_SettingServer.ko
 rmmod FSM_StatisticServer.ko
@@ -12,8 +13,11 @@ rmmod FSM_Crypt.ko
 rmmod FSMClientProtocol.ko
 rmmod FSMServerIODev.ko
 rmmod FSM_DeviceProcess.ko
-
+rmmod FSM_Beep.ko
 path=""
+
+insmod FSM_Beep.ko
+a+="add-symbol-file $path FSM_Beep.ko $(cat /sys/module/FSM_Beep/sections/.text) -s .bss $(cat /sys/module/FSM_Beep/sections/.bss)\n"
 
 insmod FSM_DeviceProcess.ko
 a+=""
@@ -60,6 +64,8 @@ a+="add-symbol-file $path FSM_Crypt.ko $(cat /sys/module/FSM_Crypt/sections/.tex
 
 insmod FSM_MN825Device.ko
 a+="add-symbol-file $path FSM_MN825Device.ko $(cat /sys/module/FSM_MN825Device/sections/.text) -s .bss $(cat /sys/module/FSM_MN825Device/sections/.bss)\n"
+
+
 
 //./FSMSendPack 
 echo -e $a > runs.prog

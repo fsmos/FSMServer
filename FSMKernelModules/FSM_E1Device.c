@@ -18,7 +18,6 @@
 
 
 struct FSM_DeviceFunctionTree dft;
-struct FSM_DeviceTree* FSME1Ethernet;
 struct FSM_E1Device FSME1Dev[FSM_E1DeviceTreeSize];
 struct FSM_SendAudioData sade1;
 struct FSM_SendCmd sendcmd;
@@ -163,7 +162,7 @@ void FSM_E1RecivePacket(char* data,short len)
 
  
 
-void FSM_E1SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
+void FSM_E1SendStreaminfo(unsigned short id,struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     short plen;
 
@@ -174,20 +173,20 @@ void FSM_E1SendStreaminfo(unsigned short id,struct FSM_DeviceTree* fsmdt)
 
     memset(&sendcmd,0,sizeof(struct FSM_SendCmd));
     sendcmd.opcode=SendCmdToDevice;
-    sendcmd.IDDevice=fsmdt->IDDevice;
+    sendcmd.IDDevice=from_dt->IDDevice;
     sendcmd.cmd=FSME1SendStream;
     sendcmd.countparam=1;
     ((unsigned short*)sendcmd.Data)[0]=id;
     sendcmd.CRC=0;
      plen=sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+2;
-   if(FSME1Ethernet!=0)  FSME1Ethernet->dt->Proc((char*)&sendcmd,plen,fsmdt);
+   if(to_dt!=0)  to_dt->dt->Proc((char*)&sendcmd,plen,to_dt,from_dt);
    
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(get_ssi_exit);
 #endif       
 }
 
-void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
+void FSM_E1Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     int i,j;
     struct FSM_AudioStream fsmas;
@@ -201,12 +200,12 @@ void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
       {
                         
         case RegDevice: ///< Регистрация устройства
-        FSM_Statstic_SetStatus(fsmdt,"ok");
+        FSM_Statstic_SetStatus(to_dt,"ok");
           for(i=0;i<FSM_E1DeviceTreeSize;i++)
           {
-              if(FSME1Dev[i].iddev==fsmdt->IDDevice)
+              if(FSME1Dev[i].iddev==to_dt->IDDevice)
               {
-                 FSM_E1SendStreaminfo(FSME1Dev[i].idstream,fsmdt);
+                 FSM_E1SendStreaminfo(FSME1Dev[i].idstream,from_dt,to_dt);
                   FSME1Dev[i].bit_ch=1;
                   FSME1Dev[i].e1_eror_ch=0;
                   FSME1Dev[i].cht=0;
@@ -218,30 +217,30 @@ void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           if(FSME1Dev[i].reg==0)
           {
              FSME1Dev[i].reg=1;
-             FSME1Dev[i].ethdev=FSM_FindEthernetDevice(fsmdt->IDDevice);
-             fsmas.iddev=fsmdt->IDDevice;
+             FSME1Dev[i].ethdev=FSM_FindEthernetDevice(to_dt->IDDevice);
+             fsmas.iddev=to_dt->IDDevice;
              
              fsmas.ToProcess=FSM_E1RecivePacket;
              //fsmas.ToUser=FSM_E1SendPacket;
              fsmas.TransportDevice=FSME1Dev[i].ethdev->numdev;
-             fsmas.TransportDeviceType=FSM_EthernetID;
+             fsmas.TransportDeviceType=FSM_EthernetID2;
              fsmas.Data=&FSME1Dev[i];
              FSME1Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
-             FSME1Dev[i].iddev=fsmdt->IDDevice;
+             FSME1Dev[i].iddev=to_dt->IDDevice;
              FSME1Dev[i].bit_ch=1;
              FSME1Dev[i].e1_eror_ch=0;
              FSME1Dev[i].cht=0;
              fsmas.ToProcess=0;
              fsmas.TransportDevice=0;
              fsmas.TransportDeviceType=FSM_FifoID;
-             fsmdt->data=&FSME1Dev[i];
+             to_dt->data=&FSME1Dev[i];
              for(j=0;j<32;j++)
              {
              FSM_FIFOAudioStreamRegistr(fsmas,&(FSME1Dev[i].streams_id[j]));
               //printk( KERN_INFO "FSM %u \n",FSME1Dev[i].streams_id[j]); 
              }
-             FSM_E1SendStreaminfo(FSME1Dev[i].idstream,fsmdt);
-             printk( KERN_INFO "FSME1 Device Added %u \n",fsmdt->IDDevice); 
+             FSM_E1SendStreaminfo(FSME1Dev[i].idstream,from_dt, to_dt);
+             printk( KERN_INFO "FSME1 Device Added %u \n",to_dt->IDDevice); 
              
              break;
           }
@@ -252,12 +251,12 @@ void FSM_E1Recive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           case DelLisr:
           for(i=0;i<FSM_E1DeviceTreeSize;i++)
           {
-          if((FSME1Dev[i].reg==1)&&( FSME1Dev[i].iddev==fsmdt->IDDevice))
+          if((FSME1Dev[i].reg==1)&&( FSME1Dev[i].iddev==to_dt->IDDevice))
           {
           
              FSM_AudioStreamUnRegistr(FSME1Dev[i].idstream);
              FSME1Dev[i].reg=0;
-             printk( KERN_INFO "FSME1 Device Deleted %u \n",fsmdt->IDDevice); 
+             printk( KERN_INFO "FSME1 Device Deleted %u \n",to_dt->IDDevice); 
              break;
           }
           }
@@ -310,12 +309,7 @@ static int __init FSME1Protocol_init(void)
    FSM_DeviceClassRegister(dft);
    //fsme1pkt2.channels=7
 
-   FSME1Ethernet = FSM_FindDevice(FSM_EthernetID);
-   if(FSME1Ethernet == 0 )
-   {
-          printk( KERN_INFO "FSME1Protocol module not loaded\n" ); 
-          return 1;
-   }
+  
    printk( KERN_INFO "FSME1Protocol module loaded\n" ); 
    
 #ifdef  DEBUG_CALL_STACK 

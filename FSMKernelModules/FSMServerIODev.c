@@ -51,7 +51,7 @@ long device_ioctl(struct file *f,
          dftv=FSM_FindDevice(fsmdat.IDDevice);
          if(dftv!=0)
          {
-         dftv->dt->Proc((char*)&fsmdat,sizeof(struct FSM_SendCmdUserspace),dftv); 
+         dftv->dt->Proc((char*)&fsmdat,sizeof(struct FSM_SendCmdUserspace),dftv,0); 
          printk( KERN_INFO "FSM SIOCTL\n" ); 
          }
          fsmdat.opcode=PacketToUserSpace;

@@ -1150,6 +1150,8 @@ enum FSM_eventlist
     FSM_ServerConfigChanged=0x02,
     FSM_ServerStatisticChanged=0x03
     /**CCK Event List 0x04 - 0x3F **/
+    /**Statistick Event List 0x40 - 0x6F **/
+    
 };
 #endif // FCMPROTOCOL
 

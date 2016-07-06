@@ -7,7 +7,7 @@
 
 struct FSM_DeviceFunctionTree dft;
 
-void FSM_ControlDeviceRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
+void FSM_ControlDeviceRecive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     
 }
@@ -22,7 +22,7 @@ static int __init FSMControlDevice_init(void)
    dft.config_len=0;
    FSM_DeviceClassRegister(dft);
    printk( KERN_INFO "FSM ControlDevice loaded\n" ); 
-
+   FSM_SendEventToAllDev(FSM_ControlDeviceRun);
    return 0;  
 }
 static void __exit FSMControlDevice_exit(void)

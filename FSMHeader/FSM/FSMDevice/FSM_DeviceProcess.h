@@ -22,13 +22,16 @@ struct FSM_DeviceTree
    void * config;
    void * data;
    int id;
+   struct FSM_DeviceTree* TrDev;
 };
 /*!
 \brief Прототип функции обратной связи
 */
-typedef void (*ApplayProcess)(struct FSM_DeviceTree*);
+typedef void (*ApplayProcess)(struct FSM_DeviceTree*,struct FSM_DeviceTree*);
+// void FS_AFun(struct FSM_DeviceTree* to,struct FSM_DeviceTree* from);
+typedef void (*DeviceProcess)(char*,short, struct FSM_DeviceTree*,struct FSM_DeviceTree*); 
+// void FS_Fun(char* Data,short len, struct FSM_DeviceTree* to,struct FSM_DeviceTree* from);
 
-typedef void (*DeviceProcess)(char*,short, struct FSM_DeviceTree*);
 /*!
 \brief Информации о виде устройства
 */
@@ -164,9 +167,11 @@ typedef void (*FSM_FClassDeRegister)(struct FSM_DeviceFunctionTree dft);
 void FSM_SendEventToDev(enum FSM_eventlist idevent, struct FSM_DeviceTree* TransportDevice);
 void FSM_SendEventToAllDev(enum FSM_eventlist idevent);
 
-void FSM_ToProcess(int id, char* Data,short len, struct FSM_DeviceTree* pdt);
+void FSM_ToProcess(int id, char* Data,short len, struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt);
 
 int FSM_ToCmdStream(struct FSM_DeviceTree* pdt);
+
+void FSM_Beep(int value,int msec);
 
 enum FSM_UK /*125 *** 254*/
 {

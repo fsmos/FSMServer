@@ -173,12 +173,17 @@ void FSM_StatEventLoaded(char* Data,short len , struct fsm_event_struct* cl_str)
     FSM_Send_Ethernet_TS(&regpcmdts,sizeof(struct FSM_SendCmdTS));
     
 }
+void FSM_StStartEventLoaded(char* Data,short len , struct fsm_event_struct* cl_str)
+{
+    FSM_RegisterDevice(FSM_StatisicID,StatisticandConfig,FSMDeviceStatistic,ComputerStatistic,PCx86,FSMStat_rcv);
+}
  
 static int __init FSM_Client_Statistic_init(void)
 {
     FSM_RegisterDevice(FSM_StatisicID,StatisticandConfig,FSMDeviceStatistic,ComputerStatistic,PCx86,FSMStat_rcv);
     FSM_RegisterEvent(FSM_ServerStatisticChanged,FSM_StatEventLoaded);
     FSM_RegisterIOCtl(FSM_StatistickIOCtlId,FSMStat_rcv_ioctl);
+    FSM_RegisterEvent(FSM_StaticServerRun,FSM_StStartEventLoaded);
     printk( KERN_INFO "FSM Statistic module loaded\n" );  
     return 0;
 }

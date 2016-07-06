@@ -17,13 +17,12 @@
 
 
 struct FSM_DeviceFunctionTree dft;
-struct FSM_DeviceTree* FSMSkyNetEthernet;
 struct FSM_SkyNetDevice FSMSkyNetDev[FSM_SkyNetDeviceTreeSize];
 struct FSM_SendCmd sendcmd;
 
 
 
-void FSM_SkyNetRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
+void FSM_SkyNetRecive(char* data,short len, struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     int i;
    
@@ -34,10 +33,10 @@ void FSM_SkyNetRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
       {
                         
         case RegDevice: ///< Регистрация устройства
-        FSM_Statstic_SetStatus(fsmdt,"ok");
+        FSM_Statstic_SetStatus(to_dt,"ok");
         for(i=0;i<FSM_SkyNetDeviceTreeSize;i++)
           {
-              if(FSMSkyNetDev[i].iddev==fsmdt->IDDevice)
+              if(FSMSkyNetDev[i].iddev==to_dt->IDDevice)
               {
                  return; 
               }
@@ -47,11 +46,11 @@ void FSM_SkyNetRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           if(FSMSkyNetDev[i].reg==0)
           {
              FSMSkyNetDev[i].reg=1;
-             FSMSkyNetDev[i].ethdev=FSM_FindEthernetDevice(fsmdt->IDDevice);
-             FSMSkyNetDev[i].iddev=fsmdt->IDDevice;
-             fsmdt->data=&FSMSkyNetDev[i];
+             FSMSkyNetDev[i].ethdev=FSM_FindEthernetDevice(to_dt->IDDevice);
+             FSMSkyNetDev[i].iddev=to_dt->IDDevice;
+             to_dt->data=&FSMSkyNetDev[i];
             // fsmdt->config=&FSMSkyNetDev[i].po06set;
-             printk( KERN_INFO "FSMSkyNET Device Added %u \n",fsmdt->IDDevice); 
+             printk( KERN_INFO "FSMSkyNET Device Added %u \n",to_dt->IDDevice); 
              break;
           }
            
@@ -61,10 +60,10 @@ void FSM_SkyNetRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
           case DelLisr:
           for(i=0;i<FSM_E1DeviceTreeSize;i++)
           {
-          if((FSMSkyNetDev[i].reg==1)&&( FSMSkyNetDev[i].iddev==fsmdt->IDDevice))
+          if((FSMSkyNetDev[i].reg==1)&&( FSMSkyNetDev[i].iddev==to_dt->IDDevice))
           {
              FSMSkyNetDev[i].reg=0;
-             printk( KERN_INFO "FSMPO06 Device Deleted %u \n",fsmdt->IDDevice); 
+             printk( KERN_INFO "FSMPO06 Device Deleted %u \n",to_dt->IDDevice); 
              break;
           }
           }
@@ -121,12 +120,6 @@ static int __init FSM_SkyNet_init(void)
    dft.Proc=FSM_SkyNetRecive;
   // dft.config_len=sizeof(struct fsm_po06_setting);
    FSM_DeviceClassRegister(dft);
-   FSMSkyNetEthernet = FSM_FindDevice(FSM_EthernetID);
-   if(FSMSkyNetEthernet == 0 )
-   {
-          printk( KERN_INFO "FSMSkyNetProtocol module not loaded\n" ); 
-          return -1;
-   }
    printk( KERN_INFO "FSM SkyNet Module loaded\n" ); 
    return 0;  
 }

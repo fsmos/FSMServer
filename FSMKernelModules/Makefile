@@ -22,7 +22,7 @@ TARGET19 =FSM_SettingClient
 TARGET20 =FSM_SendSignalToPipe
 TARGET21 = FSMClientIOCtl
 TARGET22 = FSM_MN825Device
-
+TARGET23 =FSM_Beep
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
 obj-m   += ${TARGET3}.o
@@ -45,6 +45,7 @@ obj-m   += ${TARGET19}.o
 obj-m   += ${TARGET20}.o
 obj-m   += ${TARGET21}.o
 obj-m   += ${TARGET22}.o
+obj-m   += ${TARGET23}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules

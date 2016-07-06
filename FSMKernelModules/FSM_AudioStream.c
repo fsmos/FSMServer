@@ -71,7 +71,7 @@ int FSM_AudioStreamRegistr(struct FSM_AudioStream fsmas)
             FSM_sendpkt=FSM_GetAudioStreamCallback();
             switch(fsmas.TransportDeviceType)
             {
-            case FSM_EthernetID: 
+            case FSM_EthernetID2: 
             FSMASDB[i].ToUser=(FSM_StreamProcessUser)FSM_sendpkt;
             break;
             case FSM_FifoID: 
@@ -175,7 +175,7 @@ EXPORT_SYMBOL(FSM_AudioStreamGetEthernetDevice);
 void FSM_AudioStreamSetEthernetDevice(int id,struct fsm_ethernet_dev* edev)
 {
 FSMASDB[id].TransportDevice=edev->numdev;
-FSMASDB[id].TransportDeviceType=FSM_EthernetID;
+FSMASDB[id].TransportDeviceType=FSM_EthernetID2;
 }
 EXPORT_SYMBOL(FSM_AudioStreamSetEthernetDevice);
 

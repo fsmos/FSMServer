@@ -104,11 +104,11 @@ static void __exit FSMDeviceProcess_exit(void)
 #endif
 }
 
-void FSM_ToProcess(int id, char* Data,short len, struct FSM_DeviceTree* pdt)
+void FSM_ToProcess(int id, char* Data,short len, struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
    if(fsm_dt[id].registr==1)
    {
-    fsm_dt[id].dt->Proc(Data,len,pdt);
+    fsm_dt[id].dt->Proc(Data,len,to_dt,from_dt);
    }
 }
 EXPORT_SYMBOL(FSM_ToProcess);
@@ -126,13 +126,13 @@ void FSM_SendEventToDev(enum FSM_eventlist idevent, struct FSM_DeviceTree* Trans
    fsm_event.opcode = SysEvent;
    fsm_event.IDDevice=0;
    fsm_event.CRC=0;
-   TransportDevice->dt->Proc((char*)&fsm_event,sizeof(struct FSM_EventSignal),0);
+   TransportDevice->dt->Proc((char*)&fsm_event,sizeof(struct FSM_EventSignal),0,TransportDevice);
 }
 EXPORT_SYMBOL(FSM_SendEventToDev);
 void FSM_SendEventToAllDev(enum FSM_eventlist idevent)
 {
     struct FSM_DeviceTree* TransportDevice;
-    TransportDevice=FSM_FindDevice(FSM_EthernetID);
+    TransportDevice=FSM_FindDevice(FSM_EthernetID2);
     if(TransportDevice!=0) FSM_SendEventToDev(idevent,TransportDevice);
 }
 EXPORT_SYMBOL(FSM_SendEventToAllDev);
@@ -241,7 +241,7 @@ void FSM_Setting_Applay(struct FSM_DeviceTree* fdt,void* set)
   if(fdt==0) return;
   memcpy(fdt->config,set,fdt->dt->config_len);
   printk( KERN_INFO "FSMAP %i\n", fdt->IDDevice); 
-  if(fdt->dt->aplayp!=0) fdt->dt->aplayp(fdt);
+  if(fdt->dt->aplayp!=0) fdt->dt->aplayp(fdt->TrDev,fdt);
   
    FSM_SendEventToAllDev(FSM_ServerConfigChanged);
 #ifdef  DEBUG_CALL_STACK 

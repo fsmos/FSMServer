@@ -22,7 +22,7 @@ struct FSM_SendCmd scmdt;
 struct fsm_Setting_Setting fsmSSS;
 
 
-void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
+void FSM_SettingRecive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     struct fsm_devices_config* fsmset;
     struct FSM_DeviceTree* fsdt;
@@ -35,13 +35,12 @@ void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
     switch(data[0])
     {
          case RegDevice:
-            FSM_Statstic_SetStatus(fsmdt,"ok");
-            fsmdt->config=&fsmSSS;
-            fsmSSS.fsmcs.id=fsmdt->IDDevice;
+            FSM_Statstic_SetStatus(to_dt,"ok");
+            to_dt->config=&fsmSSS;
+            fsmSSS.fsmcs.id=to_dt->IDDevice;
          break;
          case SendCmdToServer: ///< Отправка команды серверу
          fsmset=FSM_GetSetting();
-         fsdt= FSM_FindDevice(fscts->IDDevice);
          switch(fscts->cmd)
          {
          //printk( KERN_INFO "FSM Cmd %u\n",fscts->cmd); 
@@ -60,7 +59,7 @@ void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
                    if(fsmset->setel[i][j].IDDevice!=0)
                    {
                    memcpy(scmdt.Data,&fsmset->setel[i][j],sizeof(struct fsm_device_config));
-                   fsmdt->dt->Proc((char*)&scmdt,hlen,fsdt);
+                   from_dt->dt->Proc((char*)&scmdt,hlen,from_dt,to_dt);
                       //printk( KERN_INFO "FSM Send %u %s\n",fsmstate->statel[i][j].devid,fsmstate->statel[i][j].fsmdevcode);
                    }
 
@@ -77,17 +76,17 @@ void FSM_SettingRecive(char* data,short len, struct FSM_DeviceTree* fsmdt)
     }
      
 }
-void ApplaySetting(struct FSM_DeviceTree* df)
+void ApplaySetting(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
      
     // printk( KERN_INFO "FSM_Set\n" ); 
       scmdt.cmd=SetSettingClient;
           scmdt.countparam=1;
-          scmdt.IDDevice=df->IDDevice;
+          scmdt.IDDevice=to_dt->IDDevice;
           scmdt.CRC=0;
           scmdt.opcode=SendCmdToDevice;
           memcpy(&scmdt.Data,&fsmSSS.fsmcs,sizeof(struct fsm_Setting_Setting ));
-          (FSM_FindDevice(FSM_EthernetID))->dt->Proc((char*)&scmdt,sizeof(struct FSM_SendCmd),df);
+          from_dt->dt->Proc((char*)&scmdt,sizeof(struct FSM_SendCmd),from_dt,to_dt);
 }
 struct FSM_DeviceFunctionTree dft;
 static int __init FSM_Setting_Server_init(void)
