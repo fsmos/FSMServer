@@ -1,6 +1,6 @@
 /*!
 \file
-\brief Модуль взаимодествия с пультом ПО-06
+\brief Модуль взаимодествия с пультом MN111
 \authors Гусенков.С.В
 \version 0.0.1_rc1
 \date 30.12.2015
@@ -19,7 +19,7 @@
 
 
 struct FSM_DeviceFunctionTree dft;
-struct FSM_MN825Device FSMMN825Dev[FSM_PO06DeviceTreeSize];
+struct FSM_MN111Device FSMMN111Dev[FSM_PO06DeviceTreeSize];
 struct FSM_SendCmd sendcmd;
  struct FSM_AudioStream fsmas;
  
@@ -46,7 +46,7 @@ typedef enum debug_function
 }debug_fun ;
 #endif 
 
-void FSM_MN825SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
+void FSM_MN111SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     short plen;
     
@@ -72,7 +72,7 @@ void FSM_MN825SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt,str
               
 }
 
-void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
+void FSM_MN111Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     int i;
    
@@ -88,32 +88,32 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
                         
         case RegDevice: ///< Регистрация устройства
         FSM_Statstic_SetStatus(to_dt,"ok");
-        for(i=0;i<FSM_MN825DeviceTreeSize;i++)
+        for(i=0;i<FSM_MN111DeviceTreeSize;i++)
           {
-              if(FSMMN825Dev[i].iddev==to_dt->IDDevice)
+              if(FSMMN111Dev[i].iddev==to_dt->IDDevice)
               {
-                 FSM_MN825SendStreaminfo(FSMMN825Dev[i].idstream,from_dt,to_dt);
+                 FSM_MN111SendStreaminfo(FSMMN111Dev[i].idstream,from_dt,to_dt);
                  return; 
               }
           }
-          for(i=0;i<FSM_MN825DeviceTreeSize;i++)
+          for(i=0;i<FSM_MN111DeviceTreeSize;i++)
           {
-          if(FSMMN825Dev[i].reg==0)
+          if(FSMMN111Dev[i].reg==0)
           {
-             FSMMN825Dev[i].reg=1;
-             FSMMN825Dev[i].ethdev=FSM_FindEthernetDevice(to_dt->IDDevice);
+             FSMMN111Dev[i].reg=1;
+             FSMMN111Dev[i].ethdev=FSM_FindEthernetDevice(to_dt->IDDevice);
              fsmas.iddev=to_dt->IDDevice;
              //fsmas.ToProcess=FSM_PO06RecivePacket;
              //fsmas.ToUser=FSM_E1SendPacket;
-             fsmas.TransportDevice= FSMMN825Dev[i].ethdev->numdev;
+             fsmas.TransportDevice= FSMMN111Dev[i].ethdev->numdev;
              fsmas.TransportDeviceType=FSM_EthernetID2;
-             fsmas.Data=&FSMMN825Dev[i];
-             FSMMN825Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
-             FSMMN825Dev[i].iddev=to_dt->IDDevice;
-             to_dt->data=&FSMMN825Dev[i];
-             to_dt->config=&FSMMN825Dev[i].mn825set;
-             FSM_MN825SendStreaminfo(FSMMN825Dev[i].idstream,from_dt,to_dt);
-             printk( KERN_INFO "FSM MN825 Device Added %u \n",to_dt->IDDevice); ;
+             fsmas.Data=&FSMMN111Dev[i];
+             FSMMN111Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
+             FSMMN111Dev[i].iddev=to_dt->IDDevice;
+             to_dt->data=&FSMMN111Dev[i];
+             to_dt->config=&FSMMN111Dev[i].mn111set;
+             FSM_MN111SendStreaminfo(FSMMN111Dev[i].idstream,from_dt,to_dt);
+             printk( KERN_INFO "FSM MN111 Device Added %u \n",to_dt->IDDevice); ;
              
              
    //datas[0]=0xd0;
@@ -128,12 +128,12 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
           case DelLisr:
           for(i=0;i<FSM_E1DeviceTreeSize;i++)
           {
-          if((FSMMN825Dev[i].reg==1)&&( FSMMN825Dev[i].iddev==to_dt->IDDevice))
+          if((FSMMN111Dev[i].reg==1)&&( FSMMN111Dev[i].iddev==to_dt->IDDevice))
           {
           
-             FSM_AudioStreamUnRegistr(FSMMN825Dev[i].idstream);
-             FSMMN825Dev[i].reg=0;
-             printk( KERN_INFO "FSM MN825 Device Deleted %u \n",to_dt->IDDevice); 
+             FSM_AudioStreamUnRegistr(FSMMN111Dev[i].idstream);
+             FSMMN111Dev[i].reg=0;
+             printk( KERN_INFO "FSM MN111 Device Deleted %u \n",to_dt->IDDevice); 
              break;
           }
           }
@@ -143,16 +143,7 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
           case SendCmdToServer: ///< Отправка команды серверу
           switch(scmd->cmd)
           {
-              case FSMMN825ConnectToDevE1:
-             // ((struct FSM_PO06Device*)((FSM_FindDevice(scmd->IDDevice))->data))->idcon=FSM_P2P_Connect(((struct FSM_PO06Device*)((FSM_FindDevice(scmd->IDDevice))->data))->idstream, ((struct FSM_E1Device*)(FSM_FindDevice(((struct FSMPO06CommCons*)scmd->Data)->id)->data))->streams_id[((struct FSMPO06CommCons*)scmd->Data)->channel]);
-              break;
-              case FSMMN825DisConnectToDevE1:
-              FSM_P2P_Disconnect(((struct FSM_PO06Device*)(to_dt->data))->idcon);
-              break;
-              case AnsGetSettingClientMN825:
-              printk( KERN_INFO "FSM_Set Recv %i\n",scmd->IDDevice);
-              memcpy(&((struct fsm_po06_setting*)(to_dt->config))->fsm_p006_su_s,scmd->Data,to_dt->dt->config_len);
-              break;
+             
           }
           
            break;
@@ -168,7 +159,22 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
           switch(((struct FSM_WarningSignal*)data)->ID)
           {
                case FSM_CCK_Server_Connect_Error:
-              printk( KERN_WARNING "MN825 %u: Server Not Connect \n",((struct FSM_Header*)(data))->IDDevice); 
+              printk( KERN_WARNING "MN111 %u: Server Not Connect \n",((struct FSM_Header*)(data))->IDDevice); 
+              break; 
+              case FSM_MN111_Power_5V_Error:
+              printk( KERN_WARNING "MN111 %u: 5V Error \n",((struct FSM_Header*)(data))->IDDevice); 
+              break;
+              case FSM_MN111_Power_n5V_Error:
+              printk( KERN_WARNING "MN111 %u: -5V Error \n",((struct FSM_Header*)(data))->IDDevice); 
+              break;
+              case FSM_MN111_Power_n60V_Error:
+              printk( KERN_WARNING "MN111 %u: -60V Error \n",((struct FSM_Header*)(data))->IDDevice); 
+              break;
+              case FSM_MN111_Power_90V_Error:
+              printk( KERN_WARNING "MN111 %u: 90V Error \n",((struct FSM_Header*)(data))->IDDevice); 
+              break;
+              case FSM_MN111_Power_220V_Error:
+              printk( KERN_WARNING "MN111 %u: 220V Error \n",((struct FSM_Header*)(data))->IDDevice); 
               break;
           }
           break;
@@ -176,8 +182,9 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
           switch(((struct FSM_TroubleSignal*)data)->ID)
           {
               case FSM_CCK_Memory_Test_Filed:
-              printk( KERN_ERR "MN825 %u: Memory Error \n",((struct FSM_Header*)(data))->IDDevice); 
+              printk( KERN_ERR "MN111 %u: Memory Error \n",((struct FSM_Header*)(data))->IDDevice); 
               break;
+             
           }
           break;
           case Beep: ///<Звук
@@ -192,8 +199,8 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
 
     printk( KERN_INFO "RPack %u \n" ,len); 
 }
-EXPORT_SYMBOL(FSM_MN825Recive);
-void ApplaySettingMN825(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
+EXPORT_SYMBOL(FSM_MN111Recive);
+void ApplaySettingMN111(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     
 #ifdef  DEBUG_CALL_STACK 
@@ -203,20 +210,20 @@ void ApplaySettingMN825(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from
 
     memset(&sendcmd,0,sizeof(sendcmd));
     printk( KERN_INFO "FSM_Set\n" ); 
-    sendcmd.cmd=SetSettingClientMN825;
+    sendcmd.cmd=SetSettingClientMN111;
     sendcmd.countparam=1;
     sendcmd.IDDevice=to_dt->IDDevice;
     sendcmd.CRC=0;
     sendcmd.opcode=SendCmdToDevice;
-    memcpy(&sendcmd.Data,&(((struct FSM_MN825Device*)to_dt->data)->mn825set.fsm_mn825_su_s),sizeof(struct fsm_mn825_subscriber));
-    from_dt->dt->Proc((char*)&sendcmd,sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+sizeof(struct fsm_mn825_subscriber),from_dt,to_dt);
+    memcpy(&sendcmd.Data,&(((struct FSM_MN111Device*)to_dt->data)->mn111set.fsm_mn111_su_s),sizeof(struct fsm_mn111_subscriber));
+    from_dt->dt->Proc((char*)&sendcmd,sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+sizeof(struct fsm_mn111_subscriber),from_dt,to_dt);
 
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(get_asp6_exit);
 #endif
 }
 
-static int __init FSM_MN825_init(void)
+static int __init FSM_MN111_init(void)
 {
     
 #ifdef  DEBUG_CALL_STACK 
@@ -224,15 +231,15 @@ static int __init FSM_MN825_init(void)
     DEBUG_CALL_STACK_SetStack|(init_on);
 #endif
 
-   dft.aplayp=ApplaySettingMN825;
+   dft.aplayp=ApplaySettingMN111;
    dft.type=(unsigned char)AudioDevice;
    dft.VidDevice=(unsigned char)CommunicationDevice;
    dft.PodVidDevice=(unsigned char)CCK;
-   dft.KodDevice=(unsigned char)MN825;
-   dft.Proc=FSM_MN825Recive;
-   dft.config_len=sizeof(struct fsm_mn825_setting);
+   dft.KodDevice=(unsigned char)MN111;
+   dft.Proc=FSM_MN111Recive;
+   dft.config_len=sizeof(struct fsm_mn111_setting);
    FSM_DeviceClassRegister(dft);
-   printk( KERN_INFO "FSM MN825 Module loaded\n" ); 
+   printk( KERN_INFO "FSM MN111 Module loaded\n" ); 
    FSM_SendEventToAllDev(FSM_CCK_MN845_Started);
    
 #ifdef  DEBUG_CALL_STACK 
@@ -242,7 +249,7 @@ static int __init FSM_MN825_init(void)
  return 0;  
 }
 
-static void __exit FSM_MN825_exit(void)
+static void __exit FSM_MN111_exit(void)
 {
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_GLOBSET
@@ -250,7 +257,7 @@ static void __exit FSM_MN825_exit(void)
 #endif
 
    FSM_ClassDeRegister(dft);  
-   printk( KERN_INFO "FSM MN825 Module unloaded\n" );
+   printk( KERN_INFO "FSM MN111 Module unloaded\n" );
    
 
 #ifdef  DEBUG_CALL_STACK 
@@ -258,9 +265,9 @@ static void __exit FSM_MN825_exit(void)
 #endif
 }
 
-module_init(FSM_MN825_init);
-module_exit(FSM_MN825_exit);
+module_init(FSM_MN111_init);
+module_exit(FSM_MN111_exit);
 
 MODULE_AUTHOR("Gusenkov S.V FSM");
-MODULE_DESCRIPTION("FSM MN825 Module");
+MODULE_DESCRIPTION("FSM MN111 Module");
 MODULE_LICENSE("GPL");

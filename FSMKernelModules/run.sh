@@ -47,6 +47,12 @@ a+="add-symbol-file $path FSM_E1Device.ko $(cat /sys/module/FSM_E1Device/section
 insmod FSM_PO06Device.ko
 a+="add-symbol-file $path FSM_PO06Device.ko $(cat /sys/module/FSM_PO06Device/sections/.text) -s .bss $(cat /sys/module/FSM_PO06Device/sections/.bss)\n"
 
+insmod FSM_PO07Device.ko
+a+="add-symbol-file $path FSM_PO07Device.ko $(cat /sys/module/FSM_PO07Device/sections/.text) -s .bss $(cat /sys/module/FSM_PO07Device/sections/.bss)\n"
+
+insmod FSM_PO08Device.ko
+a+="add-symbol-file $path FSM_PO08Device.ko $(cat /sys/module/FSM_PO08Device/sections/.text) -s .bss $(cat /sys/module/FSM_PO08Device/sections/.bss)\n"
+
 insmod FSM_StatisticServer.ko
 a+="add-symbol-file $path FSM_StatisticServer.ko $(cat /sys/module/FSM_StatisticServer/sections/.text) -s .bss $(cat /sys/module/FSM_StatisticServer/sections/.bss)\n"
 
@@ -65,7 +71,11 @@ a+="add-symbol-file $path FSM_Crypt.ko $(cat /sys/module/FSM_Crypt/sections/.tex
 insmod FSM_MN825Device.ko
 a+="add-symbol-file $path FSM_MN825Device.ko $(cat /sys/module/FSM_MN825Device/sections/.text) -s .bss $(cat /sys/module/FSM_MN825Device/sections/.bss)\n"
 
+insmod FSM_MN921Device.ko
+a+="add-symbol-file $path FSM_MN921Device.ko $(cat /sys/module/FSM_MN921Device/sections/.text) -s .bss $(cat /sys/module/FSM_MN921Device/sections/.bss)\n"
 
+insmod FSM_MN111Device.ko
+a+="add-symbol-file $path FSM_MN111Device.ko $(cat /sys/module/FSM_MN111Device/sections/.text) -s .bss $(cat /sys/module/FSM_MN111Device/sections/.bss)\n"
 
 //./FSMSendPack 
 echo -e $a > runs.prog

@@ -84,8 +84,10 @@
     <File Name="FSM_AudioStream.c"/>
     <File Name="FSMFIFOAudioStream.c"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="FSM_PO06">
+  <VirtualDirectory Name="FSM_PO0">
     <File Name="FSM_PO06Device.c"/>
+    <File Name="FSM_PO07Device.c"/>
+    <File Name="FSM_PO08Device.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_Statistic">
     <File Name="FSM_StatisticServer.c"/>
@@ -198,8 +200,10 @@ source runs.prog</PostConnectCommands>
     <File Name="FSM_SendSignalToPipe.c"/>
     <File Name="FSMClientIOCtl.c"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="FSM_MN825">
+  <VirtualDirectory Name="FSM_MN">
     <File Name="FSM_MN825Device.c"/>
+    <File Name="FSM_MN111Device.c"/>
+    <File Name="FSM_MN921Device.c"/>
   </VirtualDirectory>
   <Dependencies Name="Debug">
     <Project Name="FSMSendPack"/>

@@ -19,7 +19,7 @@ enum FSMAD_VidDevice
 */
 enum FSMAD_PodVidDevice
 {
-   CCK=1 ///< СЦК
+   CCK=1, ///< СЦК
 };
 /*!
 \brief Род устроства
@@ -32,6 +32,7 @@ enum FSMAD_RodDevice
     PO08=4,///< PO08
     PO06=5,///< PO06
     MN524=6,///< MN524
+    MN111=7,///< MN111
 };
 struct FSME1Buff
 {
@@ -100,7 +101,7 @@ struct fsm_po07_setting
 };
 struct fsm_po08_setting
 {
-    struct fsm_po08_subscriber fsm_p007_su_s;
+    struct fsm_po08_subscriber fsm_p008_su_s;
     //struct fsm_po06_serversetting fsm_p006_se_s;
 };
 struct fsm_mn825_setting
@@ -209,10 +210,10 @@ enum FSMPO07Command /*0*****125*/
     FSMPO07SendStream=1,
     FSMPO07ConnectToDevE1=2,
     FSMPO07DisConnectToDevE1=3,
-    SetSettingClientPo07=4,
-    AnsSetSettingClientPo07=5,
-    GetSettingClientPo07=6,
-    AnsGetSettingClientPo07=7,
+    SetSettingClientPO07=4,
+    AnsSetSettingClientPO07=5,
+    GetSettingClientPO07=6,
+    AnsGetSettingClientPO07=7,
 	  FSMPo07AudioRun=8,
 	  FSMPo07Reset=10,
 	  FSMPo07Reregister=11,
@@ -222,10 +223,10 @@ enum FSMPO08Command /*0*****125*/
     FSMPO08SendStream=1,
     FSMPO08ConnectToDevE1=2,
     FSMPO08DisConnectToDevE1=3,
-    SetSettingClientPo08=4,
-    AnsSetSettingClientPo08=5,
-    GetSettingClientPo08=6,
-    AnsGetSettingClientPo08=7,
+    SetSettingClientPO08=4,
+    AnsSetSettingClientPO08=5,
+    GetSettingClientPO08=6,
+    AnsGetSettingClientPO08=7,
 	  FSMPo08AudioRun=8,
 	  FSMPo08Reset=10,
 	  FSMPo08Reregister=11,
@@ -251,12 +252,67 @@ struct FSMPO06CommCons
 enum FSM_CCK_Alert
 {
 	FSM_CCK_Server_Connect_Error=0,
-	FSM_CCK_Memory_Test_Filed=1
+	FSM_CCK_Memory_Test_Filed=1,
+    FSM_MN111_Power_5V_Error=2,
+	FSM_MN111_Power_n5V_Error=3,
+	FSM_MN111_Power_n60V_Error=4,
+	FSM_MN111_Power_90V_Error=5,
+	FSM_MN111_Power_220V_Error=6,
 };
 
 enum FSM_eventlist_CCK
 {
     FSM_CCK_MN845_Started=0x04
+};
+
+enum FSMMN111Command /*0*****125*/
+{
+    SetSettingClientMN111=0,
+	FSM_Get_CRC=1,
+    FSM_Get_MN111_Power_5V=2,
+	FSM_Get_MN111_Power_n5V=3,
+	FSM_Get_MN111_Power_n60V=4,
+	FSM_Get_MN111_Power_90V=5,
+	FSM_Get_MN111_Power_220V=6,
+	FSM_Ans_Get_MN111_Power_5V=7,
+	FSM_Ans_Get_MN111_Power_n5V=8,
+	FSM_Ans_Get_MN111_Power_n60V=9,
+	FSM_Ans_Get_MN111_Power_90V=10,
+	FSM_Ans_Get_MN111_Power_220V=11,
+};
+
+struct fsm_mn111_subscriber
+{
+	unsigned short idch1;
+};
+struct fsm_mn111_setting
+{
+    struct fsm_mn111_subscriber fsm_mn111_su_s;
+    //struct fsm_po06_serversetting fsm_p006_se_s;
+};
+
+struct MN111OneVoltageState
+{
+    unsigned short value;
+    char newdata;
+};
+struct MN111VoltageState
+{
+    struct MN111OneVoltageState MN111_Power_5V;
+    struct MN111OneVoltageState MN111_Power_n5V;
+    struct MN111OneVoltageState MN111_Power_n60V;
+    struct MN111OneVoltageState MN111_Power_90V;
+    struct MN111OneVoltageState MN111_Power_220V;
+};
+struct FSM_MN111Device
+{
+    char reg;
+    unsigned short iddev;
+    int idstream;
+    int idcon;
+    struct fsm_ethernet_dev* ethdev;
+    struct fsm_mn111_setting mn111set;
+    struct MN111VoltageState mn111vs;
 };
 
 #endif	/* FCM_AUDIODEVICECLASS_H */
