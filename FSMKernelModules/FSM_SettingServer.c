@@ -8,14 +8,7 @@
 
 #include <linux/init.h>
 #include <linux/module.h>
-#include "FSM/FSMAudio/FSM_AudioStream.h"
-#include <FSM/FSMEthernet/FSMEthernetHeader.h> 
-#include "FSM/FSMDevice/fcmprotocol.h"
-#include "FSM/FSMDevice/fcm_audiodeviceclass.h"
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
-#include "FSM/FSMSetting/FSM_settings.h"
-#include "FSM/FSMDevice/fsm_statusstruct.h"
-#include "FSM/FSMSetting/FSM_settings.h"
 #include "FSM/FSM_Client/FSM_client.h"
 
 struct FSM_SendCmd scmdt;

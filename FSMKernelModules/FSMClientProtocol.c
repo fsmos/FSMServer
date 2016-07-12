@@ -9,12 +9,8 @@
 #include <linux/init.h>
 #include <linux/module.h>
 #include <linux/netdevice.h>
-#include "FSM/FSMAudio/FSM_AudioStream.h"
-#include <FSM/FSMEthernet/FSMEthernetHeader.h> 
-#include "FSM/FSMDevice/fcmprotocol.h"
-#include "FSM/FSMDevice/fcm_audiodeviceclass.h"
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
-#include "FSM/FSMSetting/FSM_settings.h"
+
 #include <linux/netfilter.h>
 
 

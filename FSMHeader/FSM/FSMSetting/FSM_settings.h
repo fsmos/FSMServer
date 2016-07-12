@@ -70,6 +70,7 @@
 #define FSM_EventTreeSize 12
 
 #define FSM_IOCTLTreeSize 12
+#define FSM_PropertyTreeSize 12
 
 #define FSM_EventIOCtlId 1
 #define FSM_StatistickIOCtlId 2

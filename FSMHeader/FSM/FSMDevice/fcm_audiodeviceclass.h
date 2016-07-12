@@ -177,6 +177,8 @@ enum FSMPO06Command /*0*****125*/
 	  FSMPo06AudioRun=8,
 	  FSMPo06Reset=10,
 	  FSMPo06Reregister=11,
+       FSMPo06GetCRC=13,
+    FSMPo06SendIP=14,
 };
 enum FSMMN825Command /*0*****125*/
 {
@@ -187,10 +189,13 @@ enum FSMMN825Command /*0*****125*/
     AnsSetSettingClientMN825=5,
     GetSettingClientMN825=6,
     AnsGetSettingClientMN825=7,
-	  FSMMN825AudioRun=8,
-	  FSMMN825Reset=10,
-	  FSMMN825Reregister=11,
-	  FSMMN825SetTangenta=12
+    FSMMN825AudioRun=8,
+    FSMMN825Reset=10,
+    FSMMN825Reregister=11,
+    FSMMN825SetTangenta=12,
+    FSMMN825GetCRC=13,
+    FSMMN825SendIP=14,
+    
 };
 enum FSMMN921Command /*0*****125*/
 {
@@ -201,9 +206,11 @@ enum FSMMN921Command /*0*****125*/
     AnsSetSettingClientMN921=5,
     GetSettingClientMN921=6,
     AnsGetSettingClientMN921=7,
-	  FSMMN921AudioRun=8,
-		FSMMN921Reset=10,
-	  FSMMN921Reregister=11,
+    FSMMN921AudioRun=8,
+    FSMMN921Reset=10,
+    FSMMN921Reregister=11,
+    FSMMN921GetCRC=13,
+    FSMMN921SendIP=14,
 };
 enum FSMPO07Command /*0*****125*/
 {
@@ -214,9 +221,11 @@ enum FSMPO07Command /*0*****125*/
     AnsSetSettingClientPO07=5,
     GetSettingClientPO07=6,
     AnsGetSettingClientPO07=7,
-	  FSMPo07AudioRun=8,
-	  FSMPo07Reset=10,
-	  FSMPo07Reregister=11,
+    FSMPo07AudioRun=8,
+    FSMPo07Reset=10,
+    FSMPo07Reregister=11,
+    FSMPo07GetCRC=13,
+    FSMPo07SendIP=14,
 };
 enum FSMPO08Command /*0*****125*/
 {
@@ -227,12 +236,13 @@ enum FSMPO08Command /*0*****125*/
     AnsSetSettingClientPO08=5,
     GetSettingClientPO08=6,
     AnsGetSettingClientPO08=7,
-	  FSMPo08AudioRun=8,
-	  FSMPo08Reset=10,
-	  FSMPo08Reregister=11,
+    FSMPo08AudioRun=8,
+    FSMPo08Reset=10,
+    FSMPo08Reregister=11,
+    FSMPo08GetCRC=13,
+    FSMPo08SendIP=14,
 	
 };
-
 
 struct FSME1Pkt
 {
@@ -312,7 +322,6 @@ struct FSM_MN111Device
     int idcon;
     struct fsm_ethernet_dev* ethdev;
     struct fsm_mn111_setting mn111set;
-    struct MN111VoltageState mn111vs;
 };
 
 #endif	/* FCM_AUDIODEVICECLASS_H */

@@ -9,13 +9,8 @@
 #include <linux/fs.h>
 #include <linux/init.h>
 #include <linux/module.h>
-#include "FSM/FSMDevice/fcmprotocol.h"
-#include "FSM/FSMDevice/fcm_audiodeviceclass.h"
+
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
-#include "FSM/FSMSetting/FSM_settings.h"
-#include "FSM/FSMAudio/FSM_AudioStream.h"
-#include "FSM/FSM_Commutator/FSM_Commutator.h"
-#include <FSM/FSMEthernet/FSMEthernetHeader.h> 
 
 
 struct FSM_DeviceFunctionTree dft;

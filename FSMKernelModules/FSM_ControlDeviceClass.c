@@ -1,8 +1,5 @@
 #include <linux/init.h>
 #include <linux/module.h>
-#include "FSM/FSMDevice/fcmprotocol.h"
-#include "FSM/FSM_Client/FSM_client.h"
-#include "FSM/FSMDevice/fsm_statusstruct.h"
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
 struct FSM_DeviceFunctionTree dft;

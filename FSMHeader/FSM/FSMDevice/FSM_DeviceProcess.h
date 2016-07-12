@@ -9,6 +9,15 @@
 #ifndef FSM_DEVICEPROCESS_H
 #define	FSM_DEVICEPROCESS_H
 
+#include "FSM/FSMAudio/FSM_AudioStream.h"
+#include <FSM/FSMEthernet/FSMEthernetHeader.h> 
+#include "FSM/FSMDevice/fcmprotocol.h"
+#include "FSM/FSMDevice/fsm_statusstruct.h"
+#include "FSM/FSMSetting/FSM_settings.h"
+#include "FSM/FSMDevice/fcm_audiodeviceclass.h"
+#include "FSM/FSM_Switch/fsm_switch.h"
+#include "FSM/FSM_Commutator/FSM_Commutator.h"
+
 
 /*!
 \brief Информации о  устройстве
@@ -23,6 +32,8 @@ struct FSM_DeviceTree
    void * data;
    int id;
    struct FSM_DeviceTree* TrDev;
+   struct FSM_PropertyDevice pdl[FSM_PropertyTreeSize];
+   int pdl_count;
 };
 /*!
 \brief Прототип функции обратной связи
@@ -46,6 +57,7 @@ struct FSM_DeviceFunctionTree
     ApplayProcess aplayp;
    unsigned short config_len; 
 };
+
 /*!
 \brief Регистрация устройства
 \param[in] dt Пакет регистрации
@@ -173,12 +185,26 @@ int FSM_ToCmdStream(struct FSM_DeviceTree* pdt);
 
 void FSM_Beep(int value,int msec);
 
+int FSM_AddProperty(char* PropertyCode,void * Property,unsigned short pr_size, UpdateDataProperty udp,struct FSM_DeviceTree* dt)
+{
+    dt->pdl[dt->pdl_count].devid=dt->IDDevice;
+    strcpy(dt->pdl[dt->pdl_count].PropertyCode,PropertyCode);
+    dt->pdl[dt->pdl_count].Property=Property;
+    dt->pdl[dt->pdl_count].pr_size=pr_size;
+    dt->pdl[dt->pdl_count].udp=udp;
+    sprintf(dt->pdl[dt->pdl_count].fsmdevcode,"t%uv%upv%uk%u",dt->dt->type,dt->dt->VidDevice,dt->dt->PodVidDevice,dt->dt->KodDevice);
+    dt->pdl_count++;
+    return dt->pdl_count-1;
+}
+
 enum FSM_UK /*125 *** 254*/
 {
    FSMNotRegistred=0,
    FSMGetCmdStream=1,
    AnsFSMGetCmdStream=2
 };
+
+
 
 #endif	/* FSM_DEVICEPROCESS_H */
 

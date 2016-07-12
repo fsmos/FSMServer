@@ -132,4 +132,27 @@ enum FSM_eventlist_status
     
     
 };
+enum FSM_Property_time
+{
+    FSMP_INT,
+    FSMP_STRING,
+};
+
+typedef void (*UpdateDataProperty)(struct FSM_PropertyDevice*);
+
+struct FSM_PropertyDevice
+{
+    char fsmdevcode[32];
+    unsigned short devid;
+    char PropertyCode[32];
+    void * Property;
+    unsigned short pr_size;
+    UpdateDataProperty udp;
+    
+};
+//  struct FSM_PropertyDevice pdl[FSM_PropertyTreeSize];
+    
+
+
+
 #endif // FSM_STATUSSTRUCT

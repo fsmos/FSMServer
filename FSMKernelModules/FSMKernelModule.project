@@ -48,7 +48,6 @@
       <File Name="../FSMHeader/FSM/FSMDevice/fsm_electrodevice.h"/>
       <File Name="../FSMHeader/FSM/FSMDevice/fsm_statusstruct.h"/>
       <File Name="../FSMHeader/FSM/FSMDevice/FSME1Cas.h"/>
-      <File Name="FSM_Commutator.c"/>
     </VirtualDirectory>
     <VirtualDirectory Name="FSMSetting">
       <File Name="../FSMHeader/FSM/FSMSetting/FSM_settings.h"/>
@@ -188,7 +187,9 @@ source runs.prog</PostConnectCommands>
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="FSM_Commutator"/>
+  <VirtualDirectory Name="FSM_Commutator">
+    <File Name="FSM_Commutator.c"/>
+  </VirtualDirectory>
   <VirtualDirectory Name="FSM_SkyNet">
     <File Name="FSM_SkyNet.c"/>
   </VirtualDirectory>

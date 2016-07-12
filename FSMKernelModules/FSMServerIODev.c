@@ -13,13 +13,7 @@
 #include <linux/cdev.h>
 #include <linux/netdevice.h>
 
-#include "FSM/FSMAudio/FSM_AudioStream.h"
-#include <FSM/FSMEthernet/FSMEthernetHeader.h> 
-#include "FSM/FSMDevice/fcmprotocol.h"
-#include "FSM/FSMDevice/fcm_audiodeviceclass.h"
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
-#include "FSM/FSMSetting/FSM_settings.h"
-#include "FSM/FSMDevice/fsm_statusstruct.h"
 
 struct FSM_SendCmdUserspace fsmdat;
 
