@@ -1,9 +1,14 @@
 rmmod FSM_ControlDeviceClass.ko
+rmmod FSM_SocialAnalytic.ko
 rmmod FSM_MN825Device.ko
+rmmod FSM_MN921Device.ko
+rmmod FSM_MN111Device.ko
+rmmod FSM_PO06Device.ko
+rmmod FSM_PO07Device.ko
+rmmod FSM_PO08Device.ko
 rmmod FSM_SkyNet.ko
 rmmod FSM_SettingServer.ko
 rmmod FSM_StatisticServer.ko
-rmmod FSM_PO06Device.ko
 rmmod FSM_E1Device.ko
 rmmod FSM_E1CAS1.ko
 rmmod FSM_Commutator.ko
@@ -14,6 +19,7 @@ rmmod FSMClientProtocol.ko
 rmmod FSMServerIODev.ko
 rmmod FSM_DeviceProcess.ko
 rmmod FSM_Beep.ko
+
 path=""
 
 insmod FSM_Beep.ko
@@ -76,6 +82,9 @@ a+="add-symbol-file $path FSM_MN921Device.ko $(cat /sys/module/FSM_MN921Device/s
 
 insmod FSM_MN111Device.ko
 a+="add-symbol-file $path FSM_MN111Device.ko $(cat /sys/module/FSM_MN111Device/sections/.text) -s .bss $(cat /sys/module/FSM_MN111Device/sections/.bss)\n"
+
+insmod FSM_SocialAnalytic.ko
+a+="add-symbol-file $path FSM_SocialAnalytic.ko $(cat /sys/module/FSM_SocialAnalytic/sections/.text) -s .bss $(cat /sys/module/FSM_SocialAnalytic/sections/.bss)\n"
 
 //./FSMSendPack 
 echo -e $a > runs.prog

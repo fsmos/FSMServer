@@ -85,7 +85,8 @@ enum FSM_TypeDevice
     Network=5, ///< Сеть
     StatisticandConfig=6, ///< Модуль статистики и конфигурации
     Switch=7,
-    ControlMachine=8
+    ControlMachine=8,
+    SocialAnalytica=9
 };
 /*!
 \brief Регистрация устроства

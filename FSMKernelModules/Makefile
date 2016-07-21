@@ -27,6 +27,8 @@ TARGET24 =FSM_MN111Device
 TARGET25 =FSM_MN921Device
 TARGET26 =FSM_PO07Device
 TARGET27 =FSM_PO08Device
+TARGET28 =FSM_SocialAnalytic
+
 
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
@@ -55,6 +57,7 @@ obj-m   += ${TARGET24}.o
 obj-m   += ${TARGET25}.o
 obj-m   += ${TARGET26}.o
 obj-m   += ${TARGET27}.o
+obj-m   += ${TARGET28}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules
