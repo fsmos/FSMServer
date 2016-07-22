@@ -372,6 +372,13 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           FSM_Send_Ethernet_Package(skb->data,FSMH_Header_Size_AnsAnsCmd,FSM_FindEthernetDevice(((struct FSM_SendCmdTS *)skb->data)->IDDevice));
            break;
           case SendTxtMassage: ///< Отправка текстового сообщения
+           dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
+           if(dftv==0) 
+            {
+                  goto clear; 
+            }
+             dftv->dt->Proc((char*)skb->data,skb->len,dftv,dt);
+             goto clear; 
            break;
           case AnsSendTxtMassage: ///< Подтверждение приёма текстового сообщения
            break;

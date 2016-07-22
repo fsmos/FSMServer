@@ -272,7 +272,12 @@ enum FSM_CCK_Alert
 
 enum FSM_eventlist_CCK
 {
-    FSM_CCK_MN845_Started=0x04
+    FSM_CCK_MN845_Started=0x04,
+    FSM_CCK_MN921_Started=0x05,
+    FSM_CCK_MN111_Started=0x06,
+    FSM_CCK_PO08_Started=0x07,
+    FSM_CCK_PO07_Started=0x08,
+    FSM_CCK_PO06_Started=0x09,
 };
 
 enum FSMMN111Command /*0*****125*/

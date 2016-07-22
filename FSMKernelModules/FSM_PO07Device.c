@@ -72,6 +72,7 @@ void FSM_PO07Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct F
     int i;
    
     struct FSM_SendCmdTS* scmd=(struct FSM_SendCmdTS*)data;
+    struct FSM_SendMessage* sctt=(struct FSM_SendMessage*)data;
         // char datas[2];
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_GLOBSET
@@ -148,10 +149,15 @@ void FSM_PO07Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct F
               printk( KERN_INFO "FSM_Set Recv %i\n",scmd->IDDevice);
               memcpy(&((struct fsm_po07_setting*)(to_dt->config))->fsm_p007_su_s,scmd->Data,to_dt->dt->config_len);
               break;
+              case FSMPo07SendIP:
+              printk( KERN_INFO "FSM PO07 ID%i Asterisk IP %i.%i.%i.%i\n ",scmd->IDDevice, scmd->Data[0],scmd->Data[1],scmd->Data[2],scmd->Data[3]);
+              break;
           }
           
            break;
           case SendTxtMassage: ///< Отправка текстового сообщения
+           printk( KERN_INFO "%s",sctt->Data );
+           
            break;
           case Alern: ///<Тревога
           switch(((struct FSM_AlernSignal*)data)->ID)
