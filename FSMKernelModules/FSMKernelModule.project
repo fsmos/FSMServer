@@ -216,4 +216,7 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_SocialAnalytic">
     <File Name="FSM_SocialAnalytic.c"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="FSM_gpio">
+    <File Name="FSM_GPIO.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>

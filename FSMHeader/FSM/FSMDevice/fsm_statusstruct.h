@@ -101,13 +101,15 @@ enum FSMS_Cmd /*0*****125*/
 enum FSMCDPC_VidDevice
 {
     Computer=1, ///<  Модуль Конфигурации
+    Device=2,
 };
 /*!
 \brief ПодВид устроства
 */
 enum FSMCDPC_PodVidDevice
 {
-   PC=1 ///< ComputerStatistic
+   PC=1, ///< ComputerStatistic
+   GPIO=2
 };
 /*!
 \brief Род устроства
@@ -115,6 +117,7 @@ enum FSMCDPC_PodVidDevice
 enum FSMCDPC_RodDevice
 {
     ARM=1,///< PCx86
+    Bit_8=2
 };
 
 enum FSMIOCTLStat_Cmd
@@ -152,7 +155,51 @@ struct FSM_PropertyDevice
 };
 //  struct FSM_PropertyDevice pdl[FSM_PropertyTreeSize];
     
+enum FSM_GPIO_Bit_Enum
+{
+    FSM_GPIO_Bit_0=1,
+    FSM_GPIO_Bit_1=2,
+    FSM_GPIO_Bit_2=4,
+    FSM_GPIO_Bit_3=8,
+    FSM_GPIO_Bit_4=16,
+    FSM_GPIO_Bit_5=32,
+    FSM_GPIO_Bit_6=64,
+    FSM_GPIO_Bit_7=128,
+};
 
+enum FSM_GPIO_Bit_Cmd
+{
+    FSM_ON_Bit,
+    FSM_Eror_ON_Bit,
+    FSM_OFF_Bit,
+    FSM_Eror_OFF_Bit,
+    FSM_Reset_Bit,
+    FSM_Event_Bit,
+};
 
+void FSM_GPIO_SetBit(enum FSM_GPIO_Bit_Enum Pin);
+
+void FSM_GPIO_ReSetBit(enum FSM_GPIO_Bit_Enum Pin);
+
+void FSM_GPIO_Set_Input(enum FSM_GPIO_Bit_Enum Pin);
+
+void FSM_GPIO_Set_Output(enum FSM_GPIO_Bit_Enum Pin);
+
+unsigned char FSM_GPIO_Get_Status(enum FSM_GPIO_Bit_Enum Pin);
+
+void FSM_GPIO_Reset_timer_callback( unsigned long data );
+
+void FSM_GPIO_Impulse_timer_callback( unsigned long data );
+
+void FSM_GPIO_Reset(void);
+
+void FSM_GPIO_EventEror(void);
+
+void FSM_GPIO_Ctl_Reset(void);
+void FSM_GPIO_Ctl_Eror(void);
+void FSM_GPIO_Ctl_SetBit(enum FSM_GPIO_Bit_Enum Pin);
+void FSM_GPIO_Ctl_ReSetBit(enum FSM_GPIO_Bit_Enum Pin);
+void FSM_GPIO_Ctl_Error_ON(void);
+void FSM_GPIO_Ctl_Error_OFF(void);
 
 #endif // FSM_STATUSSTRUCT

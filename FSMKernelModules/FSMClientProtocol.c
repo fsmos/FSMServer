@@ -447,6 +447,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           break;
           case Alern: ///<Тревога
            printk( KERN_ALERT "%u:Alerm\n",((struct FSM_Header*)(skb->data))->IDDevice); 
+           FSM_GPIO_EventEror();
            dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
            if(dftv==0) 
            {
@@ -457,6 +458,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
            dftv->dt->Proc((char*)skb->data,FSMH_Header_Size_AlernSignal,dftv,dt);
           break;
           case Warning: ///<Предупреждение
+          FSM_GPIO_EventEror();
           printk(KERN_WARNING "%u:Warning\n",((struct FSM_Header*)(skb->data))->IDDevice);  
             dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
            if(dftv==0) 
@@ -469,6 +471,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           break;
           
           case Trouble: ///<Сбой
+          FSM_GPIO_EventEror();
           printk(KERN_ERR "%u:Troubles\n",((struct FSM_Header*)(skb->data))->IDDevice); 
           dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
            if(dftv==0) 
