@@ -23,13 +23,13 @@ static struct class *cl; // Global variable for the device class
 
 static int device_open( struct inode *inode, struct file *file )
 {
-    printk( KERN_INFO "FSM SIOCTLOpen\n" ); 
+   // printk( KERN_INFO "FSM SIOCTLOpen\n" ); 
  return SUCCESS;
 }
 
 static int device_release( struct inode *inode, struct file *file )
 {
-    printk( KERN_INFO "FSM SIOCTLClose\n" ); 
+    //printk( KERN_INFO "FSM SIOCTLClose\n" ); 
  return SUCCESS;
 }
 
@@ -46,7 +46,8 @@ long device_ioctl(struct file *f,
          if(dftv!=0)
          {
          dftv->dt->Proc((char*)&fsmdat,sizeof(struct FSM_SendCmdUserspace),dftv,0); 
-         printk( KERN_INFO "FSM SIOCTL\n" ); 
+         if(dftv->debug) 
+             printk( KERN_INFO "FSM SIOCTL, \n" ); 
          }
          fsmdat.opcode=PacketToUserSpace;
          if(copy_to_user((void*)arg, &fsmdat,sizeof(struct FSM_SendCmdUserspace))) return -EFAULT; 

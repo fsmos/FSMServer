@@ -24,6 +24,8 @@
 */
 #define FSM_EthernetID2 1
 #define FSM_FifoID 0
+#define FSM_GPIOID 2
+#define FSM_CCKControlID 3
 /*!
 \brief ID сервера статистики
 */
@@ -72,9 +74,12 @@
 
 #define FSM_IOCTLTreeSize 12
 #define FSM_PropertyTreeSize 12
+#define FSM_CCKTreeSize 20
 
 #define FSM_EventIOCtlId 1
 #define FSM_StatistickIOCtlId 2
+
+#define FSM_GPIO_BLOCK
 #endif	/* FSM_SETTINGS_H */
 
 //#define DEBUG_CALL_STACK

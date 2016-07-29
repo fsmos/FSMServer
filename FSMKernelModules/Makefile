@@ -29,7 +29,7 @@ TARGET26 =FSM_PO07Device
 TARGET27 =FSM_PO08Device
 TARGET28 =FSM_SocialAnalytic
 TARGET29 =FSM_GPIO
-
+TARGET30 =FSM_CCKControl
 
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
@@ -60,6 +60,7 @@ obj-m   += ${TARGET26}.o
 obj-m   += ${TARGET27}.o
 obj-m   += ${TARGET28}.o
 obj-m   += ${TARGET29}.o
+obj-m   += ${TARGET30}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules

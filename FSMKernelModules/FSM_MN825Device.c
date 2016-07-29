@@ -12,7 +12,7 @@
 
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-
+struct CCKDeviceInfo CCKDevE;
 struct FSM_DeviceFunctionTree dft;
 struct FSM_MN825Device FSMMN825Dev[FSM_PO06DeviceTreeSize];
 struct FSM_SendCmd sendcmd;
@@ -56,7 +56,7 @@ void FSM_MN825SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt,str
     sendcmd.cmd=FSMPO06SendStream;
     sendcmd.countparam=1;
     ((unsigned short*)sendcmd.Data)[0]=id;
-    printk( KERN_INFO "FSM Send %u ,%u \n",sendcmd.Data[0],sendcmd.Data[1]); 
+    if(to_dt->debug) printk( KERN_INFO "FSM Send %u ,%u \n",sendcmd.Data[0],sendcmd.Data[1]); 
     sendcmd.CRC=0;
     plen=sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+2;
    if(to_dt!=0)  to_dt->dt->Proc((char*)&sendcmd,plen,to_dt,from_dt);
@@ -108,7 +108,7 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
              to_dt->data=&FSMMN825Dev[i];
              to_dt->config=&FSMMN825Dev[i].mn825set;
              FSM_MN825SendStreaminfo(FSMMN825Dev[i].idstream,from_dt,to_dt);
-             printk( KERN_INFO "FSM MN825 Device Added %u \n",to_dt->IDDevice); ;
+             if(to_dt->debug) printk( KERN_INFO "FSM MN825 Device Added %u \n",to_dt->IDDevice); ;
              
              
    //datas[0]=0xd0;
@@ -128,7 +128,7 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
           
              FSM_AudioStreamUnRegistr(FSMMN825Dev[i].idstream);
              FSMMN825Dev[i].reg=0;
-             printk( KERN_INFO "FSM MN825 Device Deleted %u \n",to_dt->IDDevice); 
+             if(to_dt->debug) printk( KERN_INFO "FSM MN825 Device Deleted %u \n",to_dt->IDDevice); 
              break;
           }
           }
@@ -145,11 +145,20 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
               FSM_P2P_Disconnect(((struct FSM_PO06Device*)(to_dt->data))->idcon);
               break;
               case AnsGetSettingClientMN825:
-              printk( KERN_INFO "FSM_Set Recv %i\n",scmd->IDDevice);
-              memcpy(&((struct fsm_po06_setting*)(to_dt->config))->fsm_p006_su_s,scmd->Data,to_dt->dt->config_len);
+              if(to_dt->debug) printk( KERN_INFO "FSM_Set Recv %i\n",scmd->IDDevice);
+               memcpy(&((struct fsm_po06_setting*)(to_dt->config))->fsm_p006_su_s,scmd->Data,to_dt->dt->config_len);
               break;
               case FSMMN825SendIP:
-              printk( KERN_INFO "FSM ID%i Asterisk IP %i.%i.%i.%i\n ",scmd->IDDevice, scmd->Data[0],scmd->Data[1],scmd->Data[2],scmd->Data[3]);
+              CCKDevE.id=scmd->IDDevice;
+              CCKDevE.ip[0]=scmd->Data[0];
+              CCKDevE.ip[1]=scmd->Data[1];
+              CCKDevE.ip[2]=scmd->Data[2];
+              CCKDevE.ip[3]=scmd->Data[3];
+              CCKDevE.type=MN825;
+              CCKDevE.Position=scmd->Data[4];
+              FSMCCK_AddDeviceInfo(&CCKDevE);
+            if(to_dt->debug) 
+                  printk( KERN_INFO "FSM ID%i Asterisk IP %i.%i.%i.%i\n ",scmd->IDDevice, scmd->Data[0],scmd->Data[1],scmd->Data[2],scmd->Data[3]);
               break;
           }
           
@@ -188,7 +197,7 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
     DEBUG_CALL_STACK_SetStack|(get_por_exit);
 #endif
 
-    printk( KERN_INFO "RPack %u \n" ,len); 
+    if(to_dt->debug) printk( KERN_INFO "RPack %u \n" ,len); 
 }
 EXPORT_SYMBOL(FSM_MN825Recive);
 void ApplaySettingMN825(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
@@ -200,7 +209,7 @@ void ApplaySettingMN825(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from
 #endif
 
     memset(&sendcmd,0,sizeof(sendcmd));
-    printk( KERN_INFO "FSM_Set\n" ); 
+    if(to_dt->debug) printk( KERN_INFO "FSM_Set\n" ); 
     sendcmd.cmd=SetSettingClientMN825;
     sendcmd.countparam=1;
     sendcmd.IDDevice=to_dt->IDDevice;

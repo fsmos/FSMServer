@@ -6,6 +6,7 @@ rmmod FSM_MN111Device.ko
 rmmod FSM_PO06Device.ko
 rmmod FSM_PO07Device.ko
 rmmod FSM_PO08Device.ko
+rmmod FSM_CCKControl.ko
 rmmod FSM_SkyNet.ko
 rmmod FSM_SettingServer.ko
 rmmod FSM_StatisticServer.ko
@@ -20,6 +21,7 @@ rmmod FSMServerIODev.ko
 rmmod FSM_GPIO.ko
 rmmod FSM_DeviceProcess.ko
 rmmod FSM_Beep.ko
+
 
 path=""
 
@@ -47,6 +49,9 @@ a+="add-symbol-file $path FSMFIFOAudioStream.ko $(cat /sys/module/FSMFIFOAudioSt
 
 insmod FSM_Commutator.ko
 a+="add-symbol-file $path FSM_Commutator.ko $(cat /sys/module/FSM_Commutator/sections/.text) -s .bss $(cat /sys/module/FSM_Commutator/sections/.bss)\n"
+
+insmod FSM_CCKControl.ko
+a+="add-symbol-file $path FSM_CCKControl.ko $(cat /sys/module/FSM_CCKControl/sections/.text) -s .bss $(cat /sys/module/FSM_CCKControl/sections/.bss)\n"
 
 insmod FSM_E1CAS1.ko
 a+="add-symbol-file $path FSM_E1CAS1.ko $(cat /sys/module/FSM_E1CAS1/sections/.text) -s .bss $(cat /sys/module/FSM_E1CAS1/sections/.bss)\n"

@@ -9,6 +9,7 @@ struct FSM_SendCmdUserspace fsmdat;
 
 void FSM_GPIO_Ctl_Reset()
 {
+    fsmdat.opcode=PacketToDevice;
    fsmdat.IDDevice=FSM_GPIOID;
    fsmdat.cmd=FSM_Reset_Bit;
    FSM_SendCtlCmd(&fsmdat);
@@ -16,6 +17,7 @@ void FSM_GPIO_Ctl_Reset()
 
 void FSM_GPIO_Ctl_Eror()
 {
+     fsmdat.opcode=PacketToDevice;
    fsmdat.IDDevice=FSM_GPIOID;
    fsmdat.cmd=FSM_Event_Bit;
    FSM_SendCtlCmd(&fsmdat);
@@ -23,6 +25,7 @@ void FSM_GPIO_Ctl_Eror()
 
 void FSM_GPIO_Ctl_SetBit(enum FSM_GPIO_Bit_Enum Pin)
 {
+     fsmdat.opcode=PacketToDevice;
    fsmdat.IDDevice=FSM_GPIOID;
    fsmdat.cmd=FSM_ON_Bit;
    fsmdat.Data[0]=Pin;
@@ -31,6 +34,7 @@ void FSM_GPIO_Ctl_SetBit(enum FSM_GPIO_Bit_Enum Pin)
 
 void FSM_GPIO_Ctl_ReSetBit(enum FSM_GPIO_Bit_Enum Pin)
 {
+     fsmdat.opcode=PacketToDevice;
    fsmdat.IDDevice=FSM_GPIOID;
    fsmdat.cmd=FSM_OFF_Bit;
    fsmdat.Data[0]=Pin;
@@ -39,6 +43,7 @@ void FSM_GPIO_Ctl_ReSetBit(enum FSM_GPIO_Bit_Enum Pin)
 
 void FSM_GPIO_Ctl_Error_ON()
 {
+     fsmdat.opcode=PacketToDevice;
    fsmdat.IDDevice=FSM_GPIOID;
    fsmdat.cmd=FSM_Eror_ON_Bit;
    FSM_SendCtlCmd(&fsmdat);
@@ -46,6 +51,7 @@ void FSM_GPIO_Ctl_Error_ON()
 
 void FSM_GPIO_Ctl_Error_OFF()
 {
+     fsmdat.opcode=PacketToDevice;
    fsmdat.IDDevice=FSM_GPIOID;
    fsmdat.cmd=FSM_Eror_OFF_Bit;
    FSM_SendCtlCmd(&fsmdat);

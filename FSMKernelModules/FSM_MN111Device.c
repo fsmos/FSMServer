@@ -14,9 +14,11 @@
 
 
 struct FSM_DeviceFunctionTree dft;
-struct FSM_MN111Device FSMMN111Dev[FSM_PO06DeviceTreeSize];
+struct FSM_MN111Device FSMMN111Dev[FSM_MN111DeviceTreeSize];
 struct FSM_SendCmd sendcmd;
  struct FSM_AudioStream fsmas;
+ 
+static struct timer_list FSM_MN111_timer;
  
 #ifdef  DEBUG_CALL_STACK 
 uint64_t debug_this5;
@@ -56,7 +58,7 @@ void FSM_MN111SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt,str
     sendcmd.cmd=FSMPO06SendStream;
     sendcmd.countparam=1;
     ((unsigned short*)sendcmd.Data)[0]=id;
-    printk( KERN_INFO "FSM Send %u ,%u \n",sendcmd.Data[0],sendcmd.Data[1]); 
+    if(to_dt->debug) printk( KERN_INFO "FSM Send %u ,%u \n",sendcmd.Data[0],sendcmd.Data[1]); 
     sendcmd.CRC=0;
     plen=sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+2;
    if(to_dt!=0)  to_dt->dt->Proc((char*)&sendcmd,plen,to_dt,from_dt);
@@ -67,11 +69,48 @@ void FSM_MN111SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt,str
               
 }
 
+void FSM_TestVoltage(struct FSM_DeviceTree* to_dt,unsigned short cmd)
+{
+    sendcmd.opcode=PacketToDevice;
+    sendcmd.IDDevice=to_dt->IDDevice;
+    sendcmd.cmd=cmd;
+    to_dt->dt->Proc(&sendcmd,sizeof(struct FSM_SendCmd),to_dt,to_dt);
+}
+void FSM_Test_Callback(unsigned long data)
+{
+    int i;
+    for(i=0;i<FSM_MN111DeviceTreeSize;i++)
+    {
+    if(FSMMN111Dev[i].reg==0) break;
+    switch(FSMMN111Dev[i].vst.sel)
+    {
+        case 0:
+        FSM_TestVoltage(FSMMN111Dev[i].fsms,FSM_Get_MN111_Power_5V);
+        break;
+        case 1:
+        FSM_TestVoltage(FSMMN111Dev[i].fsms,FSM_Get_MN111_Power_n5V);
+        break;
+        case 2:
+        FSM_TestVoltage(FSMMN111Dev[i].fsms,FSM_Get_MN111_Power_n60V);
+        break;
+        case 3:
+        FSM_TestVoltage(FSMMN111Dev[i].fsms,FSM_Get_MN111_Power_90V);
+        break;
+        case 4:
+        FSM_TestVoltage(FSMMN111Dev[i].fsms,FSM_Get_MN111_Power_220V);
+        break;
+    }
+    FSMMN111Dev[i].vst.sel++;
+    if(FSMMN111Dev[i].vst.sel>=5)  FSMMN111Dev[i].vst.sel=0;
+    }
+    mod_timer( &FSM_MN111_timer, jiffies + msecs_to_jiffies(1000) );
+}
 void FSM_MN111Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     int i;
    
     struct FSM_SendCmdTS* scmd=(struct FSM_SendCmdTS*)data;
+    struct FSM_MN111Device* mn111=(struct FSM_MN111Device*)to_dt->data;
         // char datas[2];
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_GLOBSET
@@ -88,6 +127,7 @@ void FSM_MN111Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
               if(FSMMN111Dev[i].iddev==to_dt->IDDevice)
               {
                  FSM_MN111SendStreaminfo(FSMMN111Dev[i].idstream,from_dt,to_dt);
+//FSM_TestVoltage(to_dt);
                  return; 
               }
           }
@@ -105,11 +145,13 @@ void FSM_MN111Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
              fsmas.Data=&FSMMN111Dev[i];
              FSMMN111Dev[i].idstream=FSM_AudioStreamRegistr(fsmas);
              FSMMN111Dev[i].iddev=to_dt->IDDevice;
+             to_dt->TrDev=from_dt;
              to_dt->data=&FSMMN111Dev[i];
              to_dt->config=&FSMMN111Dev[i].mn111set;
              FSM_MN111SendStreaminfo(FSMMN111Dev[i].idstream,from_dt,to_dt);
-             printk( KERN_INFO "FSM MN111 Device Added %u \n",to_dt->IDDevice); ;
-             
+             if(to_dt->debug) printk( KERN_INFO "FSM MN111 Device Added %u \n",to_dt->IDDevice); 
+             FSMMN111Dev[i].fsms=to_dt;
+             //FSM_TestVoltage(to_dt);
              
    //datas[0]=0xd0;
    //datas[1]=0xd1;
@@ -119,16 +161,17 @@ void FSM_MN111Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
            
           
           }
+          
           break;
           case DelLisr:
-          for(i=0;i<FSM_E1DeviceTreeSize;i++)
+          for(i=0;i<FSM_MN111DeviceTreeSize;i++)
           {
           if((FSMMN111Dev[i].reg==1)&&( FSMMN111Dev[i].iddev==to_dt->IDDevice))
           {
           
              FSM_AudioStreamUnRegistr(FSMMN111Dev[i].idstream);
              FSMMN111Dev[i].reg=0;
-             printk( KERN_INFO "FSM MN111 Device Deleted %u \n",to_dt->IDDevice); 
+             if(to_dt->debug) printk( KERN_INFO "FSM MN111 Device Deleted %u \n",to_dt->IDDevice); 
              break;
           }
           }
@@ -138,7 +181,32 @@ void FSM_MN111Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
           case SendCmdToServer: ///< Отправка команды серверу
           switch(scmd->cmd)
           {
-             
+               case FSM_Ans_Get_MN111_Power_5V:
+                mn111->vst.MN111_Power_5V.value=((unsigned short*)scmd->Data)[0];
+                mn111->vst.MN111_Power_5V.newdata=1;
+                printk( KERN_WARNING "MN111 %u: 5V: %u \n",scmd->IDDevice,((unsigned short*)scmd->Data)[0]); 
+                break;
+                
+	           case FSM_Ans_Get_MN111_Power_n5V:
+                mn111->vst.MN111_Power_n5V.value=((unsigned short*)scmd->Data)[0];
+                mn111->vst.MN111_Power_n5V.newdata=1;
+                printk( KERN_WARNING "MN111 %u: -5V: %u \n",scmd->IDDevice,((unsigned short*)scmd->Data)[0]); 
+                break;
+               case FSM_Ans_Get_MN111_Power_n60V:
+                mn111->vst.MN111_Power_n60V.value=((unsigned short*)scmd->Data)[0];
+                mn111->vst.MN111_Power_n60V.newdata=1;
+                printk( KERN_WARNING "MN111 %u: -60V: %u \n",scmd->IDDevice,((unsigned short*)scmd->Data)[0]); 
+                break;
+	           case FSM_Ans_Get_MN111_Power_90V:
+                mn111->vst.MN111_Power_90V.value=((unsigned short*)scmd->Data)[0];
+                mn111->vst.MN111_Power_90V.newdata=1;
+                printk( KERN_WARNING "MN111 %u: 90V: %u \n",scmd->IDDevice,((unsigned short*)scmd->Data)[0]); 
+               break;
+	           case FSM_Ans_Get_MN111_Power_220V:
+                mn111->vst.MN111_Power_220V.value=((unsigned short*)scmd->Data)[0];
+                mn111->vst.MN111_Power_220V.newdata=1;
+                printk( KERN_WARNING "MN111 %u: 220V: %u \n",scmd->IDDevice,((unsigned short*)scmd->Data)[0]); 
+               break;
           }
           
            break;
@@ -184,6 +252,57 @@ void FSM_MN111Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
           break;
           case Beep: ///<Звук
           break;
+          case PacketFromUserSpace:
+          switch(scmd->cmd)
+          {
+               
+               case FSM_Get_MN111_Power_5V:
+	           case FSM_Get_MN111_Power_n5V:
+               case FSM_Get_MN111_Power_n60V:
+	           case FSM_Get_MN111_Power_90V:
+	           case FSM_Get_MN111_Power_220V:
+               scmd->IDDevice=to_dt->IDDevice;
+               scmd->opcode=SendCmdToDevice;
+               to_dt->TrDev->dt->Proc((char*)scmd,FSMH_Header_Size_SendCmd, to_dt->TrDev, to_dt);
+                printk( KERN_ERR "MN111 %u: Reqest\n",((struct FSM_Header*)(data))->IDDevice); 
+               break;
+               case FSM_Read_MN111_Power_5V:
+               ((unsigned short*)scmd->Data)[0]=mn111->vst.MN111_Power_5V.value;
+               break;
+               case FSM_Read_MN111_Power_n5V:
+               ((unsigned short*)scmd->Data)[0]=mn111->vst.MN111_Power_n5V.value;
+               break;
+               case FSM_Read_MN111_Power_n60V:
+               ((unsigned short*)scmd->Data)[0]=mn111->vst.MN111_Power_n60V.value;
+               break;
+               case FSM_Read_MN111_Power_90V:
+               ((unsigned short*)scmd->Data)[0]=mn111->vst.MN111_Power_90V.value;
+               break;
+	           case FSM_Read_MN111_Power_220V:
+               ((unsigned short*)scmd->Data)[0]=mn111->vst.MN111_Power_220V.value;
+               break;
+               case FSM_Read_MN111_AutoReqest:
+                mod_timer( &FSM_MN111_timer, jiffies + msecs_to_jiffies(1000) );
+               break;
+             
+          }
+          break;
+          case PacketToDevice:
+          switch(scmd->cmd)
+          {
+               
+               case FSM_Get_MN111_Power_5V:
+	           case FSM_Get_MN111_Power_n5V:
+               case FSM_Get_MN111_Power_n60V:
+	           case FSM_Get_MN111_Power_90V:
+	           case FSM_Get_MN111_Power_220V:
+               scmd->IDDevice=to_dt->IDDevice;
+               scmd->opcode=SendCmdToDevice;
+               to_dt->TrDev->dt->Proc((char*)scmd,FSMH_Header_Size_SendCmd, to_dt->TrDev, to_dt);
+               break;
+             
+          }
+          break;
           default:
           break;
       }                 
@@ -192,7 +311,7 @@ void FSM_MN111Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
     DEBUG_CALL_STACK_SetStack|(get_por_exit);
 #endif
 
-    printk( KERN_INFO "RPack %u \n" ,len); 
+    if(to_dt->debug) printk( KERN_INFO "RPack %u \n" ,len); 
 }
 EXPORT_SYMBOL(FSM_MN111Recive);
 void ApplaySettingMN111(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
@@ -204,7 +323,7 @@ void ApplaySettingMN111(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from
 #endif
 
     memset(&sendcmd,0,sizeof(sendcmd));
-    printk( KERN_INFO "FSM_Set\n" ); 
+     if(to_dt->debug) printk( KERN_INFO "FSM_Set\n" ); 
     sendcmd.cmd=SetSettingClientMN111;
     sendcmd.countparam=1;
     sendcmd.IDDevice=to_dt->IDDevice;
@@ -236,11 +355,11 @@ static int __init FSM_MN111_init(void)
    FSM_DeviceClassRegister(dft);
    printk( KERN_INFO "FSM MN111 Module loaded\n" ); 
    FSM_SendEventToAllDev(FSM_CCK_MN845_Started);
-   
+   setup_timer( &FSM_MN111_timer, FSM_Test_Callback, 0 );
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(init_off);
 #endif
-
+  
  return 0;  
 }
 
@@ -252,6 +371,8 @@ static void __exit FSM_MN111_exit(void)
 #endif
 
    FSM_ClassDeRegister(dft);  
+   del_timer( &FSM_MN111_timer );
+
    printk( KERN_INFO "FSM MN111 Module unloaded\n" );
    
 

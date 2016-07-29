@@ -236,7 +236,7 @@ void FSM_Setting_Applay(struct FSM_DeviceTree* fdt,void* set)
 
   if(fdt==0) return;
   memcpy(fdt->config,set,fdt->dt->config_len);
-  printk( KERN_INFO "FSMAP %i\n", fdt->IDDevice); 
+  if(fdt->debug) printk( KERN_INFO "FSMAP %i\n", fdt->IDDevice); 
   if(fdt->dt->aplayp!=0) fdt->dt->aplayp(fdt->TrDev,fdt);
   
    FSM_SendEventToAllDev(FSM_ServerConfigChanged);
@@ -334,6 +334,7 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
             fsm_dt[i].IDDevice=dt.IDDevice;
             fsm_dt[i].dt=classf;
             fsm_dt[i].id=i;
+            fsm_dt[i].debug=0;
             FSM_SendEventToAllDev(FSM_ServerConfigChanged);
             FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
             printk( KERN_INFO "DeviceRegistred: ID: %u Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n", dt.IDDevice,dt.type,dt.VidDevice,dt.PodVidDevice,dt.KodDevice );
@@ -495,6 +496,19 @@ void FSM_ClassDeRegister(struct FSM_DeviceFunctionTree dfti)
 
 }
 EXPORT_SYMBOL(FSM_ClassDeRegister);
+
+int FSM_AddProperty(char* PropertyCode,void * Property,unsigned short pr_size, UpdateDataProperty udp,struct FSM_DeviceTree* dt)
+{
+    dt->pdl[dt->pdl_count].devid=dt->IDDevice;
+    strcpy(dt->pdl[dt->pdl_count].PropertyCode,PropertyCode);
+    dt->pdl[dt->pdl_count].Property=Property;
+    dt->pdl[dt->pdl_count].pr_size=pr_size;
+    dt->pdl[dt->pdl_count].udp=udp;
+    sprintf(dt->pdl[dt->pdl_count].fsmdevcode,"t%uv%upv%uk%u",dt->dt->type,dt->dt->VidDevice,dt->dt->PodVidDevice,dt->dt->KodDevice);
+    dt->pdl_count++;
+    return dt->pdl_count-1;
+}
+EXPORT_SYMBOL(FSM_AddProperty);
 
 module_init(FSMDeviceProcess_init);
 module_exit(FSMDeviceProcess_exit);

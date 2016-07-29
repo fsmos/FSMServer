@@ -91,6 +91,11 @@ EXPORT_SYMBOL(FSM_GPIO_Impulse_timer_callback);
 
 void FSM_GPIO_Reset(void)
 {
+    
+#ifdef FSM_GPIO_BLOCK 
+return; 
+#endif
+
  FSM_GPIO_ReSetBit(FSM_GPIO_Bit_0);
  mod_timer( &FSM_GPIO_Reset_timer, jiffies + msecs_to_jiffies(100) );
 }
@@ -98,6 +103,11 @@ EXPORT_SYMBOL(FSM_GPIO_Reset);
 
 void FSM_GPIO_EventEror(void)
 {
+    
+#ifdef FSM_GPIO_BLOCK 
+return;
+#endif
+
  FSM_GPIO_ReSetBit(FSM_GPIO_Bit_1);
  mod_timer( &FSM_GPIO_Impulse_timer, jiffies + msecs_to_jiffies(1000) );
 }
@@ -124,7 +134,7 @@ void FSM_GPIODeviceRecive(char* data,short len,  struct FSM_DeviceTree* to_dt,st
         
          }
     break;
-    case PacketToDevice: ///< Отправка команды серверу
+    case PacketFromUserSpace: ///< Отправка команды серверу
          switch(fscts->cmd)
          {
             case FSM_OFF_Bit:
@@ -251,6 +261,8 @@ static void __exit FSM_GPIO_exit(void)
 {  
    FSM_ClassDeRegister(dft);
    i2c_unregister_device(gpioclient);
+   del_timer( &FSM_GPIO_Reset_timer );
+   del_timer( &FSM_GPIO_Impulse_timer );
    printk( KERN_INFO "FSM GPIO unloaded\n" );
 }
 

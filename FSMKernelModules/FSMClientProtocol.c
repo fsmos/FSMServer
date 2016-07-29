@@ -151,6 +151,7 @@ EXPORT_SYMBOL(FSM_Send_Ethernet_Package2);
 
 int FSM_RegisterEthernetDevice(struct FSM_DeviceRegistr *fsmrg, struct net_device *dev, char* mac)
 {
+    int newr=1;
     int i=0;
     
     
@@ -158,11 +159,16 @@ int FSM_RegisterEthernetDevice(struct FSM_DeviceRegistr *fsmrg, struct net_devic
     DEBUG_CALL_STACK_GLOBSET
     DEBUG_CALL_STACK_SetStack|(get_regeth_init);
 #endif
-  
+    
   
     for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
     {
-        if((fsmrg->IDDevice==fsdev[i].id)&&(fsdev[i].reg==1)) fsdev[i].reg=0;
+        if((fsmrg->IDDevice==fsdev[i].id)&&(fsdev[i].reg==1)) 
+        {
+        fsdev[i].reg=0;
+        newr=0;
+        }
+            
     }
     for(i=0;i<FSM_EthernetDeviceTreeSize;i++)
     {
@@ -173,7 +179,7 @@ int FSM_RegisterEthernetDevice(struct FSM_DeviceRegistr *fsmrg, struct net_devic
             fsdev[i].reg=1;
            fsdev[i].numdev=i;
             memcpy(fsdev[i].destmac,mac,6);
-            printk( KERN_INFO "FSM Ethernet Device Registred %u \n",fsmrg->IDDevice); 
+            if (newr) printk( KERN_INFO "FSM Ethernet Device Registred %u \n",fsmrg->IDDevice); 
             return 0;
         }
     }

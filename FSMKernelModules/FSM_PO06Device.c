@@ -56,7 +56,7 @@ void FSM_PO06SendStreaminfo(unsigned short id,struct FSM_DeviceTree* to_dt,struc
     sendcmd.cmd=FSMPO06SendStream;
     sendcmd.countparam=1;
     ((unsigned short*)sendcmd.Data)[0]=id;
-    printk( KERN_INFO "FSM Send %u ,%u \n",sendcmd.Data[0],sendcmd.Data[1]); 
+    if(to_dt->debug) printk( KERN_INFO "FSM Send %u ,%u \n",sendcmd.Data[0],sendcmd.Data[1]); 
     sendcmd.CRC=0;
     plen=sizeof(struct FSM_SendCmd)-sizeof(sendcmd.Data)+2;
    if(to_dt!=0)  to_dt->dt->Proc((char*)&sendcmd,plen,to_dt,from_dt);
@@ -130,7 +130,7 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* to_dt,struct FS
           
              FSM_AudioStreamUnRegistr(FSMPO06Dev[i].idstream);
              FSMPO06Dev[i].reg=0;
-             printk( KERN_INFO "FSMPO06 Device Deleted %u \n",to_dt->IDDevice); 
+           if(to_dt->debug) printk( KERN_INFO "FSMPO06 Device Deleted %u \n",to_dt->IDDevice); 
              break;
           }
           }
@@ -147,7 +147,7 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* to_dt,struct FS
               FSM_P2P_Disconnect(((struct FSM_PO06Device*)((FSM_FindDevice(scmd->IDDevice))->data))->idcon);
               break;
               case AnsGetSettingClientPo06:
-              printk( KERN_INFO "FSM_Set Recv %i\n",scmd->IDDevice);
+           if(to_dt->debug)   printk( KERN_INFO "FSM_Set Recv %i\n",scmd->IDDevice);
               memcpy(&((struct fsm_po06_setting*)(FSM_FindDevice(scmd->IDDevice)->config))->fsm_p006_su_s,scmd->Data,FSM_FindDevice(scmd->IDDevice)->dt->config_len);
               break;
           }
@@ -171,7 +171,7 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* to_dt,struct FS
     DEBUG_CALL_STACK_SetStack|(get_por_exit);
 #endif
 
-    printk( KERN_INFO "RPack %u \n" ,len); 
+    if(to_dt->debug) printk( KERN_INFO "RPack %u \n" ,len); 
 }
 EXPORT_SYMBOL(FSM_PO06Recive);
 void ApplaySettingPO06(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
@@ -183,7 +183,7 @@ void ApplaySettingPO06(struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_
 #endif
 
     memset(&sendcmd,0,sizeof(sendcmd));
-    printk( KERN_INFO "FSM_Set\n" ); 
+    if(to_dt->debug) printk( KERN_INFO "FSM_Set\n" ); 
     sendcmd.cmd=SetSettingClientPo06;
     sendcmd.countparam=1;
     sendcmd.IDDevice=to_dt->IDDevice;

@@ -20,6 +20,7 @@ enum FSMAD_VidDevice
 enum FSMAD_PodVidDevice
 {
    CCK=1, ///< СЦК
+   ControlCCK=2
 };
 /*!
 \brief Род устроства
@@ -33,6 +34,7 @@ enum FSMAD_RodDevice
     PO06=5,///< PO06
     MN524=6,///< MN524
     MN111=7,///< MN111
+    ControlCCKServer=8
 };
 struct FSME1Buff
 {
@@ -47,14 +49,14 @@ struct FSM_E1Device
     struct fsm_ethernet_dev* ethdev;
     unsigned short streams_id[32];
     unsigned char bit_ch;
-    uint64_t e1_eror_ch;
-    uint64_t pkg_count;
-    uint8_t cht;
+    unsigned long long e1_eror_ch;
+    unsigned long long pkg_count;
+    unsigned char cht;
     //struct FSME1Buff E1buffs;
 };
 struct fsm_po06_serversetting
 {
-    
+    int dd;
 };
 struct fsm_po06_abonent
 {
@@ -294,6 +296,12 @@ enum FSMMN111Command /*0*****125*/
 	FSM_Ans_Get_MN111_Power_n60V=9,
 	FSM_Ans_Get_MN111_Power_90V=10,
 	FSM_Ans_Get_MN111_Power_220V=11,
+    FSM_Read_MN111_Power_5V=12,
+	FSM_Read_MN111_Power_n5V=13,
+	FSM_Read_MN111_Power_n60V=14,
+	FSM_Read_MN111_Power_90V=15,
+	FSM_Read_MN111_Power_220V=16,
+     FSM_Read_MN111_AutoReqest=17,
 };
 
 struct fsm_mn111_subscriber
@@ -318,6 +326,7 @@ struct MN111VoltageState
     struct MN111OneVoltageState MN111_Power_n60V;
     struct MN111OneVoltageState MN111_Power_90V;
     struct MN111OneVoltageState MN111_Power_220V;
+    unsigned short sel;
 };
 struct FSM_MN111Device
 {
@@ -327,6 +336,27 @@ struct FSM_MN111Device
     int idcon;
     struct fsm_ethernet_dev* ethdev;
     struct fsm_mn111_setting mn111set;
+    struct MN111VoltageState vst;
+    struct FSM_DeviceTree* fsms;
 };
 
+struct CCKDeviceInfo
+{
+    unsigned char reg; 
+    unsigned char type; 
+    unsigned short id;
+    unsigned char Position;
+    unsigned char n;
+    unsigned char ip[4]; 
+};
+
+enum FSM_CCKControl_Cmd
+{
+    FSM_CCKGetInfo,
+};
+    
+void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK);
+void FSM_CCK_Get_Data(struct CCKDeviceInfo* CCKMass);
+void FSM_CCK_MN111_Reqest_Voltage(enum FSMMN111Command fsmcmd,unsigned short IDDevice);
+float FSM_CCK_MN111_Read_Voltage(enum FSMMN111Command fsmcmd,unsigned short IDDevice);
 #endif	/* FCM_AUDIODEVICECLASS_H */

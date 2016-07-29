@@ -219,4 +219,7 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_gpio">
     <File Name="FSM_GPIO.c"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="FSM_CCKControl">
+    <File Name="FSM_CCKControl.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>

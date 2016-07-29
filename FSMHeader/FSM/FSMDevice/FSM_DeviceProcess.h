@@ -32,6 +32,7 @@ struct FSM_DeviceTree
    void * data;
    int id;
    struct FSM_DeviceTree* TrDev;
+   unsigned char debug;
    struct FSM_PropertyDevice pdl[FSM_PropertyTreeSize];
    int pdl_count;
 };
@@ -55,6 +56,7 @@ struct FSM_DeviceFunctionTree
    unsigned char KodDevice;///<Код устройства
    DeviceProcess Proc;///< Обратная связь
     ApplayProcess aplayp;
+    unsigned char debug;
    unsigned short config_len; 
 };
 
@@ -185,17 +187,7 @@ int FSM_ToCmdStream(struct FSM_DeviceTree* pdt);
 
 void FSM_Beep(int value,int msec);
 
-int FSM_AddProperty(char* PropertyCode,void * Property,unsigned short pr_size, UpdateDataProperty udp,struct FSM_DeviceTree* dt)
-{
-    dt->pdl[dt->pdl_count].devid=dt->IDDevice;
-    strcpy(dt->pdl[dt->pdl_count].PropertyCode,PropertyCode);
-    dt->pdl[dt->pdl_count].Property=Property;
-    dt->pdl[dt->pdl_count].pr_size=pr_size;
-    dt->pdl[dt->pdl_count].udp=udp;
-    sprintf(dt->pdl[dt->pdl_count].fsmdevcode,"t%uv%upv%uk%u",dt->dt->type,dt->dt->VidDevice,dt->dt->PodVidDevice,dt->dt->KodDevice);
-    dt->pdl_count++;
-    return dt->pdl_count-1;
-}
+int FSM_AddProperty(char* PropertyCode,void * Property,unsigned short pr_size, UpdateDataProperty udp,struct FSM_DeviceTree* dt);
 
 enum FSM_UK /*125 *** 254*/
 {
