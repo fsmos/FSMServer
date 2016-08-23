@@ -164,9 +164,24 @@ void FSM_PO07Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct F
           
            break;
           case SendTxtMassage: ///< Отправка текстового сообщения
-           printk( KERN_INFO "%s",sctt->Data );
+           //printk( KERN_INFO "%s",sctt->Data );
            
            break;
+          case PacketFromUserSpace:
+          switch(scmd->cmd)
+          {
+          case FSMPo07AudioRun:
+          case FSMPo07Reset:
+          case FSMPo07Reregister:
+          scmd->IDDevice=to_dt->IDDevice;
+          scmd->opcode=SendCmdToDevice;
+          to_dt->TrDev->dt->Proc((char*)scmd,FSMH_Header_Size_SendCmd, to_dt->TrDev, to_dt);
+          break;
+          case FSMPo07GetCRC:
+          
+          break;
+          }
+          break;
           case Alern: ///<Тревога
           switch(((struct FSM_AlernSignal*)data)->ID)
           {

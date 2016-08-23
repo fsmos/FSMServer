@@ -11,6 +11,8 @@ struct FSM_DeviceFunctionTree dft;
 static struct timer_list FSM_GPIO_Reset_timer;
 static struct timer_list FSM_GPIO_Impulse_timer;
 unsigned char fsm_gpio_eror=0;
+#define GPIO_RESET_PIN FSM_GPIO_Bit_1
+#define GPIO_EROR_PIN FSM_GPIO_Bit_0
 
 void FSM_GPIO_SetBit(enum FSM_GPIO_Bit_Enum Pin)
 {
@@ -78,14 +80,14 @@ EXPORT_SYMBOL(FSM_GPIO_Get_Status);
 
 void FSM_GPIO_Reset_timer_callback( unsigned long data )
 {
-  FSM_GPIO_SetBit(FSM_GPIO_Bit_0);
+  FSM_GPIO_ReSetBit(GPIO_RESET_PIN);
 }
 EXPORT_SYMBOL(FSM_GPIO_Reset_timer_callback);
 
 void FSM_GPIO_Impulse_timer_callback( unsigned long data )
 {
- if(fsm_gpio_eror) FSM_GPIO_ReSetBit(FSM_GPIO_Bit_1);
- else FSM_GPIO_SetBit(FSM_GPIO_Bit_1);
+ if(fsm_gpio_eror) FSM_GPIO_ReSetBit(GPIO_EROR_PIN);
+ else FSM_GPIO_SetBit(GPIO_EROR_PIN);
 }
 EXPORT_SYMBOL(FSM_GPIO_Impulse_timer_callback);
 
@@ -96,7 +98,7 @@ void FSM_GPIO_Reset(void)
 return; 
 #endif
 
- FSM_GPIO_ReSetBit(FSM_GPIO_Bit_0);
+ FSM_GPIO_SetBit(GPIO_RESET_PIN);
  mod_timer( &FSM_GPIO_Reset_timer, jiffies + msecs_to_jiffies(100) );
 }
 EXPORT_SYMBOL(FSM_GPIO_Reset);
@@ -108,7 +110,7 @@ void FSM_GPIO_EventEror(void)
 return;
 #endif
 
- FSM_GPIO_ReSetBit(FSM_GPIO_Bit_1);
+ FSM_GPIO_ReSetBit(GPIO_EROR_PIN);
  mod_timer( &FSM_GPIO_Impulse_timer, jiffies + msecs_to_jiffies(1000) );
 }
 EXPORT_SYMBOL(FSM_GPIO_EventEror);
@@ -150,11 +152,11 @@ void FSM_GPIODeviceRecive(char* data,short len,  struct FSM_DeviceTree* to_dt,st
             FSM_GPIO_EventEror();
             break;
             case FSM_Eror_ON_Bit:
-            FSM_GPIO_ReSetBit(FSM_GPIO_Bit_1);
+            FSM_GPIO_ReSetBit(GPIO_EROR_PIN);
             fsm_gpio_eror=1;
             break;
             case FSM_Eror_OFF_Bit:
-            FSM_GPIO_SetBit(FSM_GPIO_Bit_1);
+            FSM_GPIO_SetBit(GPIO_EROR_PIN);
             fsm_gpio_eror=0;
             break;
          }
@@ -168,7 +170,7 @@ static int __init FSM_GPIO_init(void)
 #ifdef FSM_GPIO_BLOCK 
 goto fail; 
 #endif
-
+  
 int i = 0, found = 0;
 memset(&info, 0,sizeof(struct i2c_board_info));
 adapter = i2c_get_adapter(i++);

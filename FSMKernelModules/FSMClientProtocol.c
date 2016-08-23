@@ -343,7 +343,18 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           break;
           case AnsDelList: ///< Подтверждение удаления устройства из списка
           break;
-          case AnsPing:///< Пинг
+          case AnsPing:
+          dftv=FSM_FindDevice(((struct FSM_Ping *)skb->data)->IDDevice);
+          if(dftv==0) 
+          {
+                printk( KERN_INFO "Eror \n"); 
+                goto clear; 
+          }
+          dftv->dt->Proc((char*)skb->data,sizeof(struct FSM_Ping),dftv,dt);
+          break;
+          case FSMPing:///< Пинг
+          ((struct FSM_Ping *)skb->data)->opcode=AnsPing;
+          FSM_Send_Ethernet_Package(skb->data,sizeof(struct FSM_Ping*),FSM_FindEthernetDevice(((struct FSM_Ping*)skb->data)->IDDevice));
           break;
           case SendCmdToDevice:///< Отправка команды устройству
           goto clear; 
@@ -383,8 +394,8 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
             {
                   goto clear; 
             }
-             dftv->dt->Proc((char*)skb->data,skb->len,dftv,dt);
-             goto clear; 
+            dftv->dt->Proc((char*)skb->data,skb->len,dftv,dt);
+            goto clear; 
            break;
           case AnsSendTxtMassage: ///< Подтверждение приёма текстового сообщения
            break;
@@ -464,7 +475,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
            dftv->dt->Proc((char*)skb->data,FSMH_Header_Size_AlernSignal,dftv,dt);
           break;
           case Warning: ///<Предупреждение
-          FSM_GPIO_EventEror();
+         //FSM_GPIO_EventEror();
           printk(KERN_WARNING "%u:Warning\n",((struct FSM_Header*)(skb->data))->IDDevice);  
             dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
            if(dftv==0) 

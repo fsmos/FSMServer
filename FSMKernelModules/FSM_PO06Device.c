@@ -12,7 +12,7 @@
 
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-
+struct CCKDeviceInfo CCKDevE;
 struct FSM_DeviceFunctionTree dft;
 struct FSM_PO06Device FSMPO06Dev[FSM_PO06DeviceTreeSize];
 struct FSM_SendCmd sendcmd;
@@ -149,6 +149,17 @@ void FSM_PO06Recive(char* data,short len, struct FSM_DeviceTree* to_dt,struct FS
               case AnsGetSettingClientPo06:
            if(to_dt->debug)   printk( KERN_INFO "FSM_Set Recv %i\n",scmd->IDDevice);
               memcpy(&((struct fsm_po06_setting*)(FSM_FindDevice(scmd->IDDevice)->config))->fsm_p006_su_s,scmd->Data,FSM_FindDevice(scmd->IDDevice)->dt->config_len);
+              break;
+              case FSMPo06SendIP:
+              CCKDevE.id=scmd->IDDevice;
+              CCKDevE.ip[0]=scmd->Data[0];
+              CCKDevE.ip[1]=scmd->Data[1];
+              CCKDevE.ip[2]=scmd->Data[2];
+              CCKDevE.ip[3]=scmd->Data[3];
+              CCKDevE.type=PO06;
+              CCKDevE.Position=scmd->Data[4];
+              FSMCCK_AddDeviceInfo(&CCKDevE);
+              if(to_dt->debug) printk( KERN_INFO "FSM PO06 ID%i Asterisk IP %i.%i.%i.%i\n ",scmd->IDDevice, scmd->Data[0],scmd->Data[1],scmd->Data[2],scmd->Data[3]);
               break;
           }
           

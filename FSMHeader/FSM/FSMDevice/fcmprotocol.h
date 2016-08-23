@@ -71,7 +71,7 @@ enum FSM_CodeOperation
   AnsSendCmdToServerStream=54,
   SendCmdToClientStream=55,
   AnsSendCmdToClientStream=56,
-  
+  FSMPing=57
 };
 /*!
 \brief Тип устройства

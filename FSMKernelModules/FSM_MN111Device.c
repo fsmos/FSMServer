@@ -264,7 +264,7 @@ void FSM_MN111Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
                scmd->IDDevice=to_dt->IDDevice;
                scmd->opcode=SendCmdToDevice;
                to_dt->TrDev->dt->Proc((char*)scmd,FSMH_Header_Size_SendCmd, to_dt->TrDev, to_dt);
-                printk( KERN_ERR "MN111 %u: Reqest\n",((struct FSM_Header*)(data))->IDDevice); 
+                //printk( KERN_ERR "MN111 %u: Reqest\n",((struct FSM_Header*)(data))->IDDevice); 
                break;
                case FSM_Read_MN111_Power_5V:
                ((unsigned short*)scmd->Data)[0]=mn111->vst.MN111_Power_5V.value;

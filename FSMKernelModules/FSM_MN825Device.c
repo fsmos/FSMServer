@@ -189,6 +189,22 @@ void FSM_MN825Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
           break;
           case Beep: ///<Звук
           break;
+          case PacketFromUserSpace:
+          switch(scmd->cmd)
+          {
+          case FSMMN825AudioRun:
+          case FSMMN825Reset:
+          case FSMMN825Reregister:
+          case FSMMN825SetTangenta:
+          scmd->IDDevice=to_dt->IDDevice;
+          scmd->opcode=SendCmdToDevice;
+          to_dt->TrDev->dt->Proc((char*)scmd,FSMH_Header_Size_SendCmd, to_dt->TrDev, to_dt);
+          break;
+          case FSMMN825GetCRC:
+          
+          break;
+          }
+          break;
           default:
           break;
       }                 

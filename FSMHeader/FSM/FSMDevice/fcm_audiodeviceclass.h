@@ -359,4 +359,16 @@ void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK);
 void FSM_CCK_Get_Data(struct CCKDeviceInfo* CCKMass);
 void FSM_CCK_MN111_Reqest_Voltage(enum FSMMN111Command fsmcmd,unsigned short IDDevice);
 float FSM_CCK_MN111_Read_Voltage(enum FSMMN111Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_MN825_SendCMD(enum FSMMN825Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_MN825_SendCMD_Set(enum FSMMN825Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_MN825_SendCMD_ReSet(enum FSMMN825Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_MN921_SendCMD(enum FSMMN921Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_MN921_SendCMD_Set(enum FSMMN921Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_MN921_SendCMD_ReSet(enum FSMMN921Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_PO07_SendCMD(enum FSMPO07Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_PO07_SendCMD_Set(enum FSMPO07Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_PO07_SendCMD_ReSet(enum FSMPO07Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_PO08_SendCMD(enum FSMPO08Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_PO08_SendCMD_Set(enum FSMPO08Command fsmcmd,unsigned short IDDevice);
+void FSM_CCK_PO08_SendCMD_ReSet(enum FSMPO08Command fsmcmd,unsigned short IDDevice);
 #endif	/* FCM_AUDIODEVICECLASS_H */

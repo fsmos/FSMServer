@@ -1,0 +1,7 @@
+Package: fsmcore
+Version: 0.0.1
+Section: base
+Architecture: all
+Provides: fsmcore
+Maintainer: Gusenkov S.V <gusenkovs@list.ru>
+Description: FSM Core

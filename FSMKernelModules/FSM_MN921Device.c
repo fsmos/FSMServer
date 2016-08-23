@@ -162,7 +162,22 @@ void FSM_MN921Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
           
            break;
           case SendTxtMassage: ///< Отправка текстового сообщения
-           break;
+          break;
+          case PacketFromUserSpace:
+          switch(scmd->cmd)
+          {
+          case FSMMN921AudioRun:
+          case FSMMN921Reset:
+          case FSMMN921Reregister:
+          scmd->IDDevice=to_dt->IDDevice;
+          scmd->opcode=SendCmdToDevice;
+          to_dt->TrDev->dt->Proc((char*)scmd,FSMH_Header_Size_SendCmd, to_dt->TrDev, to_dt);
+          break;
+          case FSMMN921GetCRC:
+          
+          break;
+          }
+          break;
           case Alern: ///<Тревога
           switch(((struct FSM_AlernSignal*)data)->ID)
           {
