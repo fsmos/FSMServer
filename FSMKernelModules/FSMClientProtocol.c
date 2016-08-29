@@ -519,7 +519,7 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
           }
           break;
            case SendCmdToServerStream: ///< Отправка команды серверу
-          FSM_ToProcess(((struct FSM_Header*)skb->data)->IDDevice,(char*)skb->data,skb->len,dftv,dt);
+           FSM_ToProcess(((struct FSM_Header*)skb->data)->IDDevice,(char*)skb->data,skb->len,dt);
            break;
           
       }                 

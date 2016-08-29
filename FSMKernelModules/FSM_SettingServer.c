@@ -18,7 +18,7 @@ struct fsm_Setting_Setting fsmSSS;
 void FSM_SettingRecive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
     struct fsm_devices_config* fsmset;
-    struct FSM_DeviceTree* fsdt;
+    //struct FSM_DeviceTree* fsdt;
     int i,j;
     short hlen;
   //  unsigned short tmp;

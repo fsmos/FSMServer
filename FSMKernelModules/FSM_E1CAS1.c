@@ -30,8 +30,8 @@ typedef enum debug_function
 void FSMCASHandler(char* Data,short len)
 {
 
-   struct FSM_SendAudioData* indat=(struct FSM_SendAudioData*) Data;
-   struct FSME1CAS* casdata =(struct FSME1CAS*)FSM_AudioStreamData(indat->IDDevice);
+  // struct FSM_SendAudioData* indat=(struct FSM_SendAudioData*) Data;
+  // struct FSME1CAS* casdata =(struct FSME1CAS*)FSM_AudioStreamData(indat->IDDevice);
    
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_GLOBSET
@@ -56,7 +56,7 @@ int32_t FSMCASRegister(void)
 
     for(i=0;i<FSM_E1CasTreeSize;i++)
     {
-    if(fsmas.reg==0)
+    if(fsmcas[i].reg==0)
     {
     fsmcas[i].reg=1;
     fsmas.ToProcess=FSMCASHandler;

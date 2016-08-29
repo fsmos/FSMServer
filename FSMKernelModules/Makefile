@@ -4,7 +4,6 @@ TARGET1 =FSMClientProtocol
 TARGET2 =FSM_DeviceProcess
 TARGET3 =FSM_E1Device
 TARGET4 =FSM_AudioStream
-TARGET5 =FSM_ClientModule
 TARGET6 =FSM_StatisticServer
 TARGET7 =FSM_PO06Device
 TARGET8 =FSM_Crypt
@@ -35,7 +34,6 @@ obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
 obj-m   += ${TARGET3}.o
 obj-m   += ${TARGET4}.o
-obj-m   += ${TARGET5}.o
 obj-m   += ${TARGET6}.o
 obj-m   += ${TARGET7}.o
 obj-m   += ${TARGET8}.o
@@ -66,4 +64,9 @@ all:
 	make -C $(KDIR) M=$(PWD) modules
 
 clean:
+	make -C $(KDIR) M=$(PWD) clean
+	
+module:
+	make -C $(KDIR) M=$(PWD) modules
+	sh nw_module.sh
 	make -C $(KDIR) M=$(PWD) clean

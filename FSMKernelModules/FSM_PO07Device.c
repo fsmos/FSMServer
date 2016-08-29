@@ -72,7 +72,7 @@ void FSM_PO07Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct F
     int i;
     
     struct FSM_SendCmdTS* scmd=(struct FSM_SendCmdTS*)data;
-    struct FSM_SendMessage* sctt=(struct FSM_SendMessage*)data;
+   // struct FSM_SendMessage* sctt=(struct FSM_SendMessage*)data;
         // char datas[2];
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_GLOBSET

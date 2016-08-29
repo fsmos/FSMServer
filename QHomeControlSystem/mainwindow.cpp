@@ -43,8 +43,9 @@ void MainWindow::RepaintDevicePanel()
     QLocalSocket *clientConnection = server->nextPendingConnection();
     qDebug("Event");
     fsmdat.cmd=FSMIOCTLStat_Read;
-
-    memcpy(&fsmststr,fsmdat.Data,sizeof(struct fsm_statusstruct));
+    //qDebug("Memcpy sg");
+    //memcpy(&fsmststr,fsmdat.Data,sizeof(struct fsm_statusstruct));
+    qDebug("Memcpy Clear");
     int sh=0;
     ui->treeWidget->clear();
     for(int i=0;i<scolumn_cnt;i++)
@@ -52,7 +53,9 @@ void MainWindow::RepaintDevicePanel()
         {
             fsmdat.Data[0]=j;
             fsmdat.Data[1]=i;
+            qDebug("Send cMD");
             FSM_SendCtlCmd(&fsmdat);
+            qDebug("Memcpy");
             memcpy(&fsmststr.statel[j][i],fsmdat.Data,sizeof(struct fsm_status_element));
             ui->tableWidget->setItem(j,i,new QTableWidgetItem());
             ui->tableWidget->item(j,i)->setIcon(dev_list[fsmststr.statel[j][i].fsmdevcode].QFSMIC[fsmststr.statel[j][i].state].icn);

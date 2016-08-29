@@ -100,11 +100,11 @@ static void __exit FSMDeviceProcess_exit(void)
 #endif
 }
 
-void FSM_ToProcess(int id, char* Data,short len, struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
+void FSM_ToProcess(int id, char* Data,short len,struct FSM_DeviceTree* from_dt)
 {
    if(fsm_dt[id].registr==1)
    {
-    fsm_dt[id].dt->Proc(Data,len,to_dt,from_dt);
+    fsm_dt[id].dt->Proc(Data,len,&fsm_dt[id],from_dt);
    }
 }
 EXPORT_SYMBOL(FSM_ToProcess);

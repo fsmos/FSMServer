@@ -50,7 +50,7 @@ int FSMStat_rcv(char* Data,short len, struct fsm_client_struct* dev)
             FSM_SendSignalToPipe("fsmstat",FSM_ServerStatisticChanged);
             break;
             case FSMNotRegistred:
-            FSM_RegisterDevice(FSM_StatisicID,FSMDeviceStatistic,ComputerStatistic,PCx86,StatisticandConfig,FSMStat_rcv);
+            FSM_RegisterDevice(FSM_StatisicID,FSMDeviceStatistic,ComputerStatistic,PCx86,StatisticandConfig,(DeviceClientProcess)FSMStat_rcv);
             break;
           }
         
@@ -175,12 +175,12 @@ void FSM_StatEventLoaded(char* Data,short len , struct fsm_event_struct* cl_str)
 }
 void FSM_StStartEventLoaded(char* Data,short len , struct fsm_event_struct* cl_str)
 {
-    FSM_RegisterDevice(FSM_StatisicID,StatisticandConfig,FSMDeviceStatistic,ComputerStatistic,PCx86,FSMStat_rcv);
+    FSM_RegisterDevice(FSM_StatisicID,StatisticandConfig,FSMDeviceStatistic,ComputerStatistic,PCx86,(DeviceClientProcess)FSMStat_rcv);
 }
  
 static int __init FSM_Client_Statistic_init(void)
 {
-    FSM_RegisterDevice(FSM_StatisicID,StatisticandConfig,FSMDeviceStatistic,ComputerStatistic,PCx86,FSMStat_rcv);
+    FSM_RegisterDevice(FSM_StatisicID,StatisticandConfig,FSMDeviceStatistic,ComputerStatistic,PCx86,(DeviceClientProcess)FSMStat_rcv);
     FSM_RegisterEvent(FSM_ServerStatisticChanged,FSM_StatEventLoaded);
     FSM_RegisterIOCtl(FSM_StatistickIOCtlId,FSMStat_rcv_ioctl);
     FSM_RegisterEvent(FSM_StaticServerRun,FSM_StStartEventLoaded);

@@ -109,7 +109,7 @@ void ApplaySettingSkyNet(struct FSM_DeviceTree* df)
 
 static int __init FSM_SkyNet_init(void)
 {
-   dft.aplayp=ApplaySettingSkyNet;
+   dft.aplayp=(ApplayProcess)ApplaySettingSkyNet;
    dft.type=(unsigned char)Switch;
    dft.VidDevice=(unsigned char)SkyNet;
    dft.PodVidDevice=(unsigned char)K1986BE1T;

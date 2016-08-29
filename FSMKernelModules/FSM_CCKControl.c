@@ -8,10 +8,10 @@ struct CCKDeviceInfo CCKDev[FSM_CCKTreeSize];
 
 void FSM_CCKControlDeviceRecive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
-struct fsm_devices_config* fsmset;
-    struct FSM_DeviceTree* fsdt;
-    int i,j;
-    short hlen;
+//struct fsm_devices_config* fsmset;
+ //   struct FSM_DeviceTree* fsdt;
+  //  int i,j;
+   // short hlen;
   //  unsigned short tmp;
     struct FSM_SendCmdTS* fscts= (struct FSM_SendCmdTS*)data;    
    // printk( KERN_INFO "FSM SIOCTL,%u \n",fscts->opcode ); 

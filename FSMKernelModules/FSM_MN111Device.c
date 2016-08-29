@@ -74,7 +74,7 @@ void FSM_TestVoltage(struct FSM_DeviceTree* to_dt,unsigned short cmd)
     sendcmd.opcode=PacketToDevice;
     sendcmd.IDDevice=to_dt->IDDevice;
     sendcmd.cmd=cmd;
-    to_dt->dt->Proc(&sendcmd,sizeof(struct FSM_SendCmd),to_dt,to_dt);
+    to_dt->dt->Proc((char*)&sendcmd,sizeof(struct FSM_SendCmd),to_dt,to_dt);
 }
 void FSM_Test_Callback(unsigned long data)
 {

@@ -22,8 +22,7 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui
 
-RESOURCES += \
-    data.qrc
+RESOURCES +=
 
 LIBS +=-L/usr/include -lfsmctl
 

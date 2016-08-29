@@ -1,8 +1,14 @@
 #ifndef FSM_Client_H
 #define FSM_Client_H
-typedef void (*DeviceClientProcess)(char*,short, struct fsm_client_struct*);
-typedef void (*EventClientProcess)(char*,short, struct fsm_event_struct*);
-typedef void (*IOClientProcess)(char*,short, struct fsm_ioctl_struct*);
+
+typedef  struct fsm_client_struct fsm_client_struct_t;
+typedef  struct fsm_event_struct fsm_event_struct_t;
+typedef  struct fsm_ioctl_struct fsm_ioctl_struct_t;
+
+typedef void (*DeviceClientProcess)(char*,short, fsm_client_struct_t*);
+typedef void (*EventClientProcess)(char*,short,  fsm_event_struct_t*);
+typedef void (*IOClientProcess)(char*,short, fsm_ioctl_struct_t*);
+
 struct fsm_client_struct
 {
     char reg;

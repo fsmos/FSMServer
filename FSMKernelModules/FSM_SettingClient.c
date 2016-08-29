@@ -30,7 +30,7 @@ int FSMSet_rcv(char* Data,short len, struct fsm_client_struct* dev)
 { 
      char dats= Data[0];
      struct FSM_SendCmd* fscts= (struct FSM_SendCmd*)Data;  
-     struct FSM_AnsDeviceRegistr* fscar= (struct FSM_AnsDeviceRegistr*)Data;  
+     //struct FSM_AnsDeviceRegistr* fscar= (struct FSM_AnsDeviceRegistr*)Data;  
      switch(dats)
       {
           case RegDevice: ///< Регистрация устройства
@@ -51,14 +51,14 @@ int FSMSet_rcv(char* Data,short len, struct fsm_client_struct* dev)
             
             case FSMNotRegistred:
             printk( KERN_INFO "Device FSR\n" ); 
-            FSM_RegisterDevice(FSM_SettingID,StatisticandConfig,FSMDeviceConfig,ComputerStatistic,PCx86,FSMSet_rcv);
+            FSM_RegisterDevice(FSM_SettingID,StatisticandConfig,FSMDeviceConfig,ComputerStatistic,PCx86,(DeviceClientProcess)FSMSet_rcv);
             break;
             
             case SetSettingClient:
              printk( KERN_INFO "FSM_Setting_Applay\n" ); 
              FSM_DeleteDevice(FSM_SettingID);
              setservid=((struct fsm_ClientSetting_Setting*)fscts->Data)->id;
-             FSM_RegisterDevice(FSM_SettingID,StatisticandConfig,FSMDeviceConfig,ComputerStatistic,PCx86,FSMSet_rcv);
+             FSM_RegisterDevice(FSM_SettingID,StatisticandConfig,FSMDeviceConfig,ComputerStatistic,PCx86,(DeviceClientProcess)FSMSet_rcv);
             break;
           }
         
@@ -144,13 +144,13 @@ int FSMSet_rcv(char* Data,short len, struct fsm_client_struct* dev)
           case Beep: ///<Звук
           break;
       }                 
-                    
+    return 0;                
 }; 
 
 static int __init FSM_Client_Setting_init(void)
 {
     setservid=22;
-    FSM_RegisterDevice(FSM_SettingID,StatisticandConfig,FSMDeviceConfig,ComputerStatistic,PCx86,FSMSet_rcv);
+    FSM_RegisterDevice(FSM_SettingID,StatisticandConfig,FSMDeviceConfig,ComputerStatistic,PCx86,(DeviceClientProcess)FSMSet_rcv);
     printk( KERN_INFO "FSM Setting module loaded\n" );  
     return 0;
 }

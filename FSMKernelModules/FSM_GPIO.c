@@ -16,10 +16,11 @@ unsigned char fsm_gpio_eror=0;
 
 void FSM_GPIO_SetBit(enum FSM_GPIO_Bit_Enum Pin)
 {
+    int data=0;
+
 #ifdef FSM_GPIO_BLOCK 
 return; 
 #endif
-    int data=0;
     data=i2c_smbus_read_byte_data(gpioclient, 1);
     printk( KERN_INFO "FSM GPIO Read %u \n", data ); 
     data|=Pin;
@@ -30,10 +31,13 @@ EXPORT_SYMBOL(FSM_GPIO_SetBit);
 
 void FSM_GPIO_ReSetBit(enum FSM_GPIO_Bit_Enum Pin)
 {
+
+    int data=0;
+
 #ifdef FSM_GPIO_BLOCK 
 return; 
 #endif
-    int data=0;
+
     data=i2c_smbus_read_byte_data(gpioclient, 1);
     printk( KERN_INFO "FSM GPIO Read %u \n", data ); 
     data&=~Pin;
@@ -44,10 +48,12 @@ EXPORT_SYMBOL(FSM_GPIO_ReSetBit);
 
 void FSM_GPIO_Set_Input(enum FSM_GPIO_Bit_Enum Pin)
 {
+int data=0;
+
 #ifdef FSM_GPIO_BLOCK 
 return; 
 #endif
-     int data=0;
+     
     data=i2c_smbus_read_byte_data(gpioclient, 3);
     data|=Pin;
     i2c_smbus_write_byte_data(gpioclient, 3,data);
@@ -56,10 +62,12 @@ EXPORT_SYMBOL(FSM_GPIO_Set_Input);
 
 void FSM_GPIO_Set_Output(enum FSM_GPIO_Bit_Enum Pin)
 {
+int data=0;
+
 #ifdef FSM_GPIO_BLOCK 
 return; 
 #endif
-     int data=0;
+    
     data=i2c_smbus_read_byte_data(gpioclient, 3);
     data&=~Pin;
     i2c_smbus_write_byte_data(gpioclient, 3,data);
@@ -68,10 +76,13 @@ EXPORT_SYMBOL(FSM_GPIO_Set_Output);
 
 unsigned char FSM_GPIO_Get_Status(enum FSM_GPIO_Bit_Enum Pin)
 {
-      #ifdef FSM_GPIO_BLOCK 
-      return 0; 
-      #endif
+     
       int data=0;
+
+#ifdef FSM_GPIO_BLOCK 
+return 0; 
+#endif
+
       data=i2c_smbus_read_byte_data(gpioclient, 3);
       data&=Pin;
       return data;
@@ -117,10 +128,10 @@ EXPORT_SYMBOL(FSM_GPIO_EventEror);
 
 void FSM_GPIODeviceRecive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
 {
-    struct fsm_devices_config* fsmset;
-    struct FSM_DeviceTree* fsdt;
-    int i,j;
-    short hlen;
+ //   struct fsm_devices_config* fsmset;
+ //   struct FSM_DeviceTree* fsdt;
+   // int i,j;
+  //  short hlen;
   //  unsigned short tmp;
     struct FSM_SendCmdTS* fscts= (struct FSM_SendCmdTS*)data;    
     
@@ -167,11 +178,14 @@ void FSM_GPIODeviceRecive(char* data,short len,  struct FSM_DeviceTree* to_dt,st
 static int __init FSM_GPIO_init(void)
 {
     
+struct FSM_DeviceRegistr regp;
+  
+int i = 0, found = 0;
+
 #ifdef FSM_GPIO_BLOCK 
 goto fail; 
 #endif
-  
-int i = 0, found = 0;
+
 memset(&info, 0,sizeof(struct i2c_board_info));
 adapter = i2c_get_adapter(i++);
 
@@ -223,7 +237,7 @@ FSM_GPIO_ReSetBit(FSM_GPIO_Bit_5);
 FSM_GPIO_ReSetBit(FSM_GPIO_Bit_6);
 FSM_GPIO_ReSetBit(FSM_GPIO_Bit_7);
 
- struct FSM_DeviceRegistr regp;
+ 
  
    dft.aplayp=0;
    dft.type=(unsigned char)ControlMachine;

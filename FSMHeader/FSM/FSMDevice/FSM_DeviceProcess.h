@@ -18,6 +18,14 @@
 #include "FSM/FSM_Switch/fsm_switch.h"
 #include "FSM/FSM_Commutator/FSM_Commutator.h"
 
+typedef struct FSM_DeviceTree FSM_DeviceTree_t;
+/*!
+\brief Прототип функции обратной связи
+*/
+typedef void (*ApplayProcess)(FSM_DeviceTree_t*,FSM_DeviceTree_t*);
+// void FS_AFun(struct FSM_DeviceTree* to,struct FSM_DeviceTree* from);
+typedef void (*DeviceProcess)(char*,short, FSM_DeviceTree_t*, FSM_DeviceTree_t*); 
+// void FS_Fun(char* Data,short len, struct FSM_DeviceTree* to,struct FSM_DeviceTree* from);
 
 /*!
 \brief Информации о  устройстве
@@ -36,14 +44,6 @@ struct FSM_DeviceTree
    struct FSM_PropertyDevice pdl[FSM_PropertyTreeSize];
    int pdl_count;
 };
-/*!
-\brief Прототип функции обратной связи
-*/
-typedef void (*ApplayProcess)(struct FSM_DeviceTree*,struct FSM_DeviceTree*);
-// void FS_AFun(struct FSM_DeviceTree* to,struct FSM_DeviceTree* from);
-typedef void (*DeviceProcess)(char*,short, struct FSM_DeviceTree*,struct FSM_DeviceTree*); 
-// void FS_Fun(char* Data,short len, struct FSM_DeviceTree* to,struct FSM_DeviceTree* from);
-
 /*!
 \brief Информации о виде устройства
 */
@@ -181,7 +181,7 @@ typedef void (*FSM_FClassDeRegister)(struct FSM_DeviceFunctionTree dft);
 void FSM_SendEventToDev(enum FSM_eventlist idevent, struct FSM_DeviceTree* TransportDevice);
 void FSM_SendEventToAllDev(enum FSM_eventlist idevent);
 
-void FSM_ToProcess(int id, char* Data,short len, struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt);
+void FSM_ToProcess(int id, char* Data,short len, struct FSM_DeviceTree* from_dt);
 
 int FSM_ToCmdStream(struct FSM_DeviceTree* pdt);
 

@@ -141,7 +141,9 @@ enum FSM_Property_time
     FSMP_STRING,
 };
 
-typedef void (*UpdateDataProperty)(struct FSM_PropertyDevice*);
+typedef struct FSM_PropertyDevice FSM_PropertyDevice_t;
+
+typedef void (*UpdateDataProperty)(FSM_PropertyDevice_t*);
 
 struct FSM_PropertyDevice
 {

@@ -36,11 +36,14 @@ int FSM_SendSignalToPipe_thread(void * Data)
 {
     char id[10];
     struct SendSignalStruct* datas= (struct SendSignalStruct*)Data;
-    char *argv[] = {"fsmsstd",datas->pipe, datas->id, NULL };
     char *envp[] = { NULL };
-    
-    
+    char * argv[4]; 
     sprintf(id,"%u",datas->id);
+    argv[0]="fsmsstd";
+    argv[1]=datas->pipe;
+    argv[2]=id;
+    argv[3]=NULL;
+    
     call_usermodehelper("/bin/fsmsstd",argv,envp,UMH_WAIT_EXEC );
     return 0;
 }
