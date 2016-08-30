@@ -2,11 +2,9 @@
 #include <linux/module.h>
 #include <linux/sched.h>
 #include <linux/pid.h> 
-#include "FSM/FSMDevice/fcmprotocol.h"
+#include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include "FSM/FSM_Client/FSM_client.h"
-#include "FSM/FSMDevice/fsm_statusstruct.h"
-#include "FSM/FSMSetting/FSM_settings.h"
-            
+
 pid_t FSM_SSTP_PID=0;
 struct siginfo info;
 struct task_struct *task;

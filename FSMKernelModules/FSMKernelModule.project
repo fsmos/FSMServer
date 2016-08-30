@@ -222,4 +222,7 @@ source runs.prog</PostConnectCommands>
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="FSM_Tree">
+    <File Name="FSMTreeSetting.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>

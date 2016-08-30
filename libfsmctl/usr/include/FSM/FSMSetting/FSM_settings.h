@@ -26,6 +26,8 @@
 #define FSM_FifoID 0
 #define FSM_GPIOID 2
 #define FSM_CCKControlID 3
+#define FSM_TreeSettingID 4
+
 /*!
 \brief ID сервера статистики
 */
@@ -75,6 +77,9 @@
 #define FSM_IOCTLTreeSize 12
 #define FSM_PropertyTreeSize 12
 #define FSM_CCKTreeSize 20
+
+#define FSM_SettingTreeSize 100
+#define FSM_DeviceSettingTreeSize 100
 
 #define FSM_EventIOCtlId 1
 #define FSM_StatistickIOCtlId 2

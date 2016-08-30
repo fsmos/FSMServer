@@ -518,9 +518,20 @@ int FSMClientProtocol_pack_rcv( struct sk_buff *skb, struct net_device *dev,
             break;
           }
           break;
-           case SendCmdToServerStream: ///< Отправка команды серверу
+          
+          case SendCmdToServerStream: ///< Отправка команды серверу
            FSM_ToProcess(((struct FSM_Header*)skb->data)->IDDevice,(char*)skb->data,skb->len,dt);
            break;
+           
+           case Ans_FSM_Setting_Read: 
+           case Ans_FSM_Setting_Write:
+           case Ans_FSM_Setting_GetTree:
+           dftv=FSM_FindDevice(((struct FSM_Header *)skb->data)->IDDevice);
+           if(dftv==0) goto clear; 
+           FSM_TreeRecive((char*)skb->data,skb->len,dftv);
+           goto clear; 
+           break;
+           
           
       }                 
                     

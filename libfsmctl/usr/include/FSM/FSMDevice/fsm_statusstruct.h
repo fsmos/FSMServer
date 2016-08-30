@@ -73,7 +73,8 @@ enum FSMST_VidDevice
 */
 enum FSMST_PodVidDevice
 {
-   ComputerStatistic=1 ///< ComputerStatistic
+   ComputerStatistic=1, ///< ComputerStatistic
+   FSM_SettingTree_D=2
 };
 /*!
 \brief Род устроства
@@ -81,6 +82,7 @@ enum FSMST_PodVidDevice
 enum FSMST_RodDevice
 {
     PCx86=1,///< PCx86
+    CTL_FSM_SettingTree_D=2
 };
 enum FSMST_Cmd /*0*****125*/
 {
@@ -204,4 +206,37 @@ void FSM_GPIO_Ctl_ReSetBit(enum FSM_GPIO_Bit_Enum Pin);
 void FSM_GPIO_Ctl_Error_ON(void);
 void FSM_GPIO_Ctl_Error_OFF(void);
 
+enum FSM_Set_type
+{
+	FSM_T_CHAR=0,
+	FSM_T_INT=1,
+	FSM_T_STRING=3,
+};
+struct FSM_SetTreeElement
+{
+	char* id;
+	void* object;
+	char type;
+	char len;
+};
+
+struct FSM_SetTreeElementFS
+{
+	short type;
+	short len;
+    char id[20];
+};
+
+struct SettingTreeInfo
+{
+    unsigned char reg; 
+    unsigned char type; 
+    unsigned short id;
+    struct FSM_SetTreeElementFS fsmdtl[FSM_SettingTreeSize];
+    struct FSM_DeviceTree* dt;
+};
+
+void FSM_TreeRecive(char* data,short len,  struct FSM_DeviceTree* to_dt);
+void FSM_SetTreeAdd(struct FSM_DeviceTree* to_dt);
+void FSM_SendReuestDevTree(struct FSM_DeviceTree* to_dt);
 #endif // FSM_STATUSSTRUCT

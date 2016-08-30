@@ -19,6 +19,7 @@ rmmod FSM_Crypt.ko
 rmmod FSMClientProtocol.ko
 rmmod FSMServerIODev.ko
 rmmod FSM_GPIO.ko
+rmmod FSMTreeSetting.ko
 rmmod FSM_DeviceProcess.ko
 rmmod FSM_Beep.ko
 
@@ -31,6 +32,9 @@ a+="add-symbol-file $path FSM_Beep.ko $(cat /sys/module/FSM_Beep/sections/.text)
 insmod FSM_DeviceProcess.ko
 a+=""
 a+="add-symbol-file $path FSM_DeviceProcess.ko $(cat /sys/module/FSM_DeviceProcess/sections/.text) -s .bss $(cat /sys/module/FSM_DeviceProcess/sections/.bss)  \n"
+
+insmod FSMTreeSetting.ko
+a+="add-symbol-file $path FSMTreeSetting.ko $(cat /sys/module/FSMTreeSetting/sections/.text) -s .bss $(cat /sys/module/FSMTreeSetting/sections/.bss)\n"
 
 insmod FSM_GPIO.ko
 a+="add-symbol-file $path FSM_GPIO.ko $(cat /sys/module/FSM_GPIO/sections/.text) -s .bss $(cat /sys/module/FSM_GPIO/sections/.bss)\n"

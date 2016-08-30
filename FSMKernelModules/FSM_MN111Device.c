@@ -354,7 +354,7 @@ static int __init FSM_MN111_init(void)
    dft.config_len=sizeof(struct fsm_mn111_setting);
    FSM_DeviceClassRegister(dft);
    printk( KERN_INFO "FSM MN111 Module loaded\n" ); 
-   FSM_SendEventToAllDev(FSM_CCK_MN845_Started);
+   FSM_SendEventToAllDev(FSM_CCK_MN111_Started);
    setup_timer( &FSM_MN111_timer, FSM_Test_Callback, 0 );
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(init_off);

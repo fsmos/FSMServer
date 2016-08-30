@@ -82,6 +82,7 @@ void FSM_MN921Recive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct 
                         
         case RegDevice: ///< Регистрация устройства
         FSM_Statstic_SetStatus(to_dt,"ok");
+        FSM_SetTreeAdd(to_dt);
         for(i=0;i<FSM_MN921DeviceTreeSize;i++)
           {
               if(FSMMN921Dev[i].iddev==to_dt->IDDevice)
@@ -253,7 +254,7 @@ static int __init FSM_MN921_init(void)
    dft.config_len=sizeof(struct fsm_mn921_setting);
    FSM_DeviceClassRegister(dft);
    printk( KERN_INFO "FSM MN921 Module loaded\n" ); 
-   FSM_SendEventToAllDev(FSM_CCK_MN845_Started);
+   FSM_SendEventToAllDev(FSM_CCK_MN921_Started);
    
 #ifdef  DEBUG_CALL_STACK 
     DEBUG_CALL_STACK_SetStack|(init_off);

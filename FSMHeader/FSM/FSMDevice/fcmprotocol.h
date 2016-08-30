@@ -64,14 +64,20 @@ enum FSM_CodeOperation
   PacketFromUserSpace=47, ///<Пакет из пространства пользователя
   PacketToUserSpace=48, ///<Пакет в пространство пользователя
   PacketToDevice=49, ///<Пакет в пространство пользователя
-  SysEvent=50,
-  SendCmdGlobalcmdToClient=51,
-  SendCmdGlobalcmdToServer=52,
-  SendCmdToServerStream=53,
-  AnsSendCmdToServerStream=54,
-  SendCmdToClientStream=55,
-  AnsSendCmdToClientStream=56,
-  FSMPing=57
+  SysEvent=50, ///<Системное событие
+  SendCmdGlobalcmdToClient=51,  ///<Гллбальная команда клиенту
+  SendCmdGlobalcmdToServer=52, ///<Гллбальная команда серверу
+  SendCmdToServerStream=53, ///<Команда в поток (Сервер)
+  AnsSendCmdToServerStream=54,///<Ответ на команду в потоке (Сервер)
+  SendCmdToClientStream=55, ///<Команда в поток (Клиент)
+  AnsSendCmdToClientStream=56, ///<Ответ на команду в потоке (Клиент)
+  FSMPing=57, ///Пинг
+  FSM_Setting_Read=58,  ///<Считать настройки
+  Ans_FSM_Setting_Read=59, ///<Ответ с настроками
+  FSM_Setting_Write=60,  ///<Записать настроки
+  Ans_FSM_Setting_Write=61, ///<Отчет о выполнение настроек
+  FSM_Setting_GetTree=62, ///<Список настроек
+  Ans_FSM_Setting_GetTree=63, ///<Список настроек
 };
 /*!
 \brief Тип устройства
@@ -1130,6 +1136,13 @@ struct FSM_SendCmdUserspace_Header
    unsigned short countparam;///< Количество параметров
 } __attribute__((aligned(4)));
 
+
+/*!
+\brief Событие
+*/
+
+#define FSMH_Header_Size_EventSignal  8 
+
 struct FSM_EventSignal
 {
    unsigned char opcode;///< Код операции 
@@ -1137,6 +1150,138 @@ struct FSM_EventSignal
    unsigned short IDDevice;///< Ид устройства
    
    unsigned int ID;///< Ид Предупреждения
+} __attribute__((aligned(4)));
+
+/*!
+\brief Получение дерева настроек
+*/
+
+#define FSMH_Header_Size_GetTreeList  4 
+
+struct FSM_GetTreeList_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+} __attribute__((aligned(4)));
+
+struct FSM_GetTreeList
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+} __attribute__((aligned(4)));
+
+#define FSMH_Header_Size_Ans_GetTreeList  8
+
+struct FSM_AnsGetTreeList_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned int size;
+} __attribute__((aligned(4)));
+
+struct FSM_AnsGetTreeList
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned int size;
+   
+   unsigned char Data[FSMCountDATA];
+} __attribute__((aligned(4)));
+
+/*!
+\brief Получения настройки
+*/
+
+
+#define FSMH_Header_Size_GetSetting  4 
+
+struct FSM_GetSetting_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned char name[20];
+   
+} __attribute__((aligned(4)));
+
+struct FSM_GetSetting
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned char name[20];
+} __attribute__((aligned(4)));
+
+#define FSMH_Header_Size_Ans_GetSetting  4 
+
+struct FSM_AnsGetSetting_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+} __attribute__((aligned(4)));
+
+struct FSM_AnsGetSetting
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned char Data[FSMCountDATA];
+} __attribute__((aligned(4)));
+
+/*!
+\brief Запись настройки
+*/
+
+#define FSMH_Header_Size_SetSetting  4 
+
+struct FSM_SetSetting_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned char name[20];
+} __attribute__((aligned(4)));
+
+struct FSM_SetSetting
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   unsigned char name[20];
+   
+   unsigned char Data[FSMCountDATA];
+} __attribute__((aligned(4)));
+
+#define FSMH_Header_Size_Ans_SetSetting  4 
+
+struct FSM_AnsSetSetting_Header
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   int  status;
+} __attribute__((aligned(4)));
+
+struct FSM_AnsSetSetting
+{
+   unsigned char opcode;///< Код операции 
+   unsigned char CRC;///< CRC
+   unsigned short IDDevice;///< Ид устройства
+   
+   int  status;
 } __attribute__((aligned(4)));
 
 enum FSMIOCTL_Cmd
