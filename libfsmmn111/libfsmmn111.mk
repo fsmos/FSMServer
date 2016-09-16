@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=gusenkovs
-Date                   :=29/07/16
+Date                   :=15/09/16
 CodeLitePath           :=/home/gusenkovs/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -96,10 +96,10 @@ PreBuild:
 $(IntermediateDirectory)/fsmmn111.c$(ObjectSuffix): fsmmn111.c $(IntermediateDirectory)/fsmmn111.c$(DependSuffix)
 	$(CC) $(SourceSwitch) "/home/gusenkovs/FSMCoreFile/libfsmmn111/fsmmn111.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/fsmmn111.c$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/fsmmn111.c$(DependSuffix): fsmmn111.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/fsmmn111.c$(ObjectSuffix) -MF$(IntermediateDirectory)/fsmmn111.c$(DependSuffix) -MM "fsmmn111.c"
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/fsmmn111.c$(ObjectSuffix) -MF$(IntermediateDirectory)/fsmmn111.c$(DependSuffix) -MM fsmmn111.c
 
 $(IntermediateDirectory)/fsmmn111.c$(PreprocessSuffix): fsmmn111.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/fsmmn111.c$(PreprocessSuffix) "fsmmn111.c"
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/fsmmn111.c$(PreprocessSuffix)fsmmn111.c
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

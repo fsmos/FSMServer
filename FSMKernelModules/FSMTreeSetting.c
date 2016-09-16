@@ -5,124 +5,175 @@
 struct FSM_DeviceFunctionTree dft;
 struct SettingTreeInfo FSMDevSetTree[FSM_DeviceSettingTreeSize];
 struct FSM_GetTreeList fsmgetts;
+struct FSM_SetSetting fsmtset;
+struct FSM_GetSetting fsmtget;
+struct FSM_DeviceTree* dftv;
 void FSM_SendReuestDevTree(struct FSM_DeviceTree* to_dt)
 {
-    fsmgetts.CRC=0;
-    fsmgetts.IDDevice=to_dt->IDDevice;
-    fsmgetts.opcode=FSM_Setting_GetTree;
-    to_dt->TrDev->dt->Proc((char*)&fsmgetts,FSMH_Header_Size_GetTreeList, to_dt->TrDev, to_dt);
+    fsmgetts.CRC = 0;
+    fsmgetts.IDDevice = to_dt->IDDevice;
+    fsmgetts.opcode = FSM_Setting_GetTree;
+    to_dt->TrDev->dt->Proc((char*)&fsmgetts, FSMH_Header_Size_GetTreeList, to_dt->TrDev, to_dt);
 }
-EXPORT_SYMBOL(FSM_SendReuestDevTree); 
+EXPORT_SYMBOL(FSM_SendReuestDevTree);
 
 void FSM_SetTreeAdd(struct FSM_DeviceTree* to_dt)
 {
-    int i=0;
-    for(i=0;i<FSM_DeviceSettingTreeSize;i++)
-    {
-        if((FSMDevSetTree[i].id==to_dt->IDDevice)&&(FSMDevSetTree[i].reg==1))
-        {
+    int i = 0;
+    for(i = 0; i < FSM_DeviceSettingTreeSize; i++) {
+        if((FSMDevSetTree[i].id == to_dt->IDDevice) && (FSMDevSetTree[i].reg == 1)) {
             FSM_SendReuestDevTree(to_dt);
             return;
         }
     }
-    for(i=0;i<FSM_DeviceSettingTreeSize;i++)
-    {
-        if(FSMDevSetTree[i].reg==0)
-        {
-            FSMDevSetTree[i].id=to_dt->IDDevice;
-            FSMDevSetTree[i].reg=1;
-            FSMDevSetTree[i].dt=to_dt;
+    for(i = 0; i < FSM_DeviceSettingTreeSize; i++) {
+        if(FSMDevSetTree[i].reg == 0) {
+            FSMDevSetTree[i].id = to_dt->IDDevice;
+            FSMDevSetTree[i].reg = 1;
+            FSMDevSetTree[i].dt = to_dt;
             FSM_SendReuestDevTree(to_dt);
             return;
         }
     }
 }
 EXPORT_SYMBOL(FSM_SetTreeAdd);
- 
-void FSM_TreeRecive(char* data,short len,  struct FSM_DeviceTree* to_dt)
+
+void FSM_TreeRecive(char* data, short len, struct FSM_DeviceTree* to_dt)
 {
     int i;
-    switch(data[0])
-    {
+    struct FSM_SetTreeElementFS* fsmtel=((struct FSM_SetTreeElementFS*)(((struct FSM_AnsGetTreeList*)data)->Data));
+    struct FSM_AnsGetSetting* fsmtans =(struct FSM_AnsGetSetting*)data;
+    
+    switch(data[0]) {
     case Ans_FSM_Setting_GetTree:
-    for(i=0;i<FSM_DeviceSettingTreeSize;i++)
-    {
-        if((FSMDevSetTree[i].id==to_dt->IDDevice)&&(FSMDevSetTree[i].reg==1))
-        {
-            FSMDevSetTree[i].type=(char)(((struct FSM_AnsGetTreeList*)data)->size);
-            memcpy(FSMDevSetTree[i].fsmdtl,((struct FSM_AnsGetTreeList*)data)->Data, FSMDevSetTree[i].type*sizeof(struct FSM_SetTreeElementFS));
-            return;
+        for(i = 0; i < FSM_DeviceSettingTreeSize; i++) {
+            if((FSMDevSetTree[i].id == to_dt->IDDevice) && (FSMDevSetTree[i].reg == 1)) 
+            {
+                FSMDevSetTree[i].type = (char)(((struct FSM_AnsGetTreeList*)data)->size);
+                
+                memcpy(&FSMDevSetTree[i].fsmdtl[fsmtel->iid],((struct FSM_AnsGetTreeList*)data)->Data,sizeof(struct FSM_SetTreeElementFS));
+                return;
+            }
         }
-    }
-    break;
+        break;
+    case Ans_FSM_Setting_Read:
+        for(i = 0; i < FSM_DeviceSettingTreeSize; i++) {
+            if((FSMDevSetTree[i].id == to_dt->IDDevice) && (FSMDevSetTree[i].reg == 1)) 
+            {
+                memcpy(FSMDevSetTree[i].fsm_tr_temp,fsmtans->Data,fsmtans->size);
+                FSMDevSetTree[i].fsm_tr_size =fsmtans->size;
+                return;
+            }
+        }
+        break;
     }
 }
-EXPORT_SYMBOL(FSM_TreeRecive);  
+EXPORT_SYMBOL(FSM_TreeRecive);
 
-
-void FSM_SettingTreeControlDeviceRecive(char* data,short len,  struct FSM_DeviceTree* to_dt,struct FSM_DeviceTree* from_dt)
+void
+FSM_SettingTreeControlDeviceRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
 
-    struct FSM_SendCmdTS* fscts= (struct FSM_SendCmdTS*)data;  
-    int i;  
-   // printk( KERN_INFO "FSM SIOCTL,%u \n",fscts->opcode ); 
+    struct FSM_SendCmdTS* fscts = (struct FSM_SendCmdTS*)data;
+    int i;
+    // printk( KERN_INFO "FSM SIOCTL,%u \n",fscts->opcode );
 
-    switch(data[0])
-    {
+    switch(data[0]) {
     case RegDevice:
-        FSM_Statstic_SetStatus(to_dt,"ok");
-    break;
+        FSM_Statstic_SetStatus(to_dt, "ok");
+        break;
     case SendCmdToServer: ///< Отправка команды серверу
-    break;
+        break;
     case PacketFromUserSpace: ///< Отправка команды серверу
-        switch(fscts->cmd)
+        switch(fscts->cmd) 
         {
-            case FSM_DevTreeSetGet:
-            for(i=0;i<FSM_DeviceSettingTreeSize;i++)
-            {
-            if((FSMDevSetTree[i].id==to_dt->IDDevice)&&(FSMDevSetTree[i].reg==1))
-            {
-            fscts->countparam=FSMDevSetTree[i].type;
-            memcpy(fscts->Data,FSMDevSetTree[i].fsmdtl, FSMDevSetTree[i].type*sizeof(struct FSM_SetTreeElementFS));
+        case FSM_DevTreeSetGet:
+        i = ((struct FSM_SetTreeGetList*)fscts->Data)->IDDevice;
+        memcpy(fscts->Data,&FSMDevSetTree[i].fsmdtl[(((struct FSM_SetTreeGetList*)fscts->Data)->iid)],sizeof(struct FSM_SetTreeElementFS));
+        break;
+        case FSM_DevTreeSetGetCount:
+         for(i = 0; i < FSM_DeviceSettingTreeSize; i++) {
+                if((FSMDevSetTree[i].id == ((unsigned short*)fscts->Data)[0]) && (FSMDevSetTree[i].reg == 1)) {
+                    ((struct FSM_SetTreeGetListCount*)fscts->Data)->IDDevice=i;
+                    ((struct FSM_SetTreeGetListCount*)fscts->Data)->count=FSMDevSetTree[i].type;
+                    return;
+                }
+            }
+        break;
+        case FSM_DevTreeSetWrite:
+        fsmtset.IDDevice=((struct FSM_SetTreeWriteElement*)fscts->Data)->id;
+        fsmtset.opcode=FSM_Setting_Write;
+        strcpy(fsmtset.name,((struct FSM_SetTreeWriteElement*)fscts->Data)->name);
+        memcpy(fsmtset.Data,((struct FSM_SetTreeWriteElement*)fscts->Data)->Data,((struct FSM_SetTreeWriteElement*)fscts->Data)->len);
+        dftv = FSM_FindDevice(fsmtset.IDDevice);
+        if(dftv == 0) {
+            printk(KERN_INFO "Eror \n");
             return;
-            }
-            }
-            break;
         }
-    break;
+        dftv->TrDev->dt->Proc((char*)&fsmtset,sizeof(struct FSM_SetSetting),dftv->TrDev,dftv);
+        break;
+        
+        case FSM_DevTreeSetReadReqest:
+        fsmtget.IDDevice=((struct  FSM_SetTreeReadElement*)fscts->Data)->id;
+        fsmtget.opcode=FSM_Setting_Read;
+        strcpy(fsmtget.name,((struct  FSM_SetTreeReadElement *)fscts->Data)->name);
+        dftv = FSM_FindDevice(fsmtset.IDDevice);
+        if(dftv == 0) {
+            printk(KERN_INFO "Eror \n");
+            return;
+        }
+        dftv->TrDev->dt->Proc((char*)&fsmtset,sizeof(struct FSM_SetSetting),dftv->TrDev,dftv);
+        break;
+        
+        case FSM_DevTreeSetReadRead:
+        for(i = 0; i < FSM_DeviceSettingTreeSize; i++) 
+            {
+                if((FSMDevSetTree[i].id == ((unsigned short*)fscts->Data)[0]) && (FSMDevSetTree[i].reg == 1)) {
+                    if(FSMDevSetTree[i].fsm_tr_size>0)
+                    {
+                        fscts->countparam=FSMDevSetTree[i].fsm_tr_size;
+                        memcpy(fscts->Data,FSMDevSetTree[i].fsm_tr_temp,FSMDevSetTree[i].fsm_tr_size);
+                    }
+                    else fscts->countparam=0;
+                    return;
+                }
+            }
+        break;
+        }
+        break;
+
+     
     }
 }
 
-
-static int __init FSMCCKControlDevice_init(void)
+static int __init FSMSetControlDevice_init(void)
 {
-   struct FSM_DeviceRegistr regp;
-   dft.aplayp=0;
-   dft.type=(unsigned char)StatisticandConfig;
-   dft.VidDevice=(unsigned char)FSMDeviceConfig;
-   dft.PodVidDevice=(unsigned char)FSM_SettingTree_D;
-   dft.KodDevice=(unsigned char)CTL_FSM_SettingTree_D;
-   dft.Proc=FSM_SettingTreeControlDeviceRecive;
-   dft.config_len=0;
-   FSM_DeviceClassRegister(dft);
-   
-   
-   regp.IDDevice=FSM_TreeSettingID;
-   regp.VidDevice=dft.VidDevice;
-   regp.PodVidDevice= dft.PodVidDevice;
-   regp.KodDevice=dft.KodDevice;
-   regp.type=dft.type;
-   regp.opcode=RegDevice;
-   regp.CRC=0;
-   FSM_DeviceRegister(regp);
-   printk( KERN_INFO "FSM CCK ControlDevice loaded\n" ); 
-   return 0;  
+    struct FSM_DeviceRegistr regp;
+    dft.aplayp = 0;
+    dft.type = (unsigned char)StatisticandConfig;
+    dft.VidDevice = (unsigned char)FSMDeviceConfig;
+    dft.PodVidDevice = (unsigned char)FSM_SettingTree_D;
+    dft.KodDevice = (unsigned char)CTL_FSM_SettingTree_D;
+    dft.Proc = FSM_SettingTreeControlDeviceRecive;
+    dft.config_len = 0;
+    FSM_DeviceClassRegister(dft);
+
+    regp.IDDevice = FSM_TreeSettingID;
+    regp.VidDevice = dft.VidDevice;
+    regp.PodVidDevice = dft.PodVidDevice;
+    regp.KodDevice = dft.KodDevice;
+    regp.type = dft.type;
+    regp.opcode = RegDevice;
+    regp.CRC = 0;
+    FSM_DeviceRegister(regp);
+    printk(KERN_INFO "FSM Set ControlDevice loaded\n");
+    return 0;
 }
-static void __exit FSMCCKControlDevice_exit(void)
-{  
-   FSM_ClassDeRegister(dft);
-   printk( KERN_INFO "FSM CCK ControlDevice module unloaded\n" );
+static void __exit FSMSetControlDevice_exit(void)
+{
+    FSM_ClassDeRegister(dft);
+    printk(KERN_INFO "FSM Set ControlDevice module unloaded\n");
 }
 
-module_init(FSMCCKControlDevice_init);
-module_exit(FSMCCKControlDevice_exit);
+module_init(FSMSetControlDevice_init);
+module_exit(FSMSetControlDevice_exit);

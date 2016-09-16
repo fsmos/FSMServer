@@ -8,5 +8,4 @@ struct FSME1CAS
     int idcon;
 };
 
-
 #endif

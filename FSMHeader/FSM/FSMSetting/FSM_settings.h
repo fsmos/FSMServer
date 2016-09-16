@@ -42,15 +42,15 @@
 /*!
 \brief Размер дерева E1 устройств потоков
 */
-#define FSM_E1DeviceTreeSize 6
+#define FSM_E1DeviceTreeSize 12
 
-#define FSM_PO06DeviceTreeSize 6
-#define FSM_MN825DeviceTreeSize 6
-#define FSM_MN921DeviceTreeSize 6
-#define FSM_MN111DeviceTreeSize 6
-#define FSM_PO07DeviceTreeSize 6
-#define FSM_PO08DeviceTreeSize 6
-#define FSM_SADeviceTreeSize 6
+#define FSM_PO06DeviceTreeSize 12
+#define FSM_MN825DeviceTreeSize 12
+#define FSM_MN921DeviceTreeSize 12
+#define FSM_MN111DeviceTreeSize 12
+#define FSM_PO07DeviceTreeSize 12
+#define FSM_PO08DeviceTreeSize 12
+#define FSM_SADeviceTreeSize 12
 
 #define FSM_CryptoAlgoritmNum 6
 
@@ -86,5 +86,4 @@
 
 #define FSM_GPIO_BLOCK
 #endif	/* FSM_SETTINGS_H */
-
 //#define DEBUG_CALL_STACK

@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=gusenkovs
-Date                   :=28/07/16
+Date                   :=14/09/16
 CodeLitePath           :=/home/gusenkovs/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -96,10 +96,10 @@ PreBuild:
 $(IntermediateDirectory)/FSMCCKGET.c$(ObjectSuffix): FSMCCKGET.c $(IntermediateDirectory)/FSMCCKGET.c$(DependSuffix)
 	$(CC) $(SourceSwitch) "/home/gusenkovs/FSMCoreFile/libfsmcck/FSMCCKGET.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/FSMCCKGET.c$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/FSMCCKGET.c$(DependSuffix): FSMCCKGET.c
-	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/FSMCCKGET.c$(ObjectSuffix) -MF$(IntermediateDirectory)/FSMCCKGET.c$(DependSuffix) -MM "FSMCCKGET.c"
+	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/FSMCCKGET.c$(ObjectSuffix) -MF$(IntermediateDirectory)/FSMCCKGET.c$(DependSuffix) -MM FSMCCKGET.c
 
 $(IntermediateDirectory)/FSMCCKGET.c$(PreprocessSuffix): FSMCCKGET.c
-	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/FSMCCKGET.c$(PreprocessSuffix) "FSMCCKGET.c"
+	$(CC) $(CFLAGS) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/FSMCCKGET.c$(PreprocessSuffix)FSMCCKGET.c
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

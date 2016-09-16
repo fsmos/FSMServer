@@ -118,10 +118,6 @@
     <File Name="FSM_MN111Device.c"/>
     <File Name="FSM_MN921Device.c"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug">
-    <Project Name="FSMSendPack"/>
-  </Dependencies>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="FSM_SocialAnalytic">
     <File Name="FSM_SocialAnalytic.c"/>
   </VirtualDirectory>
@@ -225,4 +221,8 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_Tree">
     <File Name="FSMTreeSetting.c"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug">
+    <Project Name="FSMSendPack"/>
+  </Dependencies>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>
