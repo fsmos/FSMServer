@@ -225,4 +225,10 @@ source runs.prog</PostConnectCommands>
     <Project Name="FSMSendPack"/>
   </Dependencies>
   <Dependencies Name="Release"/>
+  <VirtualDirectory Name="FSM_Flash">
+    <File Name="FSM_Flash.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FSM_Utils">
+    <File Name="FSM_CRC.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>

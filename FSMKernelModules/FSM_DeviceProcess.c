@@ -521,5 +521,5 @@ module_init(FSMDeviceProcess_init);
 module_exit(FSMDeviceProcess_exit);
 
 MODULE_AUTHOR("Gusenkov S.V FSM");
-MODULE_DESCRIPTION("FSM Device Manager Module");
+MODULE_DESCRIPTION("FSM Flash Module");
 MODULE_LICENSE("GPL");

@@ -30,6 +30,8 @@ TARGET28 =FSM_SocialAnalytic
 TARGET29 =FSM_GPIO
 TARGET30 =FSM_CCKControl
 TARGET31 =FSMTreeSetting
+TARGET32 =FSM_Flash
+TARGET33 =FSM_CRC
 
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
@@ -61,6 +63,8 @@ obj-m   += ${TARGET28}.o
 obj-m   += ${TARGET29}.o
 obj-m   += ${TARGET30}.o
 obj-m   += ${TARGET31}.o
+obj-m   += ${TARGET32}.o
+obj-m   += ${TARGET33}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules

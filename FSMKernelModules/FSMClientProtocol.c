@@ -499,6 +499,14 @@ FSMClientProtocol_pack_rcv(struct sk_buff* skb, struct net_device* dev, struct p
                                           FSM_FindEthernetDevice(((struct FSM_SendCmdTS*)skb->data)->IDDevice));
             }
             break;
+        case FSMFlash_Start:
+        case FSMFlash_Execute:
+        case FSMFlash_Confirm:
+        case FSMFlash_Data:
+        dftv = FSM_FindDevice(((struct FSM_Header*)skb->data)->IDDevice);
+        if(dftv==0) goto clear;
+        FSM_FlashRecive(skb->data,sizeof(struct FSM_SendCmdTS),dftv);
+        break;
         }
         break;
 

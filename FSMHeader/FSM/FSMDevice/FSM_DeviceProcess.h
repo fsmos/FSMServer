@@ -193,8 +193,14 @@ int FSM_AddProperty(char* PropertyCode,
                     struct FSM_DeviceTree* dt);
 
 enum FSM_UK /*125 *** 254*/
-{ FSMNotRegistred = 0,
-  FSMGetCmdStream = 1,
-  AnsFSMGetCmdStream = 2 };
+{ 
+    FSMNotRegistred = 0,
+    FSMGetCmdStream = 1,
+    AnsFSMGetCmdStream = 2,
+    FSMFlash_Start=3,
+    FSMFlash_Execute=4,
+    FSMFlash_Confirm=5,
+    FSMFlash_Data=6
+};
 
 #endif /* FSM_DEVICEPROCESS_H */

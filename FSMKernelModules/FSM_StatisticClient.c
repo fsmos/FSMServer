@@ -50,13 +50,19 @@ int FSMStat_rcv(char* Data, short len, struct fsm_client_struct* dev)
         case SendSettingFull:
             FSM_SendSignalToPipe("fsmstat", FSM_ServerStatisticChanged);
             break;
+        }
+
+        break;
+        case SendCmdGlobalcmdToClient: ///< Отправка команды устройству
+        switch(fscts->cmd) {
         case FSMNotRegistred:
-            FSM_RegisterDevice(FSM_StatisicID,
-                               FSMDeviceStatistic,
-                               ComputerStatistic,
-                               PCx86,
-                               StatisticandConfig,
-                               (DeviceClientProcess)FSMStat_rcv);
+            printk(KERN_INFO "FNR");
+              FSM_RegisterDevice(FSM_StatisicID,
+                       StatisticandConfig,
+                       FSMDeviceStatistic,
+                       ComputerStatistic,
+                       PCx86,
+                       (DeviceClientProcess)FSMStat_rcv);
             break;
         }
 
@@ -159,7 +165,7 @@ void FSMStat_rcv_ioctl(char* Data, short len, struct fsm_ioctl_struct* ioctl)
         printk(KERN_INFO "Request");
         break;
     case FSMIOCTLStat_Read:
-        printk(KERN_INFO "Read %u - %u", fsm_scus->Data[0], fsm_scus->Data[1]);
+        //printk(KERN_INFO "Read %u - %u", fsm_scus->Data[0], fsm_scus->Data[1]);
         memcpy(
             fsm_scus->Data, &(fsm_ss.statel[fsm_scus->Data[0]][fsm_scus->Data[1]]), sizeof(struct fsm_status_element));
 

@@ -50,15 +50,7 @@ int FSMSet_rcv(char* Data, short len, struct fsm_client_struct* dev)
                    sizeof(struct fsm_device_config));
             break;
 
-        case FSMNotRegistred:
-            printk(KERN_INFO "Device FSR\n");
-            FSM_RegisterDevice(FSM_SettingID,
-                               StatisticandConfig,
-                               FSMDeviceConfig,
-                               ComputerStatistic,
-                               PCx86,
-                               (DeviceClientProcess)FSMSet_rcv);
-            break;
+        
 
         case SetSettingClient:
             printk(KERN_INFO "FSM_Setting_Applay\n");
@@ -72,7 +64,18 @@ int FSMSet_rcv(char* Data, short len, struct fsm_client_struct* dev)
                                (DeviceClientProcess)FSMSet_rcv);
             break;
         }
-
+        case SendCmdGlobalcmdToClient: ///< Отправка команды устройству
+        switch(fscts->cmd) {
+      case FSMNotRegistred:
+            printk(KERN_INFO "Device FSR\n");
+            FSM_RegisterDevice(FSM_SettingID,
+                               StatisticandConfig,
+                               FSMDeviceConfig,
+                               ComputerStatistic,
+                               PCx86,
+                               (DeviceClientProcess)FSMSet_rcv);
+            break;
+        }
         break;
     case AnsSendCmdToDevice: ///< Подтверждение приёма команды устройством
         break;

@@ -62,6 +62,7 @@ EXPORT_SYMBOL(FSM_SendSignalToPipe);
 static int __init FSMSendSigTP_init(void)
 {
     FSM_RegisterIOCtl(FSM_EventIOCtlId, FSM_EventIOCtl);
+    call_usermodehelper("/bin/fsmced", 0, 0, UMH_WAIT_EXEC);
     FSM_SendSignalToPipe("fsmstat", 2);
     printk(KERN_INFO "FSM Send Signal To Pipe loaded\n");
 

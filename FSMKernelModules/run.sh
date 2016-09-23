@@ -20,18 +20,24 @@ rmmod FSMClientProtocol.ko
 rmmod FSMServerIODev.ko
 rmmod FSM_GPIO.ko
 rmmod FSMTreeSetting.ko
+rmmod FSM_Flash.ko
 rmmod FSM_DeviceProcess.ko
 rmmod FSM_Beep.ko
-
+rmmod FSM_CRC.ko
 
 path=""
-
+a+=""
 insmod FSM_Beep.ko
 a+="add-symbol-file $path FSM_Beep.ko $(cat /sys/module/FSM_Beep/sections/.text) -s .bss $(cat /sys/module/FSM_Beep/sections/.bss)\n"
 
+insmod FSM_CRC.ko
+a+="add-symbol-file $path FSM_CRC.ko $(cat /sys/module/FSM_CRC/sections/.text) -s .bss $(cat /sys/module/FSM_CRC/sections/.bss)\n"
+
 insmod FSM_DeviceProcess.ko
-a+=""
 a+="add-symbol-file $path FSM_DeviceProcess.ko $(cat /sys/module/FSM_DeviceProcess/sections/.text) -s .bss $(cat /sys/module/FSM_DeviceProcess/sections/.bss)  \n"
+
+insmod FSM_Flash.ko
+a+="add-symbol-file $path FSM_Flash.ko $(cat /sys/module/FSM_Flash/sections/.text) -s .bss $(cat /sys/module/FSM_Flash/sections/.bss)  \n"
 
 insmod FSMTreeSetting.ko
 a+="add-symbol-file $path FSMTreeSetting.ko $(cat /sys/module/FSMTreeSetting/sections/.text) -s .bss $(cat /sys/module/FSMTreeSetting/sections/.bss)\n"

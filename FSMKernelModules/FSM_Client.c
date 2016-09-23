@@ -238,22 +238,32 @@ int FSM_RegisterDevice(unsigned short id,
         if(fsmcon.coonect == 1)
             break;
     }
-    if(fsmcon.coonect == 0)
-        return -1;
+   // if(fsmcon.coonect == 0)
+   //     return -1;
 
     for(i = 0; i < FSM_ClientTreeSize; i++) {
-        if(fsmlcs[i].reg == 0) {
-            fsmlcs[i].Handler = Handler;
-            fsmlcs[i].reg = 1;
-            fsmlcs[i].id = id;
-            fsmlcs[i].VidDevice = VidDevice;
-            fsmlcs[i].PodVidDevice = PodVidDevice;
-            fsmlcs[i].KodDevice = KodDevice;
-            fsmlcs[i].type = type;
-            break;
+        if(((fsmlcs[i].reg == 1)&&(fsmlcs[i].id == id))) 
+        {
+            goto fsm_reg;
         }
     }
-
+    
+    for(i = 0; i < FSM_ClientTreeSize; i++) {
+              if(fsmlcs[i].reg == 0) {
+              fsmlcs[i].Handler = Handler;
+              fsmlcs[i].reg = 1;
+              fsmlcs[i].id = id;
+              fsmlcs[i].VidDevice = VidDevice;
+              fsmlcs[i].PodVidDevice = PodVidDevice;
+              fsmlcs[i].KodDevice = KodDevice;
+              fsmlcs[i].type = type;
+              break;
+             }
+    }
+    
+fsm_reg:
+    if(fsmcon.coonect == 0) return -1;
+    printk(KERN_INFO "SR");
     regp.IDDevice = id;
     regp.VidDevice = VidDevice;
     regp.PodVidDevice = PodVidDevice;
@@ -280,13 +290,13 @@ struct fsm_client_struct* FSM_FindHandlerDevice(unsigned short id)
     DEBUG_CALL_STACK_SetStack | (get_findeth_init);
 #endif
 
-    if(fsmcon.coonect == 1) {
+   // if(fsmcon.coonect == 1) {
         for(i = 0; i < FSM_ClientTreeSize; i++) {
             if((fsmlcs[i].reg == 1) && (fsmlcs[i].id == id)) {
                 return &fsmlcs[i];
             }
         }
-    }
+    //}
 
 #ifdef DEBUG_CALL_STACK
     DEBUG_CALL_STACK_SetStack | (get_findeth_exit);
@@ -368,9 +378,11 @@ int FSMClient_pack_rcv(struct sk_buff* skb, struct net_device* dev, struct packe
         break;
     case AnsRegDevice: ///< Подтверждение регистрации
         if(fsmcon.id == ((struct FSM_AnsDeviceRegistr*)(skb->data))->IDDevice) {
+            printk(KERN_INFO "ER");
             memcpy(fsmcon.destmac, eth->h_source, 6);
             fsmcon.dev = dev;
             fsmcon.coonect = 1;
+            
         } else {
             clstr = FSM_FindHandlerDevice(((struct FSM_AnsDeviceRegistr*)(skb->data))->IDDevice);
             if(clstr == 0)

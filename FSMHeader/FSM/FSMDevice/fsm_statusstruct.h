@@ -67,14 +67,16 @@ enum FSMST_VidDevice {
 */
 enum FSMST_PodVidDevice {
     ComputerStatistic = 1, ///< ComputerStatistic
-    FSM_SettingTree_D = 2
+    FSM_SettingTree_D = 2,
+    FSM_Flash=3
 };
 /*!
 \brief Род устроства
 */
 enum FSMST_RodDevice {
     PCx86 = 1, ///< PCx86
-    CTL_FSM_SettingTree_D = 2
+    CTL_FSM_SettingTree_D = 2,
+    CTL_FSM_Flash = 3
 };
 enum FSMST_Cmd /*0*****125*/
 { GetStatistic = 1,
@@ -258,5 +260,61 @@ enum FSM_DevTreeSetControl_Cmd {
     FSM_DevTreeSetReadRead
 };
 
+struct FSMFlahData_StartVector
+{
+	unsigned int size;
+	unsigned int count;
+	unsigned int crc32;
+};
+struct FSMFlahData_DataVector
+{
+  unsigned int num;
+	unsigned int crc32;
+	char Data[1024];
+};
+struct FSMFlahData_DataVerifeVector
+{
+	unsigned int num;
+	unsigned int crc32;
+};
+struct FSMFlahData_EndVector
+{
+	unsigned int size;
+	unsigned int crc32;
+};
 
+struct FSMFirmware
+{
+	struct FSMFlahData_StartVector svec;
+	struct FSMFlahData_DataVector dvec[128];
+	struct FSMFlahData_EndVector evec;
+};
+
+enum FSM_Flash_Status
+{
+    FSM_Flash_S_Start,
+    FSM_Flash_S_Data,
+    FSM_Flash_S_End
+};
+
+enum FSM_Flash_CTL
+{
+    FSM_Flash_CTL_Flash,
+    FSM_Flash_CTL_GetStatus,
+};
+
+struct FSMFlash_Control
+{
+char reg;
+char state;
+struct FSMFirmware firm;
+char size;
+char count;
+struct FSM_DeviceTree* dt;
+
+};
+unsigned int FSM_crc32NT(unsigned int crc, unsigned char *buf,unsigned int len);
+
+void FSM_FlashStart(struct FSM_DeviceTree* to_dt);
+void FSM_FlashRecive(char* data, short len, struct FSM_DeviceTree* to_dt);
 #endif // FSM_STATUSSTRUCT
