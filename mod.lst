@@ -22,7 +22,8 @@ FSMClientProtocol      20480  10 FSM_MN111Device,FSM_MN921Device,FSM_MN825Device
 FSM_GPIO               16384  1 FSMClientProtocol
 FSMTreeSetting        282624  2 FSM_MN921Device,FSMClientProtocol
 FSM_Flash             282624  1 FSMClientProtocol
-FSM_DeviceProcess     245760  18 FSM_CCKControl,FSM_StatisticServer,FSM_MN111Device,FSMTreeSetting,FSM_GPIO,FSM_MN921Device,FSM_MN825Device,FSM_PO06Device,FSMClientProtocol,FSM_PO07Device,FSM_Flash,FSM_SettingServer,FSMServerIODev,FSM_SkyNet,FSM_PO08Device,FSM_SocialAnalytic,FSM_ControlDeviceClass,FSM_E1Device
+FSM_DeviceProcess     245760  18 FSM_CCKControl,FSM_StatisticServer,FSM_MN111Device,FSMTreeSetting,FSM_GPIO,FSM_MN921Device,FSM_MN825Device,FSM_PO06Device,FSMClientProtocol,FSM_PO07Device,FSM_Flash,
+FSM_SettingServer,FSMServerIODev,FSM_SkyNet,FSM_PO08Device,FSM_SocialAnalytic,FSM_ControlDeviceClass,FSM_E1Device
 FSM_CRC                16384  1 FSM_Flash
 FSM_Beep               16384  1 FSMClientProtocol
 snd_hda_codec_generic    77824  1
