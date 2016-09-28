@@ -317,4 +317,6 @@ unsigned int FSM_crc32NT(unsigned int crc, unsigned char *buf,unsigned int len);
 
 void FSM_FlashStart(struct FSM_DeviceTree* to_dt);
 void FSM_FlashRecive(char* data, short len, struct FSM_DeviceTree* to_dt);
+
+void FSM_CTL_flash_Start(unsigned short IDDevice);
 #endif // FSM_STATUSSTRUCT

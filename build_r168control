@@ -1,0 +1,3 @@
+dpkg --purge r168control
+fakeroot dpkg-deb --build r168control
+dpkg -i r168control.deb

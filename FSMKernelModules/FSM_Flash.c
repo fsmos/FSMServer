@@ -12,6 +12,7 @@ int FSM_FlashFirmwareOpen(struct FSM_DeviceTree* to_dt,int n)
     struct file *f; 
     int numb;
     char filename[100];
+    printk( KERN_INFO "Firmware Open" ); 
     sprintf(filename,"/fsm/firmware/t%uv%upv%uk%u.fsmflash",
                         to_dt->dt->type,
                         to_dt->dt->VidDevice,
@@ -19,7 +20,7 @@ int FSM_FlashFirmwareOpen(struct FSM_DeviceTree* to_dt,int n)
                         to_dt->dt->KodDevice);
     f = filp_open( filename, O_RDONLY, 0 ); 
     if( IS_ERR( f ) ) { 
-        printk( "Firmware not found" ); 
+        printk( KERN_INFO "Firmware not found" ); 
         return -1;
     } 
     numb = kernel_read( f, 0, (char*)&flctl[n].firm, sizeof(struct FSMFirmware) ); 
@@ -39,6 +40,10 @@ int FSM_FlashCheckData(int n)
             {
                 return -3-i;
             }
+            if(flctl[n].firm.dvec[i].num!=i)
+            {
+                return -3-i;
+            }
                 
     }
     return 0;
@@ -55,6 +60,7 @@ void FSM_FlashStart(struct FSM_DeviceTree* to_dt)
           {
               if(FSM_FlashFirmwareOpen(to_dt,i)!=0) return;
               if(FSM_FlashCheckData(i)!=0) return;
+              printk( KERN_INFO "Firmware Run" ); 
               flctl[i].reg=1;
               flctl[i].dt=to_dt;
               flctl[i].state = (char)FSM_Flash_S_Start;
@@ -78,6 +84,7 @@ void FSM_FlashRecive(char* data, short len, struct FSM_DeviceTree* to_dt)
     switch(((struct FSM_SendCmdTS*)data)->cmd)
     {
         case FSMFlash_Start:
+        printk( KERN_INFO "Firmware Flash Start" ); 
         fsmsc.cmd=FSMFlash_Data;
         fsmsc.IDDevice=to_dt->IDDevice;
         for(i=0;i<FSM_FlasherSize;i++)
@@ -93,6 +100,7 @@ void FSM_FlashRecive(char* data, short len, struct FSM_DeviceTree* to_dt)
         
         break;
         case FSMFlash_Execute:
+        printk( KERN_ERR "Firmware Flash Execute" ); 
         fsmsc.cmd=FSMFlash_Confirm;
         fsmsc.IDDevice=to_dt->IDDevice;
         for(i=0;i<FSM_FlasherSize;i++)
@@ -120,6 +128,7 @@ void FSM_FlashRecive(char* data, short len, struct FSM_DeviceTree* to_dt)
         
         break;
         case FSMFlash_Data:
+        printk( KERN_INFO "Firmware Flash Data %u,", ((struct FSMFlahData_DataVerifeVector*)(((struct FSM_SendCmdTS*)data)->Data))->num); 
         fsmsc.cmd=FSMFlash_Data;
         fsmsc.IDDevice=to_dt->IDDevice;
         for(i=0;i<FSM_FlasherSize;i++)
@@ -129,6 +138,7 @@ void FSM_FlashRecive(char* data, short len, struct FSM_DeviceTree* to_dt)
              if(flctl[i].firm.dvec[((struct FSMFlahData_DataVerifeVector*)(((struct FSM_SendCmdTS*)data)->Data))->num].crc32!=((struct FSMFlahData_DataVerifeVector*)(((struct FSM_SendCmdTS*)data)->Data))->crc32)
              {
              memcpy(fsmsc.Data,(char*)&flctl[i].firm.dvec[((struct FSMFlahData_DataVerifeVector*)(((struct FSM_SendCmdTS*)data)->Data))->num],sizeof(struct FSMFlahData_DataVector));
+             printk( KERN_INFO "Firmware CRC Eror 0x%08x , 0x%08x",flctl[i].firm.dvec[((struct FSMFlahData_DataVerifeVector*)(((struct FSM_SendCmdTS*)data)->Data))->num].crc32, ((struct FSMFlahData_DataVerifeVector*)(((struct FSM_SendCmdTS*)data)->Data))->crc32); 
              }
              else
              {
@@ -172,9 +182,11 @@ FSM_FlashDeviceRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struc
         switch(fscts->cmd) 
         {
         case FSM_Flash_CTL_Flash:
+        printk( KERN_INFO "Firmware Find" );
         dftv = FSM_FindDevice(((unsigned short*)fscts->Data)[0]);
         if(dftv == 0) {
          return;
+         printk( KERN_INFO "Firmware ID Dev not Find" );
         }
         FSM_FlashStart(dftv);
         break;
@@ -200,7 +212,7 @@ static int __init FSMFlash_init(void)
     dft.config_len = 0;
     FSM_DeviceClassRegister(dft);
 
-    regp.IDDevice = FSM_TreeSettingID;
+    regp.IDDevice = FSM_FlashID;
     regp.VidDevice = dft.VidDevice;
     regp.PodVidDevice = dft.PodVidDevice;
     regp.KodDevice = dft.KodDevice;

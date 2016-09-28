@@ -1,0 +1,61 @@
+Module                  Size  Used by
+FSM_SocialAnalytic     16384  0
+FSM_MN111Device        16384  0
+FSM_MN921Device        16384  0
+FSM_MN825Device        16384  0
+FSM_Crypt              16384  0
+FSM_ControlDeviceClass    16384  0
+FSM_SkyNet             16384  0
+FSM_SettingServer      16384  0
+FSM_StatisticServer    16384  0
+FSM_PO08Device         16384  0
+FSM_PO07Device         16384  0
+FSM_PO06Device         16384  0
+FSM_E1Device           20480  0
+FSM_E1CAS1             16384  0
+FSM_CCKControl         16384  5 FSM_MN921Device,FSM_MN825Device,FSM_PO06Device,FSM_PO07Device,FSM_PO08Device
+FSM_Commutator         16384  5 FSM_MN921Device,FSM_MN825Device,FSM_PO06Device,FSM_PO07Device,FSM_PO08Device
+FSMFIFOAudioStream    135168  1 FSM_E1Device
+FSM_AudioStream        20480  10 FSM_Commutator,FSMFIFOAudioStream,FSM_MN111Device,FSM_MN921Device,FSM_MN825Device,FSM_E1CAS1,FSM_PO06Device,FSM_PO07Device,FSM_PO08Device,FSM_E1Device
+FSMServerIODev         16384  0
+FSMClientProtocol      20480  10 FSM_MN111Device,FSM_MN921Device,FSM_MN825Device,FSM_PO06Device,FSM_AudioStream,FSM_PO07Device,FSM_SkyNet,FSM_PO08Device,FSM_SocialAnalytic,FSM_E1Device
+FSM_GPIO               16384  1 FSMClientProtocol
+FSMTreeSetting        282624  2 FSM_MN921Device,FSMClientProtocol
+FSM_Flash             282624  1 FSMClientProtocol
+FSM_DeviceProcess     245760  18 FSM_CCKControl,FSM_StatisticServer,FSM_MN111Device,FSMTreeSetting,FSM_GPIO,FSM_MN921Device,FSM_MN825Device,FSM_PO06Device,FSMClientProtocol,FSM_PO07Device,FSM_Flash,FSM_SettingServer,FSMServerIODev,FSM_SkyNet,FSM_PO08Device,FSM_SocialAnalytic,FSM_ControlDeviceClass,FSM_E1Device
+FSM_CRC                16384  1 FSM_Flash
+FSM_Beep               16384  1 FSMClientProtocol
+snd_hda_codec_generic    77824  1
+ppdev                  20480  0
+snd_hda_intel          36864  0
+snd_hda_codec         135168  2 snd_hda_codec_generic,snd_hda_intel
+snd_hda_core           65536  3 snd_hda_codec_generic,snd_hda_codec,snd_hda_intel
+snd_hwdep              16384  1 snd_hda_codec
+snd_pcm               102400  3 snd_hda_codec,snd_hda_intel,snd_hda_core
+snd_timer              32768  1 snd_pcm
+pcspkr                 16384  0
+input_leds             16384  0
+joydev                 20480  0
+snd                    81920  6 snd_hwdep,snd_timer,snd_pcm,snd_hda_codec_generic,snd_hda_codec,snd_hda_intel
+soundcore              16384  1 snd
+serio_raw              16384  0
+pvpanic                16384  0
+8250_fintek            16384  0
+i2c_piix4              24576  0
+parport_pc             32768  0
+parport                49152  2 ppdev,parport_pc
+mac_hid                16384  0
+autofs4                40960  2
+8139too                36864  0
+qxl                    69632  1
+syscopyarea            16384  1 qxl
+sysfillrect            16384  1 qxl
+sysimgblt              16384  1 qxl
+ttm                    94208  1 qxl
+drm_kms_helper        126976  1 qxl
+psmouse               126976  0
+8139cp                 28672  0
+mii                    16384  2 8139cp,8139too
+drm                   356352  4 qxl,ttm,drm_kms_helper
+floppy                 69632  0
+pata_acpi              16384  0

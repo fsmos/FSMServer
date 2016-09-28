@@ -101,6 +101,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_Commutator">
     <File Name="FSM_Commutator.c"/>
+    <File Name="../fsmgetccklist/main.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_SkyNet">
     <File Name="FSM_SkyNet.c"/>
@@ -221,14 +222,14 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_Tree">
     <File Name="FSMTreeSetting.c"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug">
-    <Project Name="FSMSendPack"/>
-  </Dependencies>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="FSM_Flash">
     <File Name="FSM_Flash.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_Utils">
     <File Name="FSM_CRC.c"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug">
+    <Project Name="FSMSendPack"/>
+  </Dependencies>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

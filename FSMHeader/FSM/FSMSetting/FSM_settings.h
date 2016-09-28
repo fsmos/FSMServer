@@ -27,7 +27,7 @@
 #define FSM_GPIOID 2
 #define FSM_CCKControlID 3
 #define FSM_TreeSettingID 4
-
+#define FSM_FlashID 5
 /*!
 \brief ID сервера статистики
 */

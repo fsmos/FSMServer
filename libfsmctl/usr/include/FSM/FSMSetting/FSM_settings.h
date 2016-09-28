@@ -80,6 +80,7 @@
 
 #define FSM_SettingTreeSize 100
 #define FSM_DeviceSettingTreeSize 100
+#define FSM_FlasherSize 2
 
 #define FSM_EventIOCtlId 1
 #define FSM_StatistickIOCtlId 2
