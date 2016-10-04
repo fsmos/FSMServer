@@ -11,59 +11,28 @@
 #include <linux/module.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-struct CCKDeviceInfo CCKDevE;
-struct FSM_DeviceFunctionTree dft;
-struct FSM_PO07Device FSMPO07Dev[FSM_PO06DeviceTreeSize];
-struct FSM_SendCmd sendcmd;
-struct FSM_AudioStream fsmas;
-
-#ifdef DEBUG_CALL_STACK
-uint64_t debug_this5;
-extern uint64_t debug_global;
-#define DEBUG_CALL_STACK_SetStack debug_this5 = (debug_this5 << 8)
-#define DEBUG_CALL_STACK_THIS 5
-#define DEBUG_CALL_STACK_GLOBSET debug_global = (debug_global << 8) | (DEBUG_CALL_STACK_THIS);
-
-typedef enum debug_function {
-    init_on = 0x00,
-    init_off = 0x01,
-    exit_on = 0x02,
-    exit_off = 0x03,
-    get_ssi_init = 0x04,
-    get_ssi_exit = 0x05,
-    get_por_init = 0x06,
-    get_por_exit = 0x07,
-    get_asp6_init = 0x08,
-    get_asp6_exit = 0x09,
-
-} debug_fun;
-#endif
+struct CCKDeviceInfo FSMPO07_CCKDevE;
+struct FSM_DeviceFunctionTree FSMPO07_dft;
+struct FSM_PO07Device FSMPO07Dev[FSM_PO07DeviceTreeSize];
+struct FSM_SendCmd FSMPO07_sendcmd;
+struct FSM_AudioStream FSMPO07_fsmas;
 
 void FSM_PO07SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     short plen;
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_ssi_init);
-#endif
-
-    memset(&sendcmd, 0, sizeof(struct FSM_SendCmd));
-    sendcmd.opcode = SendCmdToDevice;
-    sendcmd.IDDevice = from_dt->IDDevice;
-    sendcmd.cmd = FSMPO07SendStream;
-    sendcmd.countparam = 1;
-    ((unsigned short*)sendcmd.Data)[0] = id;
+    memset(&FSMPO07_sendcmd, 0, sizeof(struct FSM_SendCmd));
+    FSMPO07_sendcmd.opcode = SendCmdToDevice;
+    FSMPO07_sendcmd.IDDevice = from_dt->IDDevice;
+    FSMPO07_sendcmd.cmd = FSMPO07SendStream;
+    FSMPO07_sendcmd.countparam = 1;
+    ((unsigned short*)FSMPO07_sendcmd.Data)[0] = id;
     if(to_dt->debug)
-        printk(KERN_INFO "FSM Send %u ,%u \n", sendcmd.Data[0], sendcmd.Data[1]);
-    sendcmd.CRC = 0;
-    plen = sizeof(struct FSM_SendCmd) - sizeof(sendcmd.Data) + 2;
+        printk(KERN_INFO "FSM Send %u ,%u \n", FSMPO07_sendcmd.Data[0], FSMPO07_sendcmd.Data[1]);
+    FSMPO07_sendcmd.CRC = 0;
+    plen = sizeof(struct FSM_SendCmd) - sizeof(FSMPO07_sendcmd.Data) + 2;
     if(to_dt != 0)
-        to_dt->dt->Proc((char*)&sendcmd, plen, to_dt, from_dt);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_ssi_exit);
-#endif
+        to_dt->dt->Proc((char*)&FSMPO07_sendcmd, plen, to_dt, from_dt);
 }
 
 void FSM_PO07Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
@@ -73,10 +42,6 @@ void FSM_PO07Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
 // struct FSM_SendMessage* sctt=(struct FSM_SendMessage*)data;
 // char datas[2];
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_por_init);
-#endif
 
     switch(data[0]) {
 
@@ -92,13 +57,13 @@ void FSM_PO07Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             if(FSMPO07Dev[i].reg == 0) {
                 FSMPO07Dev[i].reg = 1;
                 FSMPO07Dev[i].ethdev = FSM_FindEthernetDevice(to_dt->IDDevice);
-                fsmas.iddev = to_dt->IDDevice;
+                FSMPO07_fsmas.iddev = to_dt->IDDevice;
                 // fsmas.ToProcess=FSM_PO06RecivePacket;
                 // fsmas.ToUser=FSM_E1SendPacket;
-                fsmas.TransportDevice = FSMPO07Dev[i].ethdev->numdev;
-                fsmas.TransportDeviceType = FSM_EthernetID2;
-                fsmas.Data = &FSMPO07Dev[i];
-                FSMPO07Dev[i].idstream = FSM_AudioStreamRegistr(fsmas);
+                FSMPO07_fsmas.TransportDevice = FSMPO07Dev[i].ethdev->numdev;
+                FSMPO07_fsmas.TransportDeviceType = FSM_EthernetID2;
+                FSMPO07_fsmas.Data = &FSMPO07Dev[i];
+                FSMPO07Dev[i].idstream = FSM_AudioStreamRegistr(FSMPO07_fsmas);
                 FSMPO07Dev[i].iddev = to_dt->IDDevice;
                 to_dt->data = &FSMPO07Dev[i];
                 to_dt->config = &FSMPO07Dev[i].po07set;
@@ -115,7 +80,7 @@ void FSM_PO07Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
         }
         break;
     case DelLisr:
-        for(i = 0; i < FSM_E1DeviceTreeSize; i++) {
+        for(i = 0; i < FSM_PO07DeviceTreeSize; i++) {
             if((FSMPO07Dev[i].reg == 1) && (FSMPO07Dev[i].iddev == to_dt->IDDevice)) {
 
                 FSM_AudioStreamUnRegistr(FSMPO07Dev[i].idstream);
@@ -145,14 +110,14 @@ void FSM_PO07Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             memcpy(&((struct fsm_po07_setting*)(to_dt->config))->fsm_p007_su_s, scmd->Data, to_dt->dt->config_len);
             break;
         case FSMPo07SendIP:
-            CCKDevE.id = scmd->IDDevice;
-            CCKDevE.ip[0] = scmd->Data[0];
-            CCKDevE.ip[1] = scmd->Data[1];
-            CCKDevE.ip[2] = scmd->Data[2];
-            CCKDevE.ip[3] = scmd->Data[3];
-            CCKDevE.type = PO07;
-            CCKDevE.Position = scmd->Data[4];
-            FSMCCK_AddDeviceInfo(&CCKDevE);
+            FSMPO07_CCKDevE.id = scmd->IDDevice;
+            FSMPO07_CCKDevE.ip[0] = scmd->Data[0];
+            FSMPO07_CCKDevE.ip[1] = scmd->Data[1];
+            FSMPO07_CCKDevE.ip[2] = scmd->Data[2];
+            FSMPO07_CCKDevE.ip[3] = scmd->Data[3];
+            FSMPO07_CCKDevE.type = PO07;
+            FSMPO07_CCKDevE.Position = scmd->Data[4];
+            FSMCCK_AddDeviceInfo(&FSMPO07_CCKDevE);
             if(to_dt->debug)
                 printk(KERN_INFO "FSM PO07 ID%i Asterisk IP %i.%i.%i.%i\n ",
                        scmd->IDDevice,
@@ -206,9 +171,6 @@ void FSM_PO07Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
         break;
     }
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_por_exit);
-#endif
 
     if(to_dt->debug)
         printk(KERN_INFO "RPack %u \n", len);
@@ -217,70 +179,44 @@ EXPORT_SYMBOL(FSM_PO07Recive);
 void ApplaySettingPO07(struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_asp6_init);
-#endif
 
-    memset(&sendcmd, 0, sizeof(sendcmd));
+    memset(&FSMPO07_sendcmd, 0, sizeof(FSMPO07_sendcmd));
     printk(KERN_INFO "FSM_Set\n");
-    sendcmd.cmd = SetSettingClientPO07;
-    sendcmd.countparam = 1;
-    sendcmd.IDDevice = to_dt->IDDevice;
-    sendcmd.CRC = 0;
-    sendcmd.opcode = SendCmdToDevice;
-    memcpy(&sendcmd.Data,
+    FSMPO07_sendcmd.cmd = SetSettingClientPO07;
+    FSMPO07_sendcmd.countparam = 1;
+    FSMPO07_sendcmd.IDDevice = to_dt->IDDevice;
+    FSMPO07_sendcmd.CRC = 0;
+    FSMPO07_sendcmd.opcode = SendCmdToDevice;
+    memcpy(&FSMPO07_sendcmd.Data,
            &(((struct FSM_PO07Device*)to_dt->data)->po07set.fsm_p007_su_s),
            sizeof(struct fsm_po07_subscriber));
-    from_dt->dt->Proc((char*)&sendcmd,
-                      sizeof(struct FSM_SendCmd) - sizeof(sendcmd.Data) + sizeof(struct fsm_po07_subscriber),
+    from_dt->dt->Proc((char*)&FSMPO07_sendcmd,
+                      sizeof(struct FSM_SendCmd) - sizeof(FSMPO07_sendcmd.Data) + sizeof(struct fsm_po07_subscriber),
                       from_dt,
                       to_dt);
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_asp6_exit);
-#endif
 }
 
 static int __init FSM_PO07_init(void)
 {
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (init_on);
-#endif
-
-    dft.aplayp = ApplaySettingPO07;
-    dft.type = (unsigned char)AudioDevice;
-    dft.VidDevice = (unsigned char)CommunicationDevice;
-    dft.PodVidDevice = (unsigned char)CCK;
-    dft.KodDevice = (unsigned char)PO07;
-    dft.Proc = FSM_PO07Recive;
-    dft.config_len = sizeof(struct fsm_po07_setting);
-    FSM_DeviceClassRegister(dft);
+    FSMPO07_dft.aplayp = ApplaySettingPO07;
+    FSMPO07_dft.type = (unsigned char)AudioDevice;
+    FSMPO07_dft.VidDevice = (unsigned char)CommunicationDevice;
+    FSMPO07_dft.PodVidDevice = (unsigned char)CCK;
+    FSMPO07_dft.KodDevice = (unsigned char)PO07;
+    FSMPO07_dft.Proc = FSM_PO07Recive;
+    FSMPO07_dft.config_len = sizeof(struct fsm_po07_setting);
+    FSM_DeviceClassRegister(FSMPO07_dft);
     printk(KERN_INFO "FSM PO07 Module loaded\n");
     FSM_SendEventToAllDev(FSM_CCK_MN845_Started);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (init_off);
-#endif
-
     return 0;
 }
 
 static void __exit FSM_PO07_exit(void)
 {
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (exit_on);
-#endif
-
-    FSM_ClassDeRegister(dft);
+    FSM_ClassDeRegister(FSMPO07_dft);
     printk(KERN_INFO "FSM PO07 Module unloaded\n");
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (exit_off);
-#endif
 }
 
 module_init(FSM_PO07_init);

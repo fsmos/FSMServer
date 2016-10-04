@@ -10,9 +10,9 @@
 
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-struct FSM_DeviceFunctionTree dft;
+struct FSM_DeviceFunctionTree FSMSkyNet_dft;
 struct FSM_SkyNetDevice FSMSkyNetDev[FSM_SkyNetDeviceTreeSize];
-struct FSM_SendCmd sendcmd;
+struct FSM_SendCmd FSMSkyNet_sendcmd;
 
 void FSM_SkyNetRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
@@ -81,13 +81,13 @@ void FSM_SkyNetRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struc
 EXPORT_SYMBOL(FSM_SkyNetRecive);
 void ApplaySettingSkyNet(struct FSM_DeviceTree* df)
 {
-    memset(&sendcmd, 0, sizeof(sendcmd));
+    memset(&FSMSkyNet_sendcmd, 0, sizeof(FSMSkyNet_sendcmd));
     printk(KERN_INFO "FSM_Set\n");
-    sendcmd.cmd = SetSettingSwitch;
-    sendcmd.countparam = 1;
-    sendcmd.IDDevice = df->IDDevice;
-    sendcmd.CRC = 0;
-    sendcmd.opcode = SendCmdToDevice;
+    FSMSkyNet_sendcmd.cmd = SetSettingSwitch;
+    FSMSkyNet_sendcmd.countparam = 1;
+    FSMSkyNet_sendcmd.IDDevice = df->IDDevice;
+    FSMSkyNet_sendcmd.CRC = 0;
+    FSMSkyNet_sendcmd.opcode = SendCmdToDevice;
     // memcpy(&sendcmd.Data,&(((struct FSM_PO06Device*)df->data)->po06set.fsm_p006_su_s),sizeof(struct
     // fsm_po06_subscriber));
     //(FSM_FindDevice(FSM_EthernetID))->dt->Proc((char*)&sendcmd,sizeof(struct
@@ -96,14 +96,14 @@ void ApplaySettingSkyNet(struct FSM_DeviceTree* df)
 
 static int __init FSM_SkyNet_init(void)
 {
-    dft.aplayp = (ApplayProcess)ApplaySettingSkyNet;
-    dft.type = (unsigned char)Switch;
-    dft.VidDevice = (unsigned char)SkyNet;
-    dft.PodVidDevice = (unsigned char)K1986BE1T;
-    dft.KodDevice = (unsigned char)BLE_nRFC_RS485_Ethernet;
-    dft.Proc = FSM_SkyNetRecive;
+    FSMSkyNet_dft.aplayp = (ApplayProcess)ApplaySettingSkyNet;
+    FSMSkyNet_dft.type = (unsigned char)Switch;
+    FSMSkyNet_dft.VidDevice = (unsigned char)SkyNet;
+    FSMSkyNet_dft.PodVidDevice = (unsigned char)K1986BE1T;
+    FSMSkyNet_dft.KodDevice = (unsigned char)BLE_nRFC_RS485_Ethernet;
+    FSMSkyNet_dft.Proc = FSM_SkyNetRecive;
     // dft.config_len=sizeof(struct fsm_po06_setting);
-    FSM_DeviceClassRegister(dft);
+    FSM_DeviceClassRegister(FSMSkyNet_dft);
     printk(KERN_INFO "FSM SkyNet Module loaded\n");
     return 0;
 }

@@ -101,7 +101,6 @@
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_Commutator">
     <File Name="FSM_Commutator.c"/>
-    <File Name="../fsmgetccklist/main.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_SkyNet">
     <File Name="FSM_SkyNet.c"/>

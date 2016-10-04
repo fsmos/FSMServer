@@ -23,8 +23,7 @@
 #include "FSM/FSM_Client/FSM_client.h"
 struct fsm_devices_config fsm_ds;
 struct FSMSSetconfigParam fsmspar;
-unsigned short setservid;
-struct FSM_SendCmdTS regpcmdts;
+unsigned short FSM_SC_setservid;
 
 int FSMSet_rcv(char* Data, short len, struct fsm_client_struct* dev)
 {
@@ -55,7 +54,7 @@ int FSMSet_rcv(char* Data, short len, struct fsm_client_struct* dev)
         case SetSettingClient:
             printk(KERN_INFO "FSM_Setting_Applay\n");
             FSM_DeleteDevice(FSM_SettingID);
-            setservid = ((struct fsm_ClientSetting_Setting*)fscts->Data)->id;
+            FSM_SC_setservid = ((struct fsm_ClientSetting_Setting*)fscts->Data)->id;
             FSM_RegisterDevice(FSM_SettingID,
                                StatisticandConfig,
                                FSMDeviceConfig,
@@ -163,7 +162,7 @@ int FSMSet_rcv(char* Data, short len, struct fsm_client_struct* dev)
 
 static int __init FSM_Client_Setting_init(void)
 {
-    setservid = 22;
+    FSM_SC_setservid = 22;
     FSM_RegisterDevice(
         FSM_SettingID, StatisticandConfig, FSMDeviceConfig, ComputerStatistic, PCx86, (DeviceClientProcess)FSMSet_rcv);
     printk(KERN_INFO "FSM Setting module loaded\n");

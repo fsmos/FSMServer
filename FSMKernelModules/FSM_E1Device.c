@@ -11,32 +11,10 @@
 #include <linux/module.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-struct FSM_DeviceFunctionTree dft;
+struct FSM_DeviceFunctionTree FSME1_dft;
 struct FSM_E1Device FSME1Dev[FSM_E1DeviceTreeSize];
-struct FSM_SendAudioData sade1;
-struct FSM_SendCmd sendcmd;
-
-#ifdef DEBUG_CALL_STACK
-uint64_t debug_this6;
-extern uint64_t debug_global;
-#define DEBUG_CALL_STACK_SetStack debug_this6 = (debug_this6 << 8)
-#define DEBUG_CALL_STACK_THIS 6
-#define DEBUG_CALL_STACK_GLOBSET debug_global = (debug_global << 8) | (DEBUG_CALL_STACK_THIS);
-
-typedef enum debug_function {
-    init_on = 0x00,
-    init_off = 0x01,
-    exit_on = 0x02,
-    exit_off = 0x03,
-    get_ssi_init = 0x04,
-    get_ssi_exit = 0x05,
-    get_e1r_init = 0x06,
-    get_e1r_exit = 0x07,
-    get_e1rp_init = 0x08,
-    get_e1rp_exit = 0x09,
-
-} debug_fun;
-#endif
+struct FSM_SendAudioData FSME1_sade1;
+struct FSM_SendCmd FSME1_sendcmd;
 
 char E1AnalisPAcket(char ch0, struct FSM_E1Device* e1dev)
 {
@@ -82,15 +60,10 @@ void FSM_E1RecivePacket(char* data, short len)
     unsigned short* E1SI;
     struct FSM_SendAudioData* FSMAPk = (struct FSM_SendAudioData*)data;
     struct FSME1Pkt* pkt = (struct FSME1Pkt*)FSMAPk->Data;
-    struct FSME1Pkt* pktout = (struct FSME1Pkt*)sade1.Data;
+    struct FSME1Pkt* pktout = (struct FSME1Pkt*)FSME1_sade1.Data;
     char* datar = pktout->Data;
     unsigned short size = 0;
     struct FSM_E1Device* fsmdat = FSM_AudioStreamData(FSMAPk->IDDevice);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_e1rp_init);
-#endif
 
     if(fsmdat != 0) {
         E1SI = fsmdat->streams_id;
@@ -108,7 +81,7 @@ void FSM_E1RecivePacket(char* data, short len)
         }
     }
 
-    sade1.IDDevice = FSMAPk->IDDevice;
+    FSME1_sade1.IDDevice = FSMAPk->IDDevice;
     pktout->count = pkt->count;
     pktout->channels = pkt->channels;
     for(i = 0; i < pktout->count; i++) {
@@ -126,49 +99,31 @@ void FSM_E1RecivePacket(char* data, short len)
             size++;
         }
     }
-    sade1.len = size + 2;
+    FSME1_sade1.len = size + 2;
     FSM_AudioStreamToUser(
-        FSMAPk->IDDevice, (char*)&sade1, sizeof(struct FSM_SendAudioData) - sizeof(sade1.Data) + sade1.len);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_e1rp_exit);
-#endif
+        FSMAPk->IDDevice, (char*)&FSME1_sade1, sizeof(struct FSM_SendAudioData) - sizeof(FSME1_sade1.Data) + FSME1_sade1.len);
 }
 
 void FSM_E1SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     short plen;
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_ssi_init);
-#endif
-
-    memset(&sendcmd, 0, sizeof(struct FSM_SendCmd));
-    sendcmd.opcode = SendCmdToDevice;
-    sendcmd.IDDevice = from_dt->IDDevice;
-    sendcmd.cmd = FSME1SendStream;
-    sendcmd.countparam = 1;
-    ((unsigned short*)sendcmd.Data)[0] = id;
-    sendcmd.CRC = 0;
-    plen = sizeof(struct FSM_SendCmd) - sizeof(sendcmd.Data) + 2;
+    memset(&FSME1_sendcmd, 0, sizeof(struct FSM_SendCmd));
+    FSME1_sendcmd.opcode = SendCmdToDevice;
+    FSME1_sendcmd.IDDevice = from_dt->IDDevice;
+    FSME1_sendcmd.cmd = FSME1SendStream;
+    FSME1_sendcmd.countparam = 1;
+    ((unsigned short*)FSME1_sendcmd.Data)[0] = id;
+    FSME1_sendcmd.CRC = 0;
+    plen = sizeof(struct FSM_SendCmd) - sizeof(FSME1_sendcmd.Data) + 2;
     if(to_dt != 0)
-        to_dt->dt->Proc((char*)&sendcmd, plen, to_dt, from_dt);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_ssi_exit);
-#endif
+        to_dt->dt->Proc((char*)&FSME1_sendcmd, plen, to_dt, from_dt);
 }
 
 void FSM_E1Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     int i, j;
     struct FSM_AudioStream fsmas;
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_e1r_init);
-#endif
 
     switch(data[0]) {
 
@@ -242,11 +197,6 @@ void FSM_E1Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FS
     default:
         break;
     }
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_e1r_exit);
-#endif
-
     printk(KERN_INFO "RPack %u \n", len);
 }
 EXPORT_SYMBOL(FSM_E1Recive);
@@ -260,41 +210,27 @@ static int __init FSME1Protocol_init(void)
 #endif
 
     memset(&FSME1Dev, 0, sizeof(FSME1Dev));
-    sade1.codec = 0;
-    sade1.CRC = 0;
-    sade1.len = 160;
-    sade1.opcode = SendAudio;
-    dft.type = (unsigned char)AudioDevice;
-    dft.VidDevice = (unsigned char)CommunicationDevice;
-    dft.PodVidDevice = (unsigned char)CCK;
-    dft.KodDevice = (unsigned char)MN524;
-    dft.Proc = FSM_E1Recive;
-    dft.config_len = 0;
-    FSM_DeviceClassRegister(dft);
+    FSME1_sade1.codec = 0;
+    FSME1_sade1.CRC = 0;
+    FSME1_sade1.len = 160;
+    FSME1_sade1.opcode = SendAudio;
+    FSME1_dft.type = (unsigned char)AudioDevice;
+    FSME1_dft.VidDevice = (unsigned char)CommunicationDevice;
+    FSME1_dft.PodVidDevice = (unsigned char)CCK;
+    FSME1_dft.KodDevice = (unsigned char)MN524;
+    FSME1_dft.Proc = FSM_E1Recive;
+    FSME1_dft.config_len = 0;
+    FSM_DeviceClassRegister(FSME1_dft);
     // fsme1pkt2.channels=7
 
     printk(KERN_INFO "FSME1Protocol module loaded\n");
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (init_off);
-#endif
-
     return 0;
 }
 
 static void __exit FSME1Protocol_exit(void)
 {
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (exit_on);
-#endif
-
-    FSM_ClassDeRegister(dft);
+    FSM_ClassDeRegister(FSME1_dft);
     printk(KERN_INFO "FSME1Protocol module unloaded\n");
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (exit_off);
-#endif
 }
 
 module_init(FSME1Protocol_init);

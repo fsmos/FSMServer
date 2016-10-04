@@ -12,59 +12,29 @@
 
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-struct CCKDeviceInfo CCKDevE;
-struct FSM_DeviceFunctionTree dft;
-struct FSM_MN825Device FSMMN825Dev[FSM_PO06DeviceTreeSize];
-struct FSM_SendCmd sendcmd;
-struct FSM_AudioStream fsmas;
-
-#ifdef DEBUG_CALL_STACK
-uint64_t debug_this5;
-extern uint64_t debug_global;
-#define DEBUG_CALL_STACK_SetStack debug_this5 = (debug_this5 << 8)
-#define DEBUG_CALL_STACK_THIS 5
-#define DEBUG_CALL_STACK_GLOBSET debug_global = (debug_global << 8) | (DEBUG_CALL_STACK_THIS);
-
-typedef enum debug_function {
-    init_on = 0x00,
-    init_off = 0x01,
-    exit_on = 0x02,
-    exit_off = 0x03,
-    get_ssi_init = 0x04,
-    get_ssi_exit = 0x05,
-    get_por_init = 0x06,
-    get_por_exit = 0x07,
-    get_asp6_init = 0x08,
-    get_asp6_exit = 0x09,
-
-} debug_fun;
-#endif
+struct CCKDeviceInfo FSMMN825_CCKDevE;
+struct FSM_DeviceFunctionTree FSMMN825_dft;
+struct FSM_MN825Device FSMMN825Dev[FSM_MN825DeviceTreeSize];
+struct FSM_SendCmd FSMMN825_sendcmd;
+struct FSM_AudioStream FSMMN825_fsmas;
 
 void FSM_MN825SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     short plen;
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_ssi_init);
-#endif
 
-    memset(&sendcmd, 0, sizeof(struct FSM_SendCmd));
-    sendcmd.opcode = SendCmdToDevice;
-    sendcmd.IDDevice = from_dt->IDDevice;
-    sendcmd.cmd = FSMPO06SendStream;
-    sendcmd.countparam = 1;
-    ((unsigned short*)sendcmd.Data)[0] = id;
+    memset(&FSMMN825_sendcmd, 0, sizeof(struct FSM_SendCmd));
+    FSMMN825_sendcmd.opcode = SendCmdToDevice;
+    FSMMN825_sendcmd.IDDevice = from_dt->IDDevice;
+    FSMMN825_sendcmd.cmd = FSMPO06SendStream;
+    FSMMN825_sendcmd.countparam = 1;
+    ((unsigned short*)FSMMN825_sendcmd.Data)[0] = id;
     if(to_dt->debug)
-        printk(KERN_INFO "FSM Send %u ,%u \n", sendcmd.Data[0], sendcmd.Data[1]);
-    sendcmd.CRC = 0;
-    plen = sizeof(struct FSM_SendCmd) - sizeof(sendcmd.Data) + 2;
+        printk(KERN_INFO "FSM Send %u ,%u \n", FSMMN825_sendcmd.Data[0], FSMMN825_sendcmd.Data[1]);
+    FSMMN825_sendcmd.CRC = 0;
+    plen = sizeof(struct FSM_SendCmd) - sizeof(FSMMN825_sendcmd.Data) + 2;
     if(to_dt != 0)
-        to_dt->dt->Proc((char*)&sendcmd, plen, to_dt, from_dt);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_ssi_exit);
-#endif
+        to_dt->dt->Proc((char*)&FSMMN825_sendcmd, plen, to_dt, from_dt);
 }
 
 void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
@@ -73,10 +43,6 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
 
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
 // char datas[2];
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_por_init);
-#endif
 
     switch(data[0]) {
 
@@ -92,13 +58,13 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             if(FSMMN825Dev[i].reg == 0) {
                 FSMMN825Dev[i].reg = 1;
                 FSMMN825Dev[i].ethdev = FSM_FindEthernetDevice(to_dt->IDDevice);
-                fsmas.iddev = to_dt->IDDevice;
+                FSMMN825_fsmas.iddev = to_dt->IDDevice;
                 // fsmas.ToProcess=FSM_PO06RecivePacket;
                 // fsmas.ToUser=FSM_E1SendPacket;
-                fsmas.TransportDevice = FSMMN825Dev[i].ethdev->numdev;
-                fsmas.TransportDeviceType = FSM_EthernetID2;
-                fsmas.Data = &FSMMN825Dev[i];
-                FSMMN825Dev[i].idstream = FSM_AudioStreamRegistr(fsmas);
+                FSMMN825_fsmas.TransportDevice = FSMMN825Dev[i].ethdev->numdev;
+                FSMMN825_fsmas.TransportDeviceType = FSM_EthernetID2;
+                FSMMN825_fsmas.Data = &FSMMN825Dev[i];
+                FSMMN825Dev[i].idstream = FSM_AudioStreamRegistr(FSMMN825_fsmas);
                 FSMMN825Dev[i].iddev = to_dt->IDDevice;
                 to_dt->data = &FSMMN825Dev[i];
                 to_dt->config = &FSMMN825Dev[i].mn825set;
@@ -115,7 +81,7 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
         }
         break;
     case DelLisr:
-        for(i = 0; i < FSM_E1DeviceTreeSize; i++) {
+        for(i = 0; i < FSM_MN825DeviceTreeSize; i++) {
             if((FSMMN825Dev[i].reg == 1) && (FSMMN825Dev[i].iddev == to_dt->IDDevice)) {
 
                 FSM_AudioStreamUnRegistr(FSMMN825Dev[i].idstream);
@@ -145,14 +111,14 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             memcpy(&((struct fsm_po06_setting*)(to_dt->config))->fsm_p006_su_s, scmd->Data, to_dt->dt->config_len);
             break;
         case FSMMN825SendIP:
-            CCKDevE.id = scmd->IDDevice;
-            CCKDevE.ip[0] = scmd->Data[0];
-            CCKDevE.ip[1] = scmd->Data[1];
-            CCKDevE.ip[2] = scmd->Data[2];
-            CCKDevE.ip[3] = scmd->Data[3];
-            CCKDevE.type = MN825;
-            CCKDevE.Position = scmd->Data[4];
-            FSMCCK_AddDeviceInfo(&CCKDevE);
+            FSMMN825_CCKDevE.id = scmd->IDDevice;
+            FSMMN825_CCKDevE.ip[0] = scmd->Data[0];
+            FSMMN825_CCKDevE.ip[1] = scmd->Data[1];
+            FSMMN825_CCKDevE.ip[2] = scmd->Data[2];
+            FSMMN825_CCKDevE.ip[3] = scmd->Data[3];
+            FSMMN825_CCKDevE.type = MN825;
+            FSMMN825_CCKDevE.Position = scmd->Data[4];
+            FSMCCK_AddDeviceInfo(&FSMMN825_CCKDevE);
             if(to_dt->debug)
                 printk(KERN_INFO "FSM ID%i Asterisk IP %i.%i.%i.%i\n ",
                        scmd->IDDevice,
@@ -205,10 +171,6 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
         break;
     }
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_por_exit);
-#endif
-
     if(to_dt->debug)
         printk(KERN_INFO "RPack %u \n", len);
 }
@@ -216,71 +178,45 @@ EXPORT_SYMBOL(FSM_MN825Recive);
 void ApplaySettingMN825(struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_asp6_init);
-#endif
-
-    memset(&sendcmd, 0, sizeof(sendcmd));
+    memset(&FSMMN825_sendcmd, 0, sizeof(FSMMN825_sendcmd));
     if(to_dt->debug)
         printk(KERN_INFO "FSM_Set\n");
-    sendcmd.cmd = SetSettingClientMN825;
-    sendcmd.countparam = 1;
-    sendcmd.IDDevice = to_dt->IDDevice;
-    sendcmd.CRC = 0;
-    sendcmd.opcode = SendCmdToDevice;
-    memcpy(&sendcmd.Data,
+    FSMMN825_sendcmd.cmd = SetSettingClientMN825;
+    FSMMN825_sendcmd.countparam = 1;
+    FSMMN825_sendcmd.IDDevice = to_dt->IDDevice;
+    FSMMN825_sendcmd.CRC = 0;
+    FSMMN825_sendcmd.opcode = SendCmdToDevice;
+    memcpy(&FSMMN825_sendcmd.Data,
            &(((struct FSM_MN825Device*)to_dt->data)->mn825set.fsm_mn825_su_s),
            sizeof(struct fsm_mn825_subscriber));
-    from_dt->dt->Proc((char*)&sendcmd,
-                      sizeof(struct FSM_SendCmd) - sizeof(sendcmd.Data) + sizeof(struct fsm_mn825_subscriber),
+    from_dt->dt->Proc((char*)&FSMMN825_sendcmd,
+                      sizeof(struct FSM_SendCmd) - sizeof(FSMMN825_sendcmd.Data) + sizeof(struct fsm_mn825_subscriber),
                       from_dt,
                       to_dt);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_asp6_exit);
-#endif
 }
 
 static int __init FSM_MN825_init(void)
 {
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (init_on);
-#endif
 
-    dft.aplayp = ApplaySettingMN825;
-    dft.type = (unsigned char)AudioDevice;
-    dft.VidDevice = (unsigned char)CommunicationDevice;
-    dft.PodVidDevice = (unsigned char)CCK;
-    dft.KodDevice = (unsigned char)MN825;
-    dft.Proc = FSM_MN825Recive;
-    dft.config_len = sizeof(struct fsm_mn825_setting);
-    FSM_DeviceClassRegister(dft);
+    FSMMN825_dft.aplayp = ApplaySettingMN825;
+    FSMMN825_dft.type = (unsigned char)AudioDevice;
+    FSMMN825_dft.VidDevice = (unsigned char)CommunicationDevice;
+    FSMMN825_dft.PodVidDevice = (unsigned char)CCK;
+    FSMMN825_dft.KodDevice = (unsigned char)MN825;
+    FSMMN825_dft.Proc = FSM_MN825Recive;
+    FSMMN825_dft.config_len = sizeof(struct fsm_mn825_setting);
+    FSM_DeviceClassRegister(FSMMN825_dft);
     printk(KERN_INFO "FSM MN825 Module loaded\n");
     FSM_SendEventToAllDev(FSM_CCK_MN845_Started);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (init_off);
-#endif
 
     return 0;
 }
 
 static void __exit FSM_MN825_exit(void)
 {
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (exit_on);
-#endif
-
-    FSM_ClassDeRegister(dft);
+    FSM_ClassDeRegister(FSMMN825_dft);
     printk(KERN_INFO "FSM MN825 Module unloaded\n");
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (exit_off);
-#endif
 }
 
 module_init(FSM_MN825_init);

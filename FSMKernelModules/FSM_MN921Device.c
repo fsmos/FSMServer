@@ -11,59 +11,29 @@
 #include <linux/module.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-struct CCKDeviceInfo CCKDevE;
-struct FSM_DeviceFunctionTree dft;
-struct FSM_MN921Device FSMMN921Dev[FSM_PO06DeviceTreeSize];
-struct FSM_SendCmd sendcmd;
-struct FSM_AudioStream fsmas;
+struct CCKDeviceInfo FSMMN921_CCKDevE;
+struct FSM_DeviceFunctionTree FSMMN921_dft;
+struct FSM_MN921Device FSMMN921Dev[FSM_MN921DeviceTreeSize];
+struct FSM_SendCmd FSMMN921_sendcmd;
+struct FSM_AudioStream FSMMN921_fsmas;
 
-#ifdef DEBUG_CALL_STACK
-uint64_t debug_this5;
-extern uint64_t debug_global;
-#define DEBUG_CALL_STACK_SetStack debug_this5 = (debug_this5 << 8)
-#define DEBUG_CALL_STACK_THIS 5
-#define DEBUG_CALL_STACK_GLOBSET debug_global = (debug_global << 8) | (DEBUG_CALL_STACK_THIS);
-
-typedef enum debug_function {
-    init_on = 0x00,
-    init_off = 0x01,
-    exit_on = 0x02,
-    exit_off = 0x03,
-    get_ssi_init = 0x04,
-    get_ssi_exit = 0x05,
-    get_por_init = 0x06,
-    get_por_exit = 0x07,
-    get_asp6_init = 0x08,
-    get_asp6_exit = 0x09,
-
-} debug_fun;
-#endif
 
 void FSM_MN921SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     short plen;
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_ssi_init);
-#endif
-
-    memset(&sendcmd, 0, sizeof(struct FSM_SendCmd));
-    sendcmd.opcode = SendCmdToDevice;
-    sendcmd.IDDevice = from_dt->IDDevice;
-    sendcmd.cmd = FSMPO06SendStream;
-    sendcmd.countparam = 1;
-    ((unsigned short*)sendcmd.Data)[0] = id;
+    memset(&FSMMN921_sendcmd, 0, sizeof(struct FSM_SendCmd));
+    FSMMN921_sendcmd.opcode = SendCmdToDevice;
+    FSMMN921_sendcmd.IDDevice = from_dt->IDDevice;
+    FSMMN921_sendcmd.cmd = FSMPO06SendStream;
+    FSMMN921_sendcmd.countparam = 1;
+    ((unsigned short*)FSMMN921_sendcmd.Data)[0] = id;
     if(to_dt->debug)
-        printk(KERN_INFO "FSM Send %u ,%u \n", sendcmd.Data[0], sendcmd.Data[1]);
-    sendcmd.CRC = 0;
-    plen = sizeof(struct FSM_SendCmd) - sizeof(sendcmd.Data) + 2;
+        printk(KERN_INFO "FSM Send %u ,%u \n", FSMMN921_sendcmd.Data[0], FSMMN921_sendcmd.Data[1]);
+    FSMMN921_sendcmd.CRC = 0;
+    plen = sizeof(struct FSM_SendCmd) - sizeof(FSMMN921_sendcmd.Data) + 2;
     if(to_dt != 0)
-        to_dt->dt->Proc((char*)&sendcmd, plen, to_dt, from_dt);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_ssi_exit);
-#endif
+        to_dt->dt->Proc((char*)&FSMMN921_sendcmd, plen, to_dt, from_dt);
 }
 
 void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
@@ -73,10 +43,6 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
     unsigned char fsm_mn_ramst[2];
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
 // char datas[2];
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_por_init);
-#endif
 
     switch(data[0]) {
 
@@ -93,13 +59,13 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             if(FSMMN921Dev[i].reg == 0) {
                 FSMMN921Dev[i].reg = 1;
                 FSMMN921Dev[i].ethdev = FSM_FindEthernetDevice(to_dt->IDDevice);
-                fsmas.iddev = to_dt->IDDevice;
+                FSMMN921_fsmas.iddev = to_dt->IDDevice;
                 // fsmas.ToProcess=FSM_PO06RecivePacket;
                 // fsmas.ToUser=FSM_E1SendPacket;
-                fsmas.TransportDevice = FSMMN921Dev[i].ethdev->numdev;
-                fsmas.TransportDeviceType = FSM_EthernetID2;
-                fsmas.Data = &FSMMN921Dev[i];
-                FSMMN921Dev[i].idstream = FSM_AudioStreamRegistr(fsmas);
+                FSMMN921_fsmas.TransportDevice = FSMMN921Dev[i].ethdev->numdev;
+                FSMMN921_fsmas.TransportDeviceType = FSM_EthernetID2;
+                FSMMN921_fsmas.Data = &FSMMN921Dev[i];
+                FSMMN921Dev[i].idstream = FSM_AudioStreamRegistr(FSMMN921_fsmas);
                 FSMMN921Dev[i].iddev = to_dt->IDDevice;
                 to_dt->data = &FSMMN921Dev[i];
                 to_dt->config = &FSMMN921Dev[i].mn921set;
@@ -116,7 +82,7 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
         }
         break;
     case DelLisr:
-        for(i = 0; i < FSM_E1DeviceTreeSize; i++) {
+        for(i = 0; i < FSM_MN921DeviceTreeSize; i++) {
             if((FSMMN921Dev[i].reg == 1) && (FSMMN921Dev[i].iddev == to_dt->IDDevice)) {
 
                 FSM_AudioStreamUnRegistr(FSMMN921Dev[i].idstream);
@@ -146,23 +112,23 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             memcpy(&((struct fsm_po06_setting*)(to_dt->config))->fsm_p006_su_s, scmd->Data, to_dt->dt->config_len);
             break;
         case FSMMN921SendIP:
-            CCKDevE.id = scmd->IDDevice;
-            CCKDevE.ip[0] = scmd->Data[0];
-            CCKDevE.ip[1] = scmd->Data[1];
-            CCKDevE.ip[2] = scmd->Data[2];
-            CCKDevE.ip[3] = scmd->Data[3];
-            CCKDevE.type = MN921;
-            CCKDevE.Position = scmd->Data[4];
+            FSMMN921_CCKDevE.id = scmd->IDDevice;
+            FSMMN921_CCKDevE.ip[0] = scmd->Data[0];
+            FSMMN921_CCKDevE.ip[1] = scmd->Data[1];
+            FSMMN921_CCKDevE.ip[2] = scmd->Data[2];
+            FSMMN921_CCKDevE.ip[3] = scmd->Data[3];
+            FSMMN921_CCKDevE.type = MN921;
+            FSMMN921_CCKDevE.Position = scmd->Data[4];
             fsm_mn_crc32[0] = scmd->Data[5];
             fsm_mn_crc32[1] = scmd->Data[6];
             fsm_mn_crc32[2] = scmd->Data[7];
             fsm_mn_crc32[3] = scmd->Data[8];
-            CCKDevE.crc32=((unsigned int*)fsm_mn_crc32)[0];
+            FSMMN921_CCKDevE.crc32=((unsigned int*)fsm_mn_crc32)[0];
             fsm_mn_ramst[0] = scmd->Data[9];
             fsm_mn_ramst[1] = scmd->Data[10];
-            CCKDevE.dstlen=((unsigned short*)fsm_mn_ramst)[0];
-            CCKDevE.dstlen=scmd->Data[11];
-            FSMCCK_AddDeviceInfo(&CCKDevE);
+            FSMMN921_CCKDevE.dstlen=((unsigned short*)fsm_mn_ramst)[0];
+            FSMMN921_CCKDevE.dstlen=scmd->Data[11];
+            FSMCCK_AddDeviceInfo(&FSMMN921_CCKDevE);
             if(to_dt->debug)
                 printk(KERN_INFO "FSM MN921 ID%i Asterisk IP %i.%i.%i.%i\n ",
                        scmd->IDDevice,
@@ -214,82 +180,52 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
         break;
     }
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_por_exit);
-#endif
-
     if(to_dt->debug)
         printk(KERN_INFO "RPack %u \n", len);
 }
 EXPORT_SYMBOL(FSM_MN921Recive);
 void ApplaySettingMN921(struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_asp6_init);
-#endif
-
-    memset(&sendcmd, 0, sizeof(sendcmd));
+    memset(&FSMMN921_sendcmd, 0, sizeof(FSMMN921_sendcmd));
     if(to_dt->debug)
         printk(KERN_INFO "FSM_Set\n");
-    sendcmd.cmd = SetSettingClientMN921;
-    sendcmd.countparam = 1;
-    sendcmd.IDDevice = to_dt->IDDevice;
-    sendcmd.CRC = 0;
-    sendcmd.opcode = SendCmdToDevice;
-    memcpy(&sendcmd.Data,
+    FSMMN921_sendcmd.cmd = SetSettingClientMN921;
+    FSMMN921_sendcmd.countparam = 1;
+    FSMMN921_sendcmd.IDDevice = to_dt->IDDevice;
+    FSMMN921_sendcmd.CRC = 0;
+    FSMMN921_sendcmd.opcode = SendCmdToDevice;
+    memcpy(&FSMMN921_sendcmd.Data,
            &(((struct FSM_MN921Device*)to_dt->data)->mn921set.fsm_mn921_su_s),
            sizeof(struct fsm_mn921_subscriber));
-    from_dt->dt->Proc((char*)&sendcmd,
-                      sizeof(struct FSM_SendCmd) - sizeof(sendcmd.Data) + sizeof(struct fsm_mn921_subscriber),
+    from_dt->dt->Proc((char*)&FSMMN921_sendcmd,
+                      sizeof(struct FSM_SendCmd) - sizeof(FSMMN921_sendcmd.Data) + sizeof(struct fsm_mn921_subscriber),
                       from_dt,
                       to_dt);
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_asp6_exit);
-#endif
 }
 
 static int __init FSM_MN921_init(void)
 {
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (init_on);
-#endif
-
-    dft.aplayp = ApplaySettingMN921;
-    dft.type = (unsigned char)AudioDevice;
-    dft.VidDevice = (unsigned char)CommunicationDevice;
-    dft.PodVidDevice = (unsigned char)CCK;
-    dft.KodDevice = (unsigned char)MN921;
-    dft.Proc = FSM_MN921Recive;
-    dft.config_len = sizeof(struct fsm_mn921_setting);
-    FSM_DeviceClassRegister(dft);
+    FSMMN921_dft.aplayp = ApplaySettingMN921;
+    FSMMN921_dft.type = (unsigned char)AudioDevice;
+    FSMMN921_dft.VidDevice = (unsigned char)CommunicationDevice;
+    FSMMN921_dft.PodVidDevice = (unsigned char)CCK;
+    FSMMN921_dft.KodDevice = (unsigned char)MN921;
+    FSMMN921_dft.Proc = FSM_MN921Recive;
+    FSMMN921_dft.config_len = sizeof(struct fsm_mn921_setting);
+    FSM_DeviceClassRegister(FSMMN921_dft);
     printk(KERN_INFO "FSM MN921 Module loaded\n");
     FSM_SendEventToAllDev(FSM_CCK_MN921_Started);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (init_off);
-#endif
-
+    
     return 0;
 }
 
 static void __exit FSM_MN921_exit(void)
 {
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (exit_on);
-#endif
 
-    FSM_ClassDeRegister(dft);
+    FSM_ClassDeRegister(FSMMN921_dft);
     printk(KERN_INFO "FSM MN921 Module unloaded\n");
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (exit_off);
-#endif
 }
 
 module_init(FSM_MN921_init);

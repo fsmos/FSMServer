@@ -2,28 +2,28 @@
 #include <linux/module.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-struct FSM_DeviceFunctionTree dft;
+struct FSM_DeviceFunctionTree FSMControlDevice_dft;
 
 void FSM_ControlDeviceRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
 }
 static int __init FSMControlDevice_init(void)
 {
-    dft.aplayp = 0;
-    dft.type = (unsigned char)ControlMachine;
-    dft.VidDevice = (unsigned char)Computer;
-    dft.PodVidDevice = (unsigned char)PC;
-    dft.KodDevice = (unsigned char)ARM;
-    dft.Proc = FSM_ControlDeviceRecive;
-    dft.config_len = 0;
-    FSM_DeviceClassRegister(dft);
+    FSMControlDevice_dft.aplayp = 0;
+    FSMControlDevice_dft.type = (unsigned char)ControlMachine;
+    FSMControlDevice_dft.VidDevice = (unsigned char)Computer;
+    FSMControlDevice_dft.PodVidDevice = (unsigned char)PC;
+    FSMControlDevice_dft.KodDevice = (unsigned char)ARM;
+    FSMControlDevice_dft.Proc = FSM_ControlDeviceRecive;
+    FSMControlDevice_dft.config_len = 0;
+    FSM_DeviceClassRegister(FSMControlDevice_dft);
     printk(KERN_INFO "FSM ControlDevice loaded\n");
     FSM_SendEventToAllDev(FSM_ControlDeviceRun);
     return 0;
 }
 static void __exit FSMControlDevice_exit(void)
 {
-    FSM_ClassDeRegister(dft);
+    FSM_ClassDeRegister(FSMControlDevice_dft);
     printk(KERN_INFO "FSM ControlDevice module unloaded\n");
 }
 

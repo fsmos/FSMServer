@@ -2,8 +2,8 @@
 #include <linux/module.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-struct FSM_DeviceFunctionTree dft;
-struct CCKDeviceInfo CCKDev[FSM_CCKTreeSize];
+struct FSM_DeviceFunctionTree FSMCCK_dft;
+struct CCKDeviceInfo FSMCCK_CCKDev[FSM_CCKTreeSize];
 
 void FSM_CCKControlDeviceRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
@@ -26,7 +26,7 @@ void FSM_CCKControlDeviceRecive(char* data, short len, struct FSM_DeviceTree* to
     case PacketFromUserSpace: ///< Отправка команды серверу
         switch(fscts->cmd) {
         case FSM_CCKGetInfo:
-            memcpy(fscts->Data, &CCKDev, sizeof(CCKDev));
+            memcpy(fscts->Data, &FSMCCK_CCKDev, sizeof(FSMCCK_CCKDev));
             // printk( KERN_INFO "FSM CCK RC\n" );
             break;
         }
@@ -38,33 +38,33 @@ void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK)
 {
     int i;
     for(i = 0; i < FSM_CCKTreeSize; i++) {
-        if((CCKDev[i].id == CCK->id) && (CCKDev[i].reg == 1)) {
-            CCKDev[i].ip[0] = CCK->ip[0];
-            CCKDev[i].ip[1] = CCK->ip[1];
-            CCKDev[i].ip[2] = CCK->ip[2];
-            CCKDev[i].ip[3] = CCK->ip[3];
-            CCKDev[i].Position = CCK->Position;
-            CCKDev[i].type = CCK->type;
-            CCKDev[i].crc32 = CCK->crc32;
-            CCKDev[i].ramstate = CCK->ramstate;
-            CCKDev[i].dstlen = CCK->dstlen;
+        if((FSMCCK_CCKDev[i].id == CCK->id) && (FSMCCK_CCKDev[i].reg == 1)) {
+            FSMCCK_CCKDev[i].ip[0] = CCK->ip[0];
+            FSMCCK_CCKDev[i].ip[1] = CCK->ip[1];
+            FSMCCK_CCKDev[i].ip[2] = CCK->ip[2];
+            FSMCCK_CCKDev[i].ip[3] = CCK->ip[3];
+            FSMCCK_CCKDev[i].Position = CCK->Position;
+            FSMCCK_CCKDev[i].type = CCK->type;
+            FSMCCK_CCKDev[i].crc32 = CCK->crc32;
+            FSMCCK_CCKDev[i].ramstate = CCK->ramstate;
+            FSMCCK_CCKDev[i].dstlen = CCK->dstlen;
             return;
         }
     }
     for(i = 0; i < FSM_CCKTreeSize; i++) {
-        if(CCKDev[i].reg == 0) {
-            CCKDev[i].reg = 1;
-            CCKDev[i].n = i;
-            CCKDev[i].id = CCK->id;
-            CCKDev[i].ip[0] = CCK->ip[0];
-            CCKDev[i].ip[1] = CCK->ip[1];
-            CCKDev[i].ip[2] = CCK->ip[2];
-            CCKDev[i].ip[3] = CCK->ip[3];
-            CCKDev[i].Position = CCK->Position;
-            CCKDev[i].type = CCK->type;
-            CCKDev[i].crc32 = CCK->crc32;
-            CCKDev[i].ramstate = CCK->ramstate;
-            CCKDev[i].dstlen = CCK->dstlen;
+        if(FSMCCK_CCKDev[i].reg == 0) {
+            FSMCCK_CCKDev[i].reg = 1;
+            FSMCCK_CCKDev[i].n = i;
+            FSMCCK_CCKDev[i].id = CCK->id;
+            FSMCCK_CCKDev[i].ip[0] = CCK->ip[0];
+            FSMCCK_CCKDev[i].ip[1] = CCK->ip[1];
+            FSMCCK_CCKDev[i].ip[2] = CCK->ip[2];
+            FSMCCK_CCKDev[i].ip[3] = CCK->ip[3];
+            FSMCCK_CCKDev[i].Position = CCK->Position;
+            FSMCCK_CCKDev[i].type = CCK->type;
+            FSMCCK_CCKDev[i].crc32 = CCK->crc32;
+            FSMCCK_CCKDev[i].ramstate = CCK->ramstate;
+            FSMCCK_CCKDev[i].dstlen = CCK->dstlen;
             // printk( KERN_INFO "FSM CCK Device Added\n" );
             return;
         }
@@ -75,20 +75,20 @@ EXPORT_SYMBOL(FSMCCK_AddDeviceInfo);
 static int __init FSMCCKControlDevice_init(void)
 {
     struct FSM_DeviceRegistr regp;
-    dft.aplayp = 0;
-    dft.type = (unsigned char)AudioDevice;
-    dft.VidDevice = (unsigned char)CommunicationDevice;
-    dft.PodVidDevice = (unsigned char)ControlCCK;
-    dft.KodDevice = (unsigned char)ControlCCKServer;
-    dft.Proc = FSM_CCKControlDeviceRecive;
-    dft.config_len = 0;
-    FSM_DeviceClassRegister(dft);
+    FSMCCK_dft.aplayp = 0;
+    FSMCCK_dft.type = (unsigned char)AudioDevice;
+    FSMCCK_dft.VidDevice = (unsigned char)CommunicationDevice;
+    FSMCCK_dft.PodVidDevice = (unsigned char)ControlCCK;
+    FSMCCK_dft.KodDevice = (unsigned char)ControlCCKServer;
+    FSMCCK_dft.Proc = FSM_CCKControlDeviceRecive;
+    FSMCCK_dft.config_len = 0;
+    FSM_DeviceClassRegister(FSMCCK_dft);
 
     regp.IDDevice = FSM_CCKControlID;
-    regp.VidDevice = dft.VidDevice;
-    regp.PodVidDevice = dft.PodVidDevice;
-    regp.KodDevice = dft.KodDevice;
-    regp.type = dft.type;
+    regp.VidDevice = FSMCCK_dft.VidDevice;
+    regp.PodVidDevice = FSMCCK_dft.PodVidDevice;
+    regp.KodDevice = FSMCCK_dft.KodDevice;
+    regp.type = FSMCCK_dft.type;
     regp.opcode = RegDevice;
     regp.CRC = 0;
     FSM_DeviceRegister(regp);
@@ -97,9 +97,13 @@ static int __init FSMCCKControlDevice_init(void)
 }
 static void __exit FSMCCKControlDevice_exit(void)
 {
-    FSM_ClassDeRegister(dft);
+    FSM_ClassDeRegister(FSMCCK_dft);
     printk(KERN_INFO "FSM CCK ControlDevice module unloaded\n");
 }
 
 module_init(FSMCCKControlDevice_init);
 module_exit(FSMCCKControlDevice_exit);
+
+MODULE_AUTHOR("Gusenkov S.V FSM");
+MODULE_DESCRIPTION("FSM CCK ControlDevice Module");
+MODULE_LICENSE("GPL");

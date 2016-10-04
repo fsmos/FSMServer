@@ -11,68 +11,37 @@
 #include <linux/module.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-struct FSM_DeviceFunctionTree dft;
+struct FSM_DeviceFunctionTree FSMMN111_dft;
 struct FSM_MN111Device FSMMN111Dev[FSM_MN111DeviceTreeSize];
-struct FSM_SendCmd sendcmd;
-struct FSM_AudioStream fsmas;
+struct FSM_SendCmd FSMMN111_sendcmd;
+struct FSM_AudioStream FSMMN111_fsmas;
 
 static struct timer_list FSM_MN111_timer;
-
-#ifdef DEBUG_CALL_STACK
-uint64_t debug_this5;
-extern uint64_t debug_global;
-#define DEBUG_CALL_STACK_SetStack debug_this5 = (debug_this5 << 8)
-#define DEBUG_CALL_STACK_THIS 5
-#define DEBUG_CALL_STACK_GLOBSET debug_global = (debug_global << 8) | (DEBUG_CALL_STACK_THIS);
-
-typedef enum debug_function {
-    init_on = 0x00,
-    init_off = 0x01,
-    exit_on = 0x02,
-    exit_off = 0x03,
-    get_ssi_init = 0x04,
-    get_ssi_exit = 0x05,
-    get_por_init = 0x06,
-    get_por_exit = 0x07,
-    get_asp6_init = 0x08,
-    get_asp6_exit = 0x09,
-
-} debug_fun;
-#endif
 
 void FSM_MN111SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     short plen;
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_ssi_init);
-#endif
-
-    memset(&sendcmd, 0, sizeof(struct FSM_SendCmd));
-    sendcmd.opcode = SendCmdToDevice;
-    sendcmd.IDDevice = from_dt->IDDevice;
-    sendcmd.cmd = FSMPO06SendStream;
-    sendcmd.countparam = 1;
-    ((unsigned short*)sendcmd.Data)[0] = id;
+    memset(&FSMMN111_sendcmd, 0, sizeof(struct FSM_SendCmd));
+    FSMMN111_sendcmd.opcode = SendCmdToDevice;
+    FSMMN111_sendcmd.IDDevice = from_dt->IDDevice;
+    FSMMN111_sendcmd.cmd = FSMPO06SendStream;
+    FSMMN111_sendcmd.countparam = 1;
+    ((unsigned short*)FSMMN111_sendcmd.Data)[0] = id;
     if(to_dt->debug)
-        printk(KERN_INFO "FSM Send %u ,%u \n", sendcmd.Data[0], sendcmd.Data[1]);
-    sendcmd.CRC = 0;
-    plen = sizeof(struct FSM_SendCmd) - sizeof(sendcmd.Data) + 2;
+        printk(KERN_INFO "FSM Send %u ,%u \n", FSMMN111_sendcmd.Data[0], FSMMN111_sendcmd.Data[1]);
+    FSMMN111_sendcmd.CRC = 0;
+    plen = sizeof(struct FSM_SendCmd) - sizeof(FSMMN111_sendcmd.Data) + 2;
     if(to_dt != 0)
-        to_dt->dt->Proc((char*)&sendcmd, plen, to_dt, from_dt);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_ssi_exit);
-#endif
+        to_dt->dt->Proc((char*)&FSMMN111_sendcmd, plen, to_dt, from_dt);
 }
 
 void FSM_TestVoltage(struct FSM_DeviceTree* to_dt, unsigned short cmd)
 {
-    sendcmd.opcode = PacketToDevice;
-    sendcmd.IDDevice = to_dt->IDDevice;
-    sendcmd.cmd = cmd;
-    to_dt->dt->Proc((char*)&sendcmd, sizeof(struct FSM_SendCmd), to_dt, to_dt);
+    FSMMN111_sendcmd.opcode = PacketToDevice;
+    FSMMN111_sendcmd.IDDevice = to_dt->IDDevice;
+    FSMMN111_sendcmd.cmd = cmd;
+    to_dt->dt->Proc((char*)&FSMMN111_sendcmd, sizeof(struct FSM_SendCmd), to_dt, to_dt);
 }
 void FSM_Test_Callback(unsigned long data)
 {
@@ -110,10 +79,6 @@ void FSM_MN111Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
     struct FSM_MN111Device* mn111 = (struct FSM_MN111Device*)to_dt->data;
 // char datas[2];
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_por_init);
-#endif
 
     switch(data[0]) {
 
@@ -130,13 +95,13 @@ void FSM_MN111Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             if(FSMMN111Dev[i].reg == 0) {
                 FSMMN111Dev[i].reg = 1;
                 FSMMN111Dev[i].ethdev = FSM_FindEthernetDevice(to_dt->IDDevice);
-                fsmas.iddev = to_dt->IDDevice;
+                FSMMN111_fsmas.iddev = to_dt->IDDevice;
                 // fsmas.ToProcess=FSM_PO06RecivePacket;
                 // fsmas.ToUser=FSM_E1SendPacket;
-                fsmas.TransportDevice = FSMMN111Dev[i].ethdev->numdev;
-                fsmas.TransportDeviceType = FSM_EthernetID2;
-                fsmas.Data = &FSMMN111Dev[i];
-                FSMMN111Dev[i].idstream = FSM_AudioStreamRegistr(fsmas);
+                FSMMN111_fsmas.TransportDevice = FSMMN111Dev[i].ethdev->numdev;
+                FSMMN111_fsmas.TransportDeviceType = FSM_EthernetID2;
+                FSMMN111_fsmas.Data = &FSMMN111Dev[i];
+                FSMMN111Dev[i].idstream = FSM_AudioStreamRegistr(FSMMN111_fsmas);
                 FSMMN111Dev[i].iddev = to_dt->IDDevice;
                 to_dt->TrDev = from_dt;
                 to_dt->data = &FSMMN111Dev[i];
@@ -287,85 +252,54 @@ void FSM_MN111Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
     default:
         break;
     }
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_por_exit);
-#endif
-
     if(to_dt->debug)
         printk(KERN_INFO "RPack %u \n", len);
 }
 EXPORT_SYMBOL(FSM_MN111Recive);
 void ApplaySettingMN111(struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_asp6_init);
-#endif
-
-    memset(&sendcmd, 0, sizeof(sendcmd));
+    memset(&FSMMN111_sendcmd, 0, sizeof(FSMMN111_sendcmd));
     if(to_dt->debug)
         printk(KERN_INFO "FSM_Set\n");
-    sendcmd.cmd = SetSettingClientMN111;
-    sendcmd.countparam = 1;
-    sendcmd.IDDevice = to_dt->IDDevice;
-    sendcmd.CRC = 0;
-    sendcmd.opcode = SendCmdToDevice;
-    memcpy(&sendcmd.Data,
+    FSMMN111_sendcmd.cmd = SetSettingClientMN111;
+    FSMMN111_sendcmd.countparam = 1;
+    FSMMN111_sendcmd.IDDevice = to_dt->IDDevice;
+    FSMMN111_sendcmd.CRC = 0;
+    FSMMN111_sendcmd.opcode = SendCmdToDevice;
+    memcpy(&FSMMN111_sendcmd.Data,
            &(((struct FSM_MN111Device*)to_dt->data)->mn111set.fsm_mn111_su_s),
            sizeof(struct fsm_mn111_subscriber));
-    from_dt->dt->Proc((char*)&sendcmd,
-                      sizeof(struct FSM_SendCmd) - sizeof(sendcmd.Data) + sizeof(struct fsm_mn111_subscriber),
+    from_dt->dt->Proc((char*)&FSMMN111_sendcmd,
+                      sizeof(struct FSM_SendCmd) - sizeof(FSMMN111_sendcmd.Data) + sizeof(struct fsm_mn111_subscriber),
                       from_dt,
                       to_dt);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_asp6_exit);
-#endif
 }
 
 static int __init FSM_MN111_init(void)
 {
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (init_on);
-#endif
 
-    dft.aplayp = ApplaySettingMN111;
-    dft.type = (unsigned char)AudioDevice;
-    dft.VidDevice = (unsigned char)CommunicationDevice;
-    dft.PodVidDevice = (unsigned char)CCK;
-    dft.KodDevice = (unsigned char)MN111;
-    dft.Proc = FSM_MN111Recive;
-    dft.config_len = sizeof(struct fsm_mn111_setting);
-    FSM_DeviceClassRegister(dft);
+    FSMMN111_dft.aplayp = ApplaySettingMN111;
+    FSMMN111_dft.type = (unsigned char)AudioDevice;
+    FSMMN111_dft.VidDevice = (unsigned char)CommunicationDevice;
+    FSMMN111_dft.PodVidDevice = (unsigned char)CCK;
+    FSMMN111_dft.KodDevice = (unsigned char)MN111;
+    FSMMN111_dft.Proc = FSM_MN111Recive;
+    FSMMN111_dft.config_len = sizeof(struct fsm_mn111_setting);
+    FSM_DeviceClassRegister(FSMMN111_dft);
     printk(KERN_INFO "FSM MN111 Module loaded\n");
     FSM_SendEventToAllDev(FSM_CCK_MN111_Started);
     setup_timer(&FSM_MN111_timer, FSM_Test_Callback, 0);
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (init_off);
-#endif
 
     return 0;
 }
 
 static void __exit FSM_MN111_exit(void)
 {
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (exit_on);
-#endif
-
-    FSM_ClassDeRegister(dft);
+    FSM_ClassDeRegister(FSMMN111_dft);
     del_timer(&FSM_MN111_timer);
 
     printk(KERN_INFO "FSM MN111 Module unloaded\n");
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (exit_off);
-#endif
 }
 
 module_init(FSM_MN111_init);

@@ -22,11 +22,11 @@
 #include "FSM/FSMDevice/fsm_statusstruct.h"
 #include "FSM/FSM_Client/FSM_client.h"
 
-struct FSM_SendCmdUserspace fsmdat;
+struct FSM_SendCmdUserspace FSM_CIO_fsmdat;
 struct fsm_ioctl_struct fsmioctl[FSM_IOCTLTreeSize];
-static dev_t first;       // Global variable for the first device number
-static struct cdev c_dev; // Global variable for the character device structure
-static struct class* cl;  // Global variable for the device class
+static dev_t FSM_CIO_first;       // Global variable for the first device number
+static struct cdev FSM_CIO_c_dev; // Global variable for the character device structure
+static struct class* FSM_CIO_cl;  // Global variable for the device class
 
 struct fsm_ioctl_struct* FSM_RegisterIOCtl(unsigned int id, IOClientProcess Handler)
 {
@@ -81,16 +81,16 @@ long device_ioctl(struct file* f, unsigned int cmd, unsigned long arg)
     switch(cmd) {
     case FSMIOCTL_SendData:
 
-        if(copy_from_user(&fsmdat, (void*)arg, sizeof(struct FSM_SendCmdUserspace)))
+        if(copy_from_user(&FSM_CIO_fsmdat, (void*)arg, sizeof(struct FSM_SendCmdUserspace)))
             return -EFAULT;
-        dftv = FSM_FindIOCtl(fsmdat.IDDevice);
+        dftv = FSM_FindIOCtl(FSM_CIO_fsmdat.IDDevice);
         if(dftv != 0) {
-            dftv->Handler((char*)&fsmdat, sizeof(struct FSM_SendCmdUserspace), dftv);
+            dftv->Handler((char*)&FSM_CIO_fsmdat, sizeof(struct FSM_SendCmdUserspace), dftv);
             printk(KERN_INFO "FSM SIOCTL\n");
-            printk(((struct SendSignalStruct*)fsmdat.Data)->pipe);
+            printk(((struct SendSignalStruct*)FSM_CIO_fsmdat.Data)->pipe);
         }
-        fsmdat.opcode = PacketToUserSpace;
-        if(copy_to_user((void*)arg, &fsmdat, sizeof(struct FSM_SendCmdUserspace)))
+        FSM_CIO_fsmdat.opcode = PacketToUserSpace;
+        if(copy_to_user((void*)arg, &FSM_CIO_fsmdat, sizeof(struct FSM_SendCmdUserspace)))
             return -EFAULT;
 
         break;
@@ -104,22 +104,22 @@ static struct file_operations fops = { .open = device_open, .release = device_re
 
 static int __init FSM_CSIOCTLModule_init(void)
 {
-    if(alloc_chrdev_region(&first, 0, 1, "fsmr") < 0)
+    if(alloc_chrdev_region(&FSM_CIO_first, 0, 1, "fsmr") < 0)
         return -1;
-    if((cl = class_create(THIS_MODULE, "fsm")) == NULL) {
-        unregister_chrdev_region(first, 1);
-        return -1;
-    }
-    if(device_create(cl, NULL, first, NULL, "fsmio") == NULL) {
-        class_destroy(cl);
-        unregister_chrdev_region(first, 1);
+    if((FSM_CIO_cl = class_create(THIS_MODULE, "fsm")) == NULL) {
+        unregister_chrdev_region(FSM_CIO_first, 1);
         return -1;
     }
-    cdev_init(&c_dev, &fops);
-    if(cdev_add(&c_dev, first, 1) == -1) {
-        device_destroy(cl, first);
-        class_destroy(cl);
-        unregister_chrdev_region(first, 1);
+    if(device_create(FSM_CIO_cl, NULL, FSM_CIO_first, NULL, "fsmio") == NULL) {
+        class_destroy(FSM_CIO_cl);
+        unregister_chrdev_region(FSM_CIO_first, 1);
+        return -1;
+    }
+    cdev_init(&FSM_CIO_c_dev, &fops);
+    if(cdev_add(&FSM_CIO_c_dev, FSM_CIO_first, 1) == -1) {
+        device_destroy(FSM_CIO_cl, FSM_CIO_first);
+        class_destroy(FSM_CIO_cl);
+        unregister_chrdev_region(FSM_CIO_first, 1);
         return -1;
     }
     printk(KERN_INFO "FSM SIOCTL module loaded\n");
@@ -128,10 +128,10 @@ static int __init FSM_CSIOCTLModule_init(void)
 
 static void __exit FSM_CSIOCTLModule_exit(void)
 {
-    cdev_del(&c_dev);
-    device_destroy(cl, first);
-    class_destroy(cl);
-    unregister_chrdev_region(first, 1);
+    cdev_del(&FSM_CIO_c_dev);
+    device_destroy(FSM_CIO_cl, FSM_CIO_first);
+    class_destroy(FSM_CIO_cl);
+    unregister_chrdev_region(FSM_CIO_first, 1);
 
     printk(KERN_INFO "FSM SIOCTL module unloaded\n");
 }

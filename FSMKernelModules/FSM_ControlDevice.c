@@ -18,3 +18,7 @@ static void __exit FSMControlDevice_exit(void)
 
 module_init(FSMControlDevice_init);
 module_exit(FSMControlDevice_exit);
+
+MODULE_AUTHOR("Gusenkov S.V FSM");
+MODULE_DESCRIPTION("FSM Control Device Module");
+MODULE_LICENSE("GPL");

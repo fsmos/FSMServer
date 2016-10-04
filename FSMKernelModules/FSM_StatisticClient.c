@@ -23,7 +23,7 @@
 #include "FSM/FSM_Client/FSM_client.h"
 struct fsm_statusstruct fsm_ss;
 struct FSMSSetconfigParam fsmspar;
-struct FSM_SendCmdTS regpcmdts;
+struct FSM_SendCmdTS FSM_SC_regpcmdts;
 
 int FSMStat_rcv(char* Data, short len, struct fsm_client_struct* dev)
 {
@@ -156,12 +156,12 @@ void FSMStat_rcv_ioctl(char* Data, short len, struct fsm_ioctl_struct* ioctl)
     switch(fsm_scus->cmd) {
     case FSMIOCTLStat_Requst:
         memset(&fsm_ss, 0, sizeof(fsm_ss));
-        regpcmdts.opcode = SendCmdToServer;
-        regpcmdts.countparam = 1;
-        regpcmdts.CRC = 0;
-        regpcmdts.IDDevice = FSM_StatisicID;
-        regpcmdts.cmd = GetStatistic;
-        FSM_Send_Ethernet_TS(&regpcmdts, sizeof(struct FSM_SendCmdTS));
+        FSM_SC_regpcmdts.opcode = SendCmdToServer;
+        FSM_SC_regpcmdts.countparam = 1;
+        FSM_SC_regpcmdts.CRC = 0;
+        FSM_SC_regpcmdts.IDDevice = FSM_StatisicID;
+        FSM_SC_regpcmdts.cmd = GetStatistic;
+        FSM_Send_Ethernet_TS(&FSM_SC_regpcmdts, sizeof(struct FSM_SendCmdTS));
         printk(KERN_INFO "Request");
         break;
     case FSMIOCTLStat_Read:
@@ -177,12 +177,12 @@ void FSM_StatEventLoaded(char* Data, short len, struct fsm_event_struct* cl_str)
 {
     printk(KERN_INFO "Event");
     memset(&fsm_ss, 0, sizeof(fsm_ss));
-    regpcmdts.opcode = SendCmdToServer;
-    regpcmdts.countparam = 1;
-    regpcmdts.CRC = 0;
-    regpcmdts.IDDevice = FSM_StatisicID;
-    regpcmdts.cmd = GetStatistic;
-    FSM_Send_Ethernet_TS(&regpcmdts, sizeof(struct FSM_SendCmdTS));
+    FSM_SC_regpcmdts.opcode = SendCmdToServer;
+    FSM_SC_regpcmdts.countparam = 1;
+    FSM_SC_regpcmdts.CRC = 0;
+    FSM_SC_regpcmdts.IDDevice = FSM_StatisicID;
+    FSM_SC_regpcmdts.cmd = GetStatistic;
+    FSM_Send_Ethernet_TS(&FSM_SC_regpcmdts, sizeof(struct FSM_SendCmdTS));
 }
 void FSM_StStartEventLoaded(char* Data, short len, struct fsm_event_struct* cl_str)
 {

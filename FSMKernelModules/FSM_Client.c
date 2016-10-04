@@ -15,36 +15,6 @@ struct fsm_client_struct fsmlcs[FSM_ClientTreeSize];
 struct fsm_server_connection fsmcon;
 struct fsm_event_struct fsmes[FSM_EventTreeSize];
 
-#ifdef DEBUG_CALL_STACK
-uint64_t debug_this1;
-extern uint64_t debug_global;
-#define DEBUG_CALL_STACK_SetStack debug_this1 = (debug_this2 << 8)
-#define DEBUG_CALL_STACK_THIS 1
-#define DEBUG_CALL_STACK_GLOBSET debug_global = (debug_global << 8) | (DEBUG_CALL_STACK_THIS);
-
-typedef enum debug_function {
-    init_on = 0x00,
-    init_off = 0x01,
-    exit_on = 0x02,
-    exit_off = 0x03,
-    get_sendethpack_init = 0x04,
-    get_sendethpack_exit = 0x05,
-    get_regeth_init = 0x06,
-    get_regeth_exit = 0x07,
-    get_findeth_init = 0x08,
-    get_findeth_exit = 0x09,
-    get_deleth_init = 0x10,
-    get_deleth_exit = 0x11,
-    get_esp_init = 0x12,
-    get_esp_exit = 0x13,
-    get_prcv_init = 0x14,
-    get_prcv_exit = 0x15,
-    get_sendethpack_exit_eror = 0x16,
-    get_regdev_init = 0x17,
-    get_regdev_exit = 0x18
-
-} debug_fun;
-#endif
 
 static int packet_direct_xmit(struct sk_buff* skb)
 {
@@ -89,11 +59,6 @@ unsigned int FSM_Send_Ethernet(void* data, int len, struct fsm_server_connection
     int hlen = LL_RESERVED_SPACE(dev);
     int tlen = dev->needed_tailroom;
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_sendethpack_init);
-#endif
-
     if(fsmdev == 0)
         return 1;
     // skb = alloc_skb(len + hlen + tlen, GFP_ATOMIC);
@@ -111,18 +76,9 @@ unsigned int FSM_Send_Ethernet(void* data, int len, struct fsm_server_connection
         goto out;
     packet_direct_xmit(skb);
 //надо чистить буфер
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_sendethpack_exit);
-#endif
     return 0;
 
 out:
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_sendethpack_exit_eror);
-#endif
 
     kfree_skb(skb);
     return 0;
@@ -147,12 +103,6 @@ int FSM_RegisterServer(unsigned short id,
 {
     struct FSM_DeviceRegistr regp;
     struct fsm_server_connection fsmdev;
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_regeth_init);
-#endif
-
     memset(&fsmdev, 0, sizeof(fsmdev));
     regp.IDDevice = id;
     regp.VidDevice = VidDevice;
@@ -174,11 +124,6 @@ int FSM_RegisterServer(unsigned short id,
         FSM_Send_Ethernet(&regp, sizeof(regp), &fsmdev);
         fsmdev.dev = next_net_device(fsmdev.dev);
     }
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_regeth_exit);
-#endif
-
     return 2;
 }
 EXPORT_SYMBOL(FSM_RegisterServer);
@@ -228,11 +173,6 @@ int FSM_RegisterDevice(unsigned short id,
     int i;
     struct FSM_DeviceRegistr regp;
     int time = 9000000;
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_regdev_init);
-#endif
     while(time) {
         time--;
         if(fsmcon.coonect == 1)
@@ -273,10 +213,6 @@ fsm_reg:
     regp.CRC = 0;
     FSM_Send_Ethernet(&regp, sizeof(regp), &fsmcon);
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_regdev_exit);
-#endif
-
     return 0;
 }
 EXPORT_SYMBOL(FSM_RegisterDevice);
@@ -284,11 +220,6 @@ EXPORT_SYMBOL(FSM_RegisterDevice);
 struct fsm_client_struct* FSM_FindHandlerDevice(unsigned short id)
 {
     int i;
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_findeth_init);
-#endif
 
    // if(fsmcon.coonect == 1) {
         for(i = 0; i < FSM_ClientTreeSize; i++) {
@@ -298,10 +229,6 @@ struct fsm_client_struct* FSM_FindHandlerDevice(unsigned short id)
         }
     //}
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_findeth_exit);
-#endif
-
     return 0;
 }
 EXPORT_SYMBOL(FSM_FindHandlerDevice);
@@ -310,10 +237,6 @@ int FSM_DeleteDevice(unsigned short id)
 {
     struct FSM_DeviceDelete delp;
     struct fsm_client_struct* strdev;
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_deleth_init);
-#endif
 
     if(fsmcon.coonect == 1) {
         delp.IDDevice = id;
@@ -326,10 +249,6 @@ int FSM_DeleteDevice(unsigned short id)
         strdev->reg = 0;
     }
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_deleth_exit);
-#endif
-
     return 1;
 }
 
@@ -339,11 +258,6 @@ void FSM_DeregisterServer(void)
 {
     struct FSM_DeviceDelete delp;
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_esp_init);
-#endif
-
     if(fsmcon.coonect == 1) {
         delp.IDDevice = fsmcon.id;
         delp.opcode = DelLisr;
@@ -351,10 +265,6 @@ void FSM_DeregisterServer(void)
         fsmcon.coonect = 0;
         FSM_Send_Ethernet(&delp, sizeof(delp), &fsmcon);
     }
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_esp_exit);
-#endif
 }
 EXPORT_SYMBOL(FSM_DeregisterServer);
 
@@ -364,10 +274,6 @@ int FSMClient_pack_rcv(struct sk_buff* skb, struct net_device* dev, struct packe
     struct ethhdr* eth = eth_hdr(skb);
     struct fsm_client_struct* clstr;
     struct fsm_event_struct* evstr;
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (get_prcv_init);
-#endif
 
     if(skb->pkt_type == PACKET_OTHERHOST || skb->pkt_type == PACKET_LOOPBACK)
         goto clear;
@@ -525,10 +431,6 @@ int FSMClient_pack_rcv(struct sk_buff* skb, struct net_device* dev, struct packe
         break;
     }
 
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (get_prcv_exit);
-#endif
-
 clear:
     kfree_skb(skb);
     return skb->len;
@@ -548,37 +450,16 @@ static int __init FSMClient_init(void)
 {
 
     memset(&fsmcon, 0, sizeof(fsmcon));
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (init_on);
-#endif
-
     dev_add_pack(&FSMClient_proto);
     printk(KERN_INFO "FSMClient module loaded\n");
     FSM_RegisterEvent(FSM_ControlDeviceRun, FSM_EthernetEventLoaded);
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (init_off);
-#endif
-
     return 0;
 }
 
 static void __exit FSMClient_exit(void)
 {
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_GLOBSET
-    DEBUG_CALL_STACK_SetStack | (exit_on);
-#endif
-
     dev_remove_pack(&FSMClient_proto);
     printk(KERN_INFO "FSMClient module unloaded\n");
-
-#ifdef DEBUG_CALL_STACK
-    DEBUG_CALL_STACK_SetStack | (exit_off);
-#endif
 }
 
 module_init(FSMClient_init);
