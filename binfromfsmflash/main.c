@@ -31,10 +31,10 @@ int main(int argc, char **argv)
      size =ftell(binfw) ;
      rewind (binfw);
      printf("Size:%u\n",size);
-     firm.svec.crc32=FSM_crc32NT(0,(unsigned char*)Data,size);
+     
      firm.svec.size=size;
      firm.evec.size=size;
-     firm.evec.crc32=firm.svec.crc32;
+    
      fread(Data, sizeof(char), size, binfw);  
      fclose(binfw);
      for(i=0;i<128;i++)
@@ -53,6 +53,8 @@ int main(int argc, char **argv)
          firm.dvec[i].crc32=FSM_crc32NT(0,(unsigned char*)firm.dvec[i].Data,1024);
          firm.dvec[i].num=i;
      }
+     firm.svec.crc32=FSM_crc32NT(0,(unsigned char*)Data,size);
+     firm.evec.crc32=firm.svec.crc32;
      fsmflash = fopen(argv[2], "wb");
      fwrite(&firm,sizeof(struct FSMFirmware),1,fsmflash);
      fclose(fsmflash);

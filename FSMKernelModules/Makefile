@@ -68,11 +68,12 @@ obj-m   += ${TARGET33}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules
-
+	sh mw_dm.sh
+	
 clean:
 	make -C $(KDIR) M=$(PWD) clean
 	
 module:
 	make -C $(KDIR) M=$(PWD) modules
-	sh nw_module.sh
+	sh mw_module.sh
 	make -C $(KDIR) M=$(PWD) clean

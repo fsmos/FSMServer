@@ -107,7 +107,7 @@ void FSM_FlashRecive(char* data, short len, struct FSM_DeviceTree* to_dt)
         {
           if((FSMFlash_flctl[i].reg==1)&&(FSMFlash_flctl[i].dt!=0))  if(FSMFlash_flctl[i].dt->IDDevice==to_dt->IDDevice)
           {
-             if(FSMFlash_flctl[i].firm.evec.crc32!=((struct FSMFlahData_DataVerifeVector*)(((struct FSM_SendCmdTS*)data)->Data))->crc32)
+             if(FSMFlash_flctl[i].firm.evec.crc32==((struct FSMFlahData_DataVerifeVector*)(((struct FSM_SendCmdTS*)data)->Data))->crc32)
              {
              FSMFlash_fsmsc.cmd=FSMFlash_Confirm;
              to_dt->TrDev->dt->Proc((char*)&FSMFlash_fsmsc,FSMH_Header_Size_SendCmd,to_dt->TrDev,to_dt);
