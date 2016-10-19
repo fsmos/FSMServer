@@ -3,17 +3,17 @@
 ## any manual changes will be erased      
 ##
 ## Release
-ProjectName            :=binfromfsmflash
+ProjectName            :=fsmcckhttpserver
 ConfigurationName      :=Release
 WorkspacePath          :=/home/gusenkovs/FSMCoreFile
-ProjectPath            :=/home/gusenkovs/FSMCoreFile/binfromfsmflash
+ProjectPath            :=/home/gusenkovs/FSMCoreFile/fsmcckhttpserver
 IntermediateDirectory  :=./Release
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=gusenkovs
-Date                   :=17/10/16
+Date                   :=19/10/16
 CodeLitePath           :=/home/gusenkovs/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -32,15 +32,15 @@ Preprocessors          :=$(PreprocessorSwitch)NDEBUG
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
-ObjectsFileList        :="binfromfsmflash.txt"
+ObjectsFileList        :="fsmcckhttpserver.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            :=  
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := 
-ArLibs                 :=  
+Libs                   := $(LibrarySwitch)event $(LibrarySwitch)fsmcck $(LibrarySwitch)fsmflash 
+ArLibs                 :=  "libevent" "libfsmcck" "libfsmflash" 
 LibPath                := $(LibraryPathSwitch). 
 
 ##
@@ -92,7 +92,7 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/main.c$(ObjectSuffix): main.c $(IntermediateDirectory)/main.c$(DependSuffix)
-	$(CC) $(SourceSwitch) "/home/gusenkovs/FSMCoreFile/binfromfsmflash/main.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IncludePath)
+	$(CC) $(SourceSwitch) "/home/gusenkovs/FSMCoreFile/fsmcckhttpserver/main.c" $(CFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.c$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/main.c$(DependSuffix): main.c
 	@$(CC) $(CFLAGS) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.c$(ObjectSuffix) -MF$(IntermediateDirectory)/main.c$(DependSuffix) -MM main.c
 

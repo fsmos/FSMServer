@@ -12,6 +12,9 @@
 
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
+unsigned char fsm_po06_crc32[4];
+unsigned char fsm_po06_ramst[2];
+unsigned char fsm_po06_build[4];
 struct CCKDeviceInfo FSMPO06_CCKDevE;
 struct FSM_DeviceFunctionTree FSMPO06_dft;
 struct FSM_PO06Device FSMPO06Dev[FSM_PO06DeviceTreeSize];
@@ -122,6 +125,46 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             FSMPO06_CCKDevE.ip[3] = scmd->Data[3];
             FSMPO06_CCKDevE.type = PO06;
             FSMPO06_CCKDevE.Position = scmd->Data[4];
+            fsm_po06_crc32[0] = scmd->Data[5];
+            fsm_po06_crc32[1] = scmd->Data[6];
+            fsm_po06_crc32[2] = scmd->Data[7];
+            fsm_po06_crc32[3] = scmd->Data[8];
+            FSMPO06_CCKDevE.crc32=((unsigned int*)fsm_po06_crc32)[0];
+            fsm_po06_ramst[0] = scmd->Data[9];
+            fsm_po06_ramst[1] = scmd->Data[10];
+            FSMPO06_CCKDevE.ramstate=((unsigned short*)fsm_po06_ramst)[0];
+            FSMPO06_CCKDevE.dstlen=scmd->Data[11];
+            FSMPO06_CCKDevE.channel=scmd->Data[12];
+            FSMPO06_CCKDevE.ver1=scmd->Data[13];
+            FSMPO06_CCKDevE.ver2=scmd->Data[14];
+            FSMPO06_CCKDevE.ver3=scmd->Data[15];
+            FSMPO06_CCKDevE.crcerror=0;
+            
+            if(FSMPO06_CCKDevE.channel==0) 
+            {
+            if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+            else if(to_dt->dt->crcfw!=FSMPO06_CCKDevE.crc32)
+            {     
+                printk( KERN_ERR "Firmware CRC Error Please Enter \"fsmflash %u\" \n",to_dt->IDDevice ); 
+                FSMPO06_CCKDevE.crcerror=1;
+                //FSM_FlashStart(to_dt);
+            }
+            
+            }
+            else
+            {
+                if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+                else if(to_dt->dt->crcfw!=FSMPO06_CCKDevE.crc32)
+                {     
+                    FSMPO06_CCKDevE.crcerror=2;
+                //FSM_FlashStart(to_dt);
+                }
+            }
+            fsm_po06_build[0] = scmd->Data[16];
+            fsm_po06_build[1] = scmd->Data[17];
+            fsm_po06_build[2] = scmd->Data[18];
+            fsm_po06_build[3] = scmd->Data[19];
+            FSMPO06_CCKDevE.id_build=((unsigned int*)fsm_po06_build)[0];
             FSMCCK_AddDeviceInfo(&FSMPO06_CCKDevE);
             if(to_dt->debug)
                 printk(KERN_INFO "FSM PO06 ID%i Asterisk IP %i.%i.%i.%i\n ",
@@ -183,6 +226,8 @@ static int __init FSM_PO06_init(void)
     FSMPO06_dft.KodDevice = (unsigned char)PO06;
     FSMPO06_dft.Proc = FSM_PO06Recive;
     FSMPO06_dft.config_len = sizeof(struct fsm_po06_setting);
+    FSMPO06_dft.crcfw=0;
+    FSM_FlashFirmwareCheck(&FSMPO06_dft);
     FSM_DeviceClassRegister(FSMPO06_dft);
     printk(KERN_INFO "FSM PO06 Module loaded\n");
     return 0;

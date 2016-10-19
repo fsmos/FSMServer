@@ -27,12 +27,12 @@
 #define FSM_GPIOID 2
 #define FSM_CCKControlID 3
 #define FSM_TreeSettingID 4
-
+#define FSM_FlashID 5
 /*!
 \brief ID сервера статистики
 */
 #define FSM_StatisicID 21
-#define FSM_SettingID setservid
+#define FSM_SettingID FSM_SC_setservid
 /*!
 \brief Размер дерева аудио потоков
 */

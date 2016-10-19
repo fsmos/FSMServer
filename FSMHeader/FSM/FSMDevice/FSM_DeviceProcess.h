@@ -58,6 +58,7 @@ struct FSM_DeviceFunctionTree
     ApplayProcess aplayp;
     unsigned char debug;
     unsigned short config_len;
+    unsigned int crcfw;
 };
 
 /*!
@@ -202,5 +203,5 @@ enum FSM_UK /*125 *** 254*/
     FSMFlash_Confirm=5,
     FSMFlash_Data=6
 };
-
+int FSM_FlashFirmwareCheck(struct FSM_DeviceFunctionTree* dft);
 #endif /* FSM_DEVICEPROCESS_H */

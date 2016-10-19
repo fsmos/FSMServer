@@ -176,7 +176,8 @@ unsigned char FSM_DeviceClassRegister(struct FSM_DeviceFunctionTree dft)
             fsm_dft[i].Proc = dft.Proc;
             fsm_dft[i].config_len = dft.config_len;
             fsm_dft[i].aplayp = dft.aplayp;
-
+            fsm_dft[i].crcfw = dft.crcfw;
+            
             FSM_SendEventToAllDev(FSM_ServerConfigChanged);
             FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
             printk(KERN_INFO "DeviceClassRegistred: Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n",

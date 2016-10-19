@@ -48,6 +48,11 @@ void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK)
             FSMCCK_CCKDev[i].crc32 = CCK->crc32;
             FSMCCK_CCKDev[i].ramstate = CCK->ramstate;
             FSMCCK_CCKDev[i].dstlen = CCK->dstlen;
+            FSMCCK_CCKDev[i].channel= CCK->channel;
+            FSMCCK_CCKDev[i].ver1= CCK->ver1;
+            FSMCCK_CCKDev[i].ver2= CCK->ver2;
+            FSMCCK_CCKDev[i].ver3= CCK->ver3;
+            FSMCCK_CCKDev[i].crcerror= CCK->crcerror;
             return;
         }
     }
@@ -65,6 +70,12 @@ void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK)
             FSMCCK_CCKDev[i].crc32 = CCK->crc32;
             FSMCCK_CCKDev[i].ramstate = CCK->ramstate;
             FSMCCK_CCKDev[i].dstlen = CCK->dstlen;
+            FSMCCK_CCKDev[i].channel= CCK->channel;
+            FSMCCK_CCKDev[i].ver1= CCK->ver1;
+            FSMCCK_CCKDev[i].ver2= CCK->ver2;
+            FSMCCK_CCKDev[i].ver3= CCK->ver3;
+            FSMCCK_CCKDev[i].crcerror= CCK->crcerror;
+            FSMCCK_CCKDev[i].id_build= CCK->id_build;
             // printk( KERN_INFO "FSM CCK Device Added\n" );
             return;
         }
@@ -92,6 +103,7 @@ static int __init FSMCCKControlDevice_init(void)
     regp.opcode = RegDevice;
     regp.CRC = 0;
     FSM_DeviceRegister(regp);
+    call_usermodehelper("/bin/fsmcckhttpserver", 0, 0, UMH_WAIT_EXEC);
     printk(KERN_INFO "FSM CCK ControlDevice loaded\n");
     return 0;
 }

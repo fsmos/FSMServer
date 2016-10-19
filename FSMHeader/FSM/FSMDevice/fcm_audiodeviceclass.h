@@ -332,11 +332,17 @@ struct CCKDeviceInfo
     unsigned char type;
     unsigned short id;
     unsigned char Position;
-    unsigned char n;
-    unsigned char ip[4]; 
+    unsigned char n; 
     unsigned char dstlen;
+    unsigned char channel;
+    unsigned char ip[4]; 
     unsigned int crc32;
     unsigned short ramstate;
+    unsigned char ver1;
+    unsigned char ver2;
+    unsigned char ver3;
+    unsigned char crcerror;
+    unsigned int id_build;
   
 };
 
