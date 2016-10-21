@@ -40,7 +40,9 @@ void FSM_MN825SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, st
 void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     int i;
-
+      unsigned char fsm_mn825_crc32[4];
+    unsigned char fsm_mn825_ramst[2];
+    unsigned char fsm_mn825_build[4];
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
 // char datas[2];
 
@@ -118,6 +120,46 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             FSMMN825_CCKDevE.ip[3] = scmd->Data[3];
             FSMMN825_CCKDevE.type = MN825;
             FSMMN825_CCKDevE.Position = scmd->Data[4];
+            fsm_mn825_crc32[0] = scmd->Data[5];
+            fsm_mn825_crc32[1] = scmd->Data[6];
+            fsm_mn825_crc32[2] = scmd->Data[7];
+            fsm_mn825_crc32[3] = scmd->Data[8];
+            FSMMN825_CCKDevE.crc32=((unsigned int*)fsm_mn825_crc32)[0];
+            fsm_mn825_ramst[0] = scmd->Data[9];
+            fsm_mn825_ramst[1] = scmd->Data[10];
+            FSMMN825_CCKDevE.dstlen=((unsigned short*)fsm_mn825_ramst)[0];
+            FSMMN825_CCKDevE.dstlen=scmd->Data[11];
+            FSMMN825_CCKDevE.channel=scmd->Data[12];
+            FSMMN825_CCKDevE.ver1=scmd->Data[13];
+            FSMMN825_CCKDevE.ver2=scmd->Data[14];
+            FSMMN825_CCKDevE.ver3=scmd->Data[15];
+            FSMMN825_CCKDevE.crcerror=0;
+            
+            if(FSMMN825_CCKDevE.channel==0) 
+            {
+            if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+            else if(to_dt->dt->crcfw!=FSMMN825_CCKDevE.crc32)
+            {     
+                printk( KERN_ERR "Firmware CRC Error Please Enter \"fsmflash %u\" \n",to_dt->IDDevice ); 
+                FSMMN825_CCKDevE.crcerror=1;
+                //FSM_FlashStart(to_dt);
+            }
+            
+            }
+            else
+            {
+                if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+                else if(to_dt->dt->crcfw!=FSMMN825_CCKDevE.crc32)
+                {     
+                    FSMMN825_CCKDevE.crcerror=2;
+                //FSM_FlashStart(to_dt);
+                }
+            }
+            fsm_mn825_build[0] = scmd->Data[16];
+            fsm_mn825_build[1] = scmd->Data[17];
+            fsm_mn825_build[2] = scmd->Data[18];
+            fsm_mn825_build[3] = scmd->Data[19];
+            FSMMN825_CCKDevE.id_build=((unsigned int*)fsm_mn825_build)[0];
             FSMCCK_AddDeviceInfo(&FSMMN825_CCKDevE);
             if(to_dt->debug)
                 printk(KERN_INFO "FSM ID%i Asterisk IP %i.%i.%i.%i\n ",
@@ -206,6 +248,7 @@ static int __init FSM_MN825_init(void)
     FSMMN825_dft.KodDevice = (unsigned char)MN825;
     FSMMN825_dft.Proc = FSM_MN825Recive;
     FSMMN825_dft.config_len = sizeof(struct fsm_mn825_setting);
+    FSM_FlashFirmwareCheck(&FSMMN825_dft);
     FSM_DeviceClassRegister(FSMMN825_dft);
     printk(KERN_INFO "FSM MN825 Module loaded\n");
     FSM_SendEventToAllDev(FSM_CCK_MN845_Started);
@@ -216,6 +259,7 @@ static int __init FSM_MN825_init(void)
 static void __exit FSM_MN825_exit(void)
 {
     FSM_ClassDeRegister(FSMMN825_dft);
+    
     printk(KERN_INFO "FSM MN825 Module unloaded\n");
 }
 

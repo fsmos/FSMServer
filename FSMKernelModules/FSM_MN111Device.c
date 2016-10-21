@@ -15,6 +15,7 @@ struct FSM_DeviceFunctionTree FSMMN111_dft;
 struct FSM_MN111Device FSMMN111Dev[FSM_MN111DeviceTreeSize];
 struct FSM_SendCmd FSMMN111_sendcmd;
 struct FSM_AudioStream FSMMN111_fsmas;
+struct CCKDeviceInfo FSMMN111_CCKDevE;
 
 static struct timer_list FSM_MN111_timer;
 
@@ -75,7 +76,9 @@ void FSM_Test_Callback(unsigned long data)
 void FSM_MN111Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     int i;
-
+      unsigned char fsm_mn111_crc32[4];
+    unsigned char fsm_mn111_ramst[2];
+    unsigned char fsm_mn111_build[4];
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
     struct FSM_MN111Device* mn111 = (struct FSM_MN111Device*)to_dt->data;
 // char datas[2];
@@ -162,9 +165,59 @@ void FSM_MN111Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             mn111->vst.MN111_Power_220V.newdata = 1;
             printk(KERN_WARNING "MN111 %u: 220V: %u \n", scmd->IDDevice, ((unsigned short*)scmd->Data)[0]);
             break;
-        }
-
+        case FSMMN111SendIP:
+            FSMMN111_CCKDevE.id = scmd->IDDevice;
+            FSMMN111_CCKDevE.ip[0] = scmd->Data[0];
+            FSMMN111_CCKDevE.ip[1] = scmd->Data[1];
+            FSMMN111_CCKDevE.ip[2] = scmd->Data[2];
+            FSMMN111_CCKDevE.ip[3] = scmd->Data[3];
+            FSMMN111_CCKDevE.type = MN111;
+            FSMMN111_CCKDevE.Position = scmd->Data[4];
+            fsm_mn111_crc32[0] = scmd->Data[5];
+            fsm_mn111_crc32[1] = scmd->Data[6];
+            fsm_mn111_crc32[2] = scmd->Data[7];
+            fsm_mn111_crc32[3] = scmd->Data[8];
+            FSMMN111_CCKDevE.crc32=((unsigned int*)fsm_mn111_crc32)[0];
+            fsm_mn111_ramst[0] = scmd->Data[9];
+            fsm_mn111_ramst[1] = scmd->Data[10];
+            FSMMN111_CCKDevE.dstlen=((unsigned short*)fsm_mn111_ramst)[0];
+            FSMMN111_CCKDevE.dstlen=scmd->Data[11];
+            FSMMN111_CCKDevE.channel=scmd->Data[12];
+            FSMMN111_CCKDevE.ver1=scmd->Data[13];
+            FSMMN111_CCKDevE.ver2=scmd->Data[14];
+            FSMMN111_CCKDevE.ver3=scmd->Data[15];
+            FSMMN111_CCKDevE.crcerror=0;
+            
+            if(FSMMN111_CCKDevE.channel==0) 
+            {
+            if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+            else if(to_dt->dt->crcfw!=FSMMN111_CCKDevE.crc32)
+            {     
+                printk( KERN_ERR "Firmware CRC Error Please Enter \"fsmflash %u\" \n",to_dt->IDDevice ); 
+                FSMMN111_CCKDevE.crcerror=1;
+                //FSM_FlashStart(to_dt);
+            }
+            
+            }
+            else
+            {
+                if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+                else if(to_dt->dt->crcfw!=FSMMN111_CCKDevE.crc32)
+                {     
+                    FSMMN111_CCKDevE.crcerror=2;
+                //FSM_FlashStart(to_dt);
+                }
+            }
+            fsm_mn111_build[0] = scmd->Data[16];
+            fsm_mn111_build[1] = scmd->Data[17];
+            fsm_mn111_build[2] = scmd->Data[18];
+            fsm_mn111_build[3] = scmd->Data[19];
+            FSMMN111_CCKDevE.id_build=((unsigned int*)fsm_mn111_build)[0];
+            FSMCCK_AddDeviceInfo(&FSMMN111_CCKDevE);
         break;
+        }
+        break;
+      
     case SendTxtMassage: ///< Отправка текстового сообщения
         break;
     case Alern: ///<Тревога
@@ -235,6 +288,7 @@ void FSM_MN111Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             break;
         }
         break;
+        
     case PacketToDevice:
         switch(scmd->cmd) {
 

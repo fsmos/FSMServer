@@ -33,9 +33,6 @@ const char* fsm_firmware_state[]=
     "Повреждена",
 };
 const short  SERVER_BACKLOG    = 128;
-const short  BUF_LEN           = 26;
-const char * RESPONCE = "<H1>Hello there</H1><BR/>";
-const char * SERVER_NAME       = "Simple HTTP Server";
 
 void on_request(struct evhttp_request *, void *);
 

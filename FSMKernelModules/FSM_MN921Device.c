@@ -39,8 +39,10 @@ void FSM_MN921SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, st
 void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     int i;
-    unsigned char fsm_mn_crc32[4];
-    unsigned char fsm_mn_ramst[2];
+    unsigned char fsm_mn921_crc32[4];
+    unsigned char fsm_mn921_ramst[2];
+    unsigned char fsm_mn921_build[4];
+    
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
 // char datas[2];
 
@@ -69,6 +71,7 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
                 FSMMN921Dev[i].iddev = to_dt->IDDevice;
                 to_dt->data = &FSMMN921Dev[i];
                 to_dt->config = &FSMMN921Dev[i].mn921set;
+                
                 FSM_MN921SendStreaminfo(FSMMN921Dev[i].idstream, from_dt, to_dt);
                 if(to_dt->debug)
                     printk(KERN_INFO "FSM MN921 Device Added %u \n", to_dt->IDDevice);
@@ -119,15 +122,46 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             FSMMN921_CCKDevE.ip[3] = scmd->Data[3];
             FSMMN921_CCKDevE.type = MN921;
             FSMMN921_CCKDevE.Position = scmd->Data[4];
-            fsm_mn_crc32[0] = scmd->Data[5];
-            fsm_mn_crc32[1] = scmd->Data[6];
-            fsm_mn_crc32[2] = scmd->Data[7];
-            fsm_mn_crc32[3] = scmd->Data[8];
-            FSMMN921_CCKDevE.crc32=((unsigned int*)fsm_mn_crc32)[0];
-            fsm_mn_ramst[0] = scmd->Data[9];
-            fsm_mn_ramst[1] = scmd->Data[10];
-            FSMMN921_CCKDevE.dstlen=((unsigned short*)fsm_mn_ramst)[0];
+            fsm_mn921_crc32[0] = scmd->Data[5];
+            fsm_mn921_crc32[1] = scmd->Data[6];
+            fsm_mn921_crc32[2] = scmd->Data[7];
+            fsm_mn921_crc32[3] = scmd->Data[8];
+            FSMMN921_CCKDevE.crc32=((unsigned int*)fsm_mn921_crc32)[0];
+            fsm_mn921_ramst[0] = scmd->Data[9];
+            fsm_mn921_ramst[1] = scmd->Data[10];
+            FSMMN921_CCKDevE.dstlen=((unsigned short*)fsm_mn921_ramst)[0];
             FSMMN921_CCKDevE.dstlen=scmd->Data[11];
+            FSMMN921_CCKDevE.channel=scmd->Data[12];
+            FSMMN921_CCKDevE.ver1=scmd->Data[13];
+            FSMMN921_CCKDevE.ver2=scmd->Data[14];
+            FSMMN921_CCKDevE.ver3=scmd->Data[15];
+            FSMMN921_CCKDevE.crcerror=0;
+            
+            if(FSMMN921_CCKDevE.channel==0) 
+            {
+            if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+            else if(to_dt->dt->crcfw!=FSMMN921_CCKDevE.crc32)
+            {     
+                printk( KERN_ERR "Firmware CRC Error Please Enter \"fsmflash %u\" \n",to_dt->IDDevice ); 
+                FSMMN921_CCKDevE.crcerror=1;
+                //FSM_FlashStart(to_dt);
+            }
+            
+            }
+            else
+            {
+                if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+                else if(to_dt->dt->crcfw!=FSMMN921_CCKDevE.crc32)
+                {     
+                    FSMMN921_CCKDevE.crcerror=2;
+                //FSM_FlashStart(to_dt);
+                }
+            }
+            fsm_mn921_build[0] = scmd->Data[16];
+            fsm_mn921_build[1] = scmd->Data[17];
+            fsm_mn921_build[2] = scmd->Data[18];
+            fsm_mn921_build[3] = scmd->Data[19];
+            FSMMN921_CCKDevE.id_build=((unsigned int*)fsm_mn921_build)[0];
             FSMCCK_AddDeviceInfo(&FSMMN921_CCKDevE);
             if(to_dt->debug)
                 printk(KERN_INFO "FSM MN921 ID%i Asterisk IP %i.%i.%i.%i\n ",
@@ -214,6 +248,7 @@ static int __init FSM_MN921_init(void)
     FSMMN921_dft.KodDevice = (unsigned char)MN921;
     FSMMN921_dft.Proc = FSM_MN921Recive;
     FSMMN921_dft.config_len = sizeof(struct fsm_mn921_setting);
+    FSM_FlashFirmwareCheck(&FSMMN921_dft);
     FSM_DeviceClassRegister(FSMMN921_dft);
     printk(KERN_INFO "FSM MN921 Module loaded\n");
     FSM_SendEventToAllDev(FSM_CCK_MN921_Started);

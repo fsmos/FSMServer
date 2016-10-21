@@ -12,9 +12,7 @@
 
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
-unsigned char fsm_po06_crc32[4];
-unsigned char fsm_po06_ramst[2];
-unsigned char fsm_po06_build[4];
+
 struct CCKDeviceInfo FSMPO06_CCKDevE;
 struct FSM_DeviceFunctionTree FSMPO06_dft;
 struct FSM_PO06Device FSMPO06Dev[FSM_PO06DeviceTreeSize];
@@ -45,10 +43,12 @@ void FSM_PO06SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, str
 void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     int i;
-
+ 
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
 // char datas[2];
-
+    unsigned char fsm_po06_crc32[4];
+    unsigned char fsm_po06_ramst[2];
+    unsigned char fsm_po06_build[4];
     switch(data[0]) {
 
     case RegDevice: ///< Регистрация устройства

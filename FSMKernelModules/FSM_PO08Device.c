@@ -39,7 +39,9 @@ void FSM_PO08SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, str
 void FSM_PO08Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     int i;
-
+    unsigned char fsm_po08_crc32[4];
+unsigned char fsm_po08_ramst[2];
+unsigned char fsm_po08_build[4];
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
 // char datas[2];
 
@@ -117,6 +119,47 @@ void FSM_PO08Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             FSMPO08_CCKDevE.ip[3] = scmd->Data[3];
             FSMPO08_CCKDevE.type = PO08;
             FSMPO08_CCKDevE.Position = scmd->Data[4];
+            fsm_po08_crc32[0] = scmd->Data[5];
+            fsm_po08_crc32[1] = scmd->Data[6];
+            fsm_po08_crc32[2] = scmd->Data[7];
+            fsm_po08_crc32[3] = scmd->Data[8];
+            FSMPO08_CCKDevE.crc32=((unsigned int*)fsm_po08_crc32)[0];
+            fsm_po08_ramst[0] = scmd->Data[9];
+            fsm_po08_ramst[1] = scmd->Data[10];
+            FSMPO08_CCKDevE.ramstate=((unsigned short*)fsm_po08_ramst)[0];
+            FSMPO08_CCKDevE.dstlen=scmd->Data[11];
+            FSMPO08_CCKDevE.channel=scmd->Data[12];
+            FSMPO08_CCKDevE.ver1=scmd->Data[13];
+            FSMPO08_CCKDevE.ver2=scmd->Data[14];
+            FSMPO08_CCKDevE.ver3=scmd->Data[15];
+            FSMPO08_CCKDevE.crcerror=0;
+            
+            if(FSMPO08_CCKDevE.channel==0) 
+            {
+            if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+            else if(to_dt->dt->crcfw!=FSMPO08_CCKDevE.crc32)
+            {     
+                printk( KERN_ERR "Firmware CRC Error Please Enter \"fsmflash %u\" \n",to_dt->IDDevice ); 
+                FSMPO08_CCKDevE.crcerror=1;
+                //FSM_FlashStart(to_dt);
+            }
+            
+            }
+            else
+            {
+                if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
+                else if(to_dt->dt->crcfw!=FSMPO08_CCKDevE.crc32)
+                {     
+                    FSMPO08_CCKDevE.crcerror=2;
+                //FSM_FlashStart(to_dt);
+                }
+            }
+            fsm_po08_build[0] = scmd->Data[16];
+            fsm_po08_build[1] = scmd->Data[17];
+            fsm_po08_build[2] = scmd->Data[18];
+            fsm_po08_build[3] = scmd->Data[19];
+            FSMPO08_CCKDevE.id_build=((unsigned int*)fsm_po08_build)[0];
+
             FSMCCK_AddDeviceInfo(&FSMPO08_CCKDevE);
             if(to_dt->debug)
                 printk(KERN_INFO "FSM PO08 ID%i Asterisk IP %i.%i.%i.%i\n ",
@@ -203,8 +246,10 @@ static int __init FSM_PO08_init(void)
     FSMPO08_dft.PodVidDevice = (unsigned char)CCK;
     FSMPO08_dft.KodDevice = (unsigned char)PO08;
     FSMPO08_dft.Proc = FSM_PO08Recive;
-    FSMPO08_dft.config_len = sizeof(struct fsm_po08_setting);
+    FSMPO08_dft.config_len = sizeof(struct fsm_po08_setting);    
+    FSM_FlashFirmwareCheck(&FSMPO08_dft);
     FSM_DeviceClassRegister(FSMPO08_dft);
+
     printk(KERN_INFO "FSM PO08 Module loaded\n");
     FSM_SendEventToAllDev(FSM_CCK_MN845_Started);
 
