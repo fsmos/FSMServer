@@ -29,7 +29,7 @@ void FSM_EventIOCtl(char* Data, short len, struct fsm_ioctl_struct* ioctl)
         break;
     }
 }
-int FSM_SendSignalToPipe_thread(void* Data)
+/*int FSM_SendSignalToPipe_thread(void* Data)
 {
     char id[10];
     struct SendSignalStruct* datas = (struct SendSignalStruct*)Data;
@@ -44,6 +44,7 @@ int FSM_SendSignalToPipe_thread(void* Data)
     call_usermodehelper("/bin/fsmsstd", argv, envp, UMH_WAIT_EXEC);
     return 0;
 }
+ * */
 
 int FSM_SendSignalToPipe(char* pipe, int signal)
 {
@@ -51,7 +52,7 @@ int FSM_SendSignalToPipe(char* pipe, int signal)
     FSM_SSTP_signstr.id = signal;
     strcpy(FSM_SSTP_signstr.pipe, pipe);
     if(FSM_SSTP_PID)
-        send_sig_info(SIGUSR1, &FSM_SSTP_info, FSM_SSTP_task);
+    send_sig_info(SIGUSR1, &FSM_SSTP_info, FSM_SSTP_task);
     // send_sig_info( SIGUSR1, FSM_SSTP_PID, 0 );
     // pid = kthread_run(FSM_SendSignalToPipe_thread, &signstr, "FSM_SendSignalToPipe" ); /* запускаем новый поток */
     // FSM_SendSignalToPipe_thread(&signstr);
@@ -59,6 +60,15 @@ int FSM_SendSignalToPipe(char* pipe, int signal)
 }
 EXPORT_SYMBOL(FSM_SendSignalToPipe);
 
+int FSM_SendSignalToProcess(pid_t pid)
+{
+    FSM_SSTP_info.si_signo = SIGUSR1;
+    FSM_SSTP_info.si_errno = 0;
+    FSM_SSTP_info.si_code = SI_USER;
+    send_sig_info(SIGUSR1, &FSM_SSTP_info, pid_task(find_vpid(pid), PIDTYPE_PID));
+    return 0;
+}
+EXPORT_SYMBOL(FSM_SendSignalToProcess);
 static int __init FSMSendSigTP_init(void)
 {
     FSM_RegisterIOCtl(FSM_EventIOCtlId, FSM_EventIOCtl);

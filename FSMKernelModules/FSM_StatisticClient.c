@@ -22,9 +22,8 @@
 #include "FSM/FSMDevice/fsm_statusstruct.h"
 #include "FSM/FSM_Client/FSM_client.h"
 struct fsm_statusstruct fsm_ss;
-struct FSMSSetconfigParam fsmspar;
 struct FSM_SendCmdTS FSM_SC_regpcmdts;
-
+pid_t fsm_pid_ss;
 int FSMStat_rcv(char* Data, short len, struct fsm_client_struct* dev)
 {
     char dats = Data[0];
@@ -48,8 +47,10 @@ int FSMStat_rcv(char* Data, short len, struct fsm_client_struct* dev)
                    sizeof(struct fsm_status_element));
             break;
         case SendSettingFull:
-            FSM_SendSignalToPipe("fsmstat", FSM_ServerStatisticChanged);
+            if(fsm_pid_ss==0 ) FSM_SendSignalToPipe("fsmstat", FSM_ServerStatisticChanged);
+            else FSM_SendSignalToProcess(fsm_pid_ss);
             break;
+        
         }
 
         break;
@@ -155,6 +156,7 @@ void FSMStat_rcv_ioctl(char* Data, short len, struct fsm_ioctl_struct* ioctl)
     struct FSM_SendCmdUserspace* fsm_scus = (struct FSM_SendCmdUserspace*)Data;
     switch(fsm_scus->cmd) {
     case FSMIOCTLStat_Requst:
+        fsm_pid_ss=((pid_t*)(fsm_scus->Data))[0];
         memset(&fsm_ss, 0, sizeof(fsm_ss));
         FSM_SC_regpcmdts.opcode = SendCmdToServer;
         FSM_SC_regpcmdts.countparam = 1;
@@ -164,11 +166,13 @@ void FSMStat_rcv_ioctl(char* Data, short len, struct fsm_ioctl_struct* ioctl)
         FSM_Send_Ethernet_TS(&FSM_SC_regpcmdts, sizeof(struct FSM_SendCmdTS));
         printk(KERN_INFO "Request");
         break;
-    case FSMIOCTLStat_Read:
+        case FSMIOCTLStat_Read:
         //printk(KERN_INFO "Read %u - %u", fsm_scus->Data[0], fsm_scus->Data[1]);
-        memcpy(
-            fsm_scus->Data, &(fsm_ss.statel[fsm_scus->Data[0]][fsm_scus->Data[1]]), sizeof(struct fsm_status_element));
+        memcpy(fsm_scus->Data, &(fsm_ss.statel[fsm_scus->Data[0]][fsm_scus->Data[1]]), sizeof(struct fsm_status_element));
 
+        break;
+        case FSMIOCTLStat_SetPid:
+        fsm_pid_ss=((pid_t*)(fsm_scus->Data))[0];
         break;
     }
 }
