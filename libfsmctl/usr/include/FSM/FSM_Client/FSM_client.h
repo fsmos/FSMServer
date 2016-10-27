@@ -62,6 +62,7 @@ int FSM_DeleteDevice(unsigned short id);
 void FSM_DeregisterServer(void);
 unsigned int FSM_Send_Ethernet_TS(void* data, int len);
 int FSM_SendSignalToPipe(char* pipe, int signal);
+int FSM_SendSignalToProcess(pid_t pid);
 void FSM_DeleteEvent(unsigned int id);
 struct fsm_event_struct* FSM_FindEvent(unsigned int id);
 struct fsm_event_struct* FSM_RegisterEvent(unsigned int id, EventClientProcess Handler);

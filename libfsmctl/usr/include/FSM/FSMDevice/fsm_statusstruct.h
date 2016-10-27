@@ -109,7 +109,7 @@ enum FSMCDPC_RodDevice {
     Bit_8 = 2
 };
 
-enum FSMIOCTLStat_Cmd { FSMIOCTLStat_Read, FSMIOCTLStat_Requst };
+enum FSMIOCTLStat_Cmd { FSMIOCTLStat_Read, FSMIOCTLStat_Requst,FSMIOCTLStat_SetPid };
 enum FSM_eventlist_status {
 
     /**Statistick Event List 0x40 - 0x6F **/

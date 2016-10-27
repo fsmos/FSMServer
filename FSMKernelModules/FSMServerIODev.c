@@ -80,6 +80,7 @@ static int __init FSM_SIOCTLModule_init(void)
         unregister_chrdev_region(FSM_ServerIO_first, 1);
         return -1;
     }
+    call_usermodehelper("/bin/fsmwebservice", 0, 0, UMH_WAIT_EXEC);
     printk(KERN_INFO "FSM SIOCTL module loaded\n");
     return 0;
 }
@@ -90,7 +91,7 @@ static void __exit FSM_SIOCTLModule_exit(void)
     device_destroy(FSM_ServerIO_cl, FSM_ServerIO_first);
     class_destroy(FSM_ServerIO_cl);
     unregister_chrdev_region(FSM_ServerIO_first, 1);
-
+    
     printk(KERN_INFO "FSM SIOCTL module unloaded\n");
 }
 module_init(FSM_SIOCTLModule_init);

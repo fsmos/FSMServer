@@ -118,6 +118,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
                    FSM_FindDevice(scmd->IDDevice)->dt->config_len);
             break;
         case FSMPo06SendIP:
+            memset(&FSMPO06_CCKDevE,0,sizeof(struct CCKDeviceInfo));
             FSMPO06_CCKDevE.id = scmd->IDDevice;
             FSMPO06_CCKDevE.ip[0] = scmd->Data[0];
             FSMPO06_CCKDevE.ip[1] = scmd->Data[1];

@@ -166,6 +166,7 @@ void FSM_MN111Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             printk(KERN_WARNING "MN111 %u: 220V: %u \n", scmd->IDDevice, ((unsigned short*)scmd->Data)[0]);
             break;
         case FSMMN111SendIP:
+            memset(&FSMMN111_CCKDevE,0,sizeof(struct CCKDeviceInfo));
             FSMMN111_CCKDevE.id = scmd->IDDevice;
             FSMMN111_CCKDevE.ip[0] = scmd->Data[0];
             FSMMN111_CCKDevE.ip[1] = scmd->Data[1];

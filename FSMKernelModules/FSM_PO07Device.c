@@ -112,6 +112,7 @@ unsigned char fsm_po07_build[4];
             memcpy(&((struct fsm_po07_setting*)(to_dt->config))->fsm_p007_su_s, scmd->Data, to_dt->dt->config_len);
             break;
         case FSMPo07SendIP:
+            memset(&FSMPO07_CCKDevE,0,sizeof(struct CCKDeviceInfo));
             FSMPO07_CCKDevE.id = scmd->IDDevice;
             FSMPO07_CCKDevE.ip[0] = scmd->Data[0];
             FSMPO07_CCKDevE.ip[1] = scmd->Data[1];

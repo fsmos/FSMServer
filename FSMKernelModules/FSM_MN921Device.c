@@ -115,6 +115,7 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             memcpy(&((struct fsm_po06_setting*)(to_dt->config))->fsm_p006_su_s, scmd->Data, to_dt->dt->config_len);
             break;
         case FSMMN921SendIP:
+            memset(&FSMMN921_CCKDevE,0,sizeof(struct CCKDeviceInfo));
             FSMMN921_CCKDevE.id = scmd->IDDevice;
             FSMMN921_CCKDevE.ip[0] = scmd->Data[0];
             FSMMN921_CCKDevE.ip[1] = scmd->Data[1];

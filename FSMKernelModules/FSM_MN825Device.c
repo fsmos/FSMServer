@@ -113,6 +113,7 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             memcpy(&((struct fsm_po06_setting*)(to_dt->config))->fsm_p006_su_s, scmd->Data, to_dt->dt->config_len);
             break;
         case FSMMN825SendIP:
+            memset(&FSMMN825_CCKDevE,0,sizeof(struct CCKDeviceInfo));
             FSMMN825_CCKDevE.id = scmd->IDDevice;
             FSMMN825_CCKDevE.ip[0] = scmd->Data[0];
             FSMMN825_CCKDevE.ip[1] = scmd->Data[1];

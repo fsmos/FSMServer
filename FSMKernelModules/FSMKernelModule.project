@@ -71,13 +71,12 @@
       <File Name="../FSMHeader/FSM/FSM_SA/FSM_SA.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
-  <VirtualDirectory Name="Make">
-    <File Name="Makefile"/>
-  </VirtualDirectory>
+  <VirtualDirectory Name="Make"/>
   <VirtualDirectory Name="Script">
     <File Name="run.sh"/>
     <File Name="FSM_ClientRun.sh"/>
     <File Name="nw_module.sh"/>
+    <File Name="Makefile"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_E1Device">
     <File Name="FSM_E1Device.c"/>

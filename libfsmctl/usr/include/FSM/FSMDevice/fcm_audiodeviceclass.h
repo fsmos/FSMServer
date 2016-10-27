@@ -288,6 +288,7 @@ enum FSMMN111Command /*0*****125*/
   FSM_Read_MN111_Power_90V = 15,
   FSM_Read_MN111_Power_220V = 16,
   FSM_Read_MN111_AutoReqest = 17,
+  FSMMN111SendIP=18
 };
 
 struct fsm_mn111_subscriber
