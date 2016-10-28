@@ -214,6 +214,7 @@ FSMClientProtocol_pack_rcv(struct sk_buff* skb, struct net_device* dev, struct p
         // printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice);
         dftv->TrDev = FSM_Ethernet_dt;
         dftv->dt->Proc((char*)skb->data, sizeof(struct FSM_DeviceRegistr), dftv, FSM_Ethernet_dt);
+        FSMProgrammDevRun(dftv);
         ((struct FSM_DeviceRegistr*)skb->data)->opcode = AnsRegDevice;
         FSM_Send_Ethernet_Package(skb->data,
                                   sizeof(struct FSM_DeviceRegistr),

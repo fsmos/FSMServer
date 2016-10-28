@@ -35,7 +35,6 @@
   </VirtualDirectory>
   <VirtualDirectory Name="FSMDeviceManager">
     <File Name="FSM_DeviceProcess.c"/>
-    <File Name="FSM_Beep.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM">
     <VirtualDirectory Name="FSMEthernet">
@@ -71,12 +70,13 @@
       <File Name="../FSMHeader/FSM/FSM_SA/FSM_SA.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
-  <VirtualDirectory Name="Make"/>
+  <VirtualDirectory Name="Make">
+    <File Name="Makefile"/>
+  </VirtualDirectory>
   <VirtualDirectory Name="Script">
     <File Name="run.sh"/>
     <File Name="FSM_ClientRun.sh"/>
     <File Name="nw_module.sh"/>
-    <File Name="Makefile"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_E1Device">
     <File Name="FSM_E1Device.c"/>
@@ -103,6 +103,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_SkyNet">
     <File Name="FSM_SkyNet.c"/>
+    <File Name="FSM_ControlPower.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSMClient">
     <File Name="FSM_Client.c"/>
@@ -225,6 +226,7 @@ source runs.prog</PostConnectCommands>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_Utils">
     <File Name="FSM_CRC.c"/>
+    <File Name="FSM_Beep.c"/>
   </VirtualDirectory>
   <Dependencies Name="Debug">
     <Project Name="FSMSendPack"/>

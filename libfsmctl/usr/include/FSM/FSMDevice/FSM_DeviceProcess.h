@@ -17,6 +17,7 @@
 #include "FSM/FSMDevice/fcm_audiodeviceclass.h"
 #include "FSM/FSM_Switch/fsm_switch.h"
 #include "FSM/FSM_Commutator/FSM_Commutator.h"
+#include "FSM/FSMDevice/fsm_electrodevice.h"
 
 typedef struct FSM_DeviceTree FSM_DeviceTree_t;
 /*!
@@ -30,6 +31,25 @@ typedef void (*DeviceProcess)(char*, short, FSM_DeviceTree_t*, FSM_DeviceTree_t*
 /*!
 \brief Информации о  устройстве
 */
+struct fsm_signal_info
+{
+    unsigned short ID;
+    char* name;
+    char* info;
+};
+struct fsm_signal_hndl
+{
+    struct fsm_signal_info* info; 
+    DeviceProcess event_handler;
+    FSM_DeviceTree_t* dt;
+};
+struct fsm_slot_hndl
+{
+    unsigned short ID;
+    char* name;
+    char* info;
+    DeviceProcess signal_handler;
+};
 struct FSM_DeviceTree
 {
     unsigned char registr;             ///< Состояние регистрации
@@ -43,6 +63,7 @@ struct FSM_DeviceTree
     unsigned char debug;
     struct FSM_PropertyDevice pdl[FSM_PropertyTreeSize];
     int pdl_count;
+    struct fsm_signal_hndl signal[FSM_SignalCount];
 };
 /*!
 \brief Информации о виде устройства
@@ -59,6 +80,9 @@ struct FSM_DeviceFunctionTree
     unsigned char debug;
     unsigned short config_len;
     unsigned int crcfw;
+    unsigned short signal_count;
+    unsigned short slot_count;
+    struct fsm_slot_hndl* slot;
 };
 
 /*!
@@ -203,5 +227,27 @@ enum FSM_UK /*125 *** 254*/
     FSMFlash_Confirm=5,
     FSMFlash_Data=6
 };
+
+
 int FSM_FlashFirmwareCheck(struct FSM_DeviceFunctionTree* dft);
+
+
+struct FSM_ProgLine
+{
+    unsigned short DeviceSignal;
+    unsigned short IDSignal;
+    unsigned short DeviceSlot;
+    unsigned short IDSlot;
+};
+struct FSM_ProgBuf
+{
+   unsigned int PrgSize;
+   unsigned int CRC;
+   struct FSM_ProgLine prg[FSM_ProgrammSSSize];
+};
+
+void FSM_Connect_Signal_to_Slot(unsigned short DevSignal,unsigned short IDsignal,unsigned short DeviceSlot,unsigned short IDSlot);
+void FSM_SendSignal(char *data,unsigned short len, struct FSM_DeviceTree* from_dt,unsigned short IDsignal);
+void FSM_ProgrammSSLoad(void);
+void FSMProgrammDevRun(struct FSM_DeviceTree* dt);
 #endif /* FSM_DEVICEPROCESS_H */

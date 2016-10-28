@@ -20,11 +20,14 @@ struct FSM_DeviceFunctionTree fsm_dft[FSM_DeviceFunctionTreeSize];
 struct FSM_DeviceTree fsm_dt[FSM_DeviceTreeSize];
 struct fsm_statusstruct fsm_str;
 struct fsm_devices_config fsm_set;
+struct FSM_ProgBuf ProgSSvar;
+
 
 static int __init FSMDeviceProcess_init(void)
 {
     memset(fsm_dft, 0, sizeof(fsm_dft));
     memset(fsm_dt, 0, sizeof(fsm_dt));
+    FSM_ProgrammSSLoad();
     FSM_SendEventToAllDev(FSM_ServerStarted);
     printk(KERN_INFO "FSMDeviceProcess module loaded\n");
     return 0;
@@ -354,6 +357,65 @@ int FSM_AddProperty(char* PropertyCode,
     return dt->pdl_count - 1;
 }
 EXPORT_SYMBOL(FSM_AddProperty);
+
+void FSM_Connect_Signal_to_Slot(unsigned short DevSignal,unsigned short IDsignal,unsigned short DeviceSlot,unsigned short IDSlot)
+{
+    struct FSM_DeviceTree* fsmdev_signal=FSM_FindDevice(DevSignal);
+    struct FSM_DeviceTree* fsmdev_slot=FSM_FindDevice(DeviceSlot);
+    if(fsmdev_signal==0) return;
+    if(fsmdev_slot==0) return;
+    fsmdev_signal->signal[IDsignal].dt=fsmdev_slot;
+    fsmdev_signal->signal[IDsignal].event_handler=fsmdev_slot->dt->slot[IDSlot].signal_handler;
+}
+EXPORT_SYMBOL(FSM_Connect_Signal_to_Slot);
+
+void FSM_SendSignal(char *data,unsigned short len, struct FSM_DeviceTree* from_dt,unsigned short IDsignal)
+{
+   if(from_dt->signal[IDsignal].event_handler!=0) from_dt->signal[IDsignal].event_handler(data,len,from_dt->signal[IDsignal].dt,from_dt);
+}
+EXPORT_SYMBOL(FSM_SendSignal);
+
+void FSM_ProgrammSSLoad(void)
+{
+    struct file *f; 
+    int numb;
+   // preempt_disable();
+    printk( KERN_INFO "Read Programm" ); 
+    memset( (char*)&ProgSSvar,0, sizeof(struct FSM_ProgBuf));
+    f = filp_open( "/fsm/programm/index.fsmprg", O_RDONLY, 0 ); 
+    if( IS_ERR( f ) ) { 
+        printk( KERN_INFO "Programm not found" ); 
+        return;
+    } 
+    numb = kernel_read( f, 0, (char*)&ProgSSvar, sizeof(struct FSM_ProgBuf) ); 
+    filp_close( f, NULL ); 
+    if(!(numb)) return;   
+    FSMProgrammDevRun(0);
+}
+
+EXPORT_SYMBOL(FSM_ProgrammSSLoad);
+
+void FSMProgrammDevRun(struct FSM_DeviceTree* dt)
+{
+    int i;
+    if(dt==0)
+    {
+        if(ProgSSvar.CRC!=FSM_crc32NT(0,(char*)&ProgSSvar.prg,ProgSSvar.PrgSize*8)) return;
+        for(i=0;i<ProgSSvar.PrgSize;i++)
+        {
+            FSM_Connect_Signal_to_Slot(ProgSSvar.prg[i].DeviceSignal,ProgSSvar.prg[i].IDSignal,ProgSSvar.prg[i].DeviceSlot,ProgSSvar.prg[i].IDSlot);
+        }
+    }
+    else
+    {
+        if(ProgSSvar.CRC!=FSM_crc32NT(0,(char*)&ProgSSvar.prg,ProgSSvar.PrgSize*8)) return;
+        for(i=0;i<ProgSSvar.PrgSize;i++)
+        {
+            if((ProgSSvar.prg[i].DeviceSignal==dt->IDDevice) || (ProgSSvar.prg[i].DeviceSlot==dt->IDDevice)) FSM_Connect_Signal_to_Slot(ProgSSvar.prg[i].DeviceSignal,ProgSSvar.prg[i].IDSignal,ProgSSvar.prg[i].DeviceSlot,ProgSSvar.prg[i].IDSlot);
+        }
+    }
+}
+EXPORT_SYMBOL(FSMProgrammDevRun);
 
 module_init(FSMDeviceProcess_init);
 module_exit(FSMDeviceProcess_exit);

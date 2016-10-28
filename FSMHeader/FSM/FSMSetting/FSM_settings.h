@@ -68,6 +68,8 @@
 
 #define FSM_SkyNetDeviceTreeSize 12
 
+#define FSM_CPCDeviceTreeSize 12
+
 #define FSM_ClientTreeSize 12
 
 #define FSM_E1CasTreeSize 12
@@ -75,16 +77,21 @@
 #define FSM_EventTreeSize 12
 
 #define FSM_IOCTLTreeSize 12
+
+#define FSM_SignalCount 100
+#define FSM_SlotCount 100
+
 #define FSM_PropertyTreeSize 12
 #define FSM_CCKTreeSize 20
 
 #define FSM_SettingTreeSize 100
 #define FSM_DeviceSettingTreeSize 100
+#define FSM_ProgrammSSSize 100
 #define FSM_FlasherSize 2
 
 #define FSM_EventIOCtlId 1
 #define FSM_StatistickIOCtlId 2
 
-//#define FSM_GPIO_BLOCK
+#define FSM_GPIO_BLOCK
 #endif	/* FSM_SETTINGS_H */
 //#define DEBUG_CALL_STACK

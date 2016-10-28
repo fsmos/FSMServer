@@ -1,3 +1,4 @@
+rmmod FSM_ControlPower.ko
 rmmod FSM_ControlDeviceClass.ko
 rmmod FSM_SocialAnalytic.ko
 rmmod FSM_MN825Device.ko
@@ -104,6 +105,9 @@ a+="add-symbol-file $path FSM_MN111Device.ko $(cat /sys/module/FSM_MN111Device/s
 
 insmod FSM_SocialAnalytic.ko
 a+="add-symbol-file $path FSM_SocialAnalytic.ko $(cat /sys/module/FSM_SocialAnalytic/sections/.text) -s .bss $(cat /sys/module/FSM_SocialAnalytic/sections/.bss)\n"
+
+insmod FSM_ControlPower.ko
+a+="add-symbol-file $path FSM_ControlPower.ko $(cat /sys/module/FSM_ControlPower/sections/.text) -s .bss $(cat /sys/module/FSM_ControlPower/sections/.bss)\n"
 
 //./FSMSendPack 
 echo -e $a > runs.prog

@@ -1,0 +1,7 @@
+# DeviceSignal IDSignal DeviceSlot IDSlot
+# Test 1
+ss 1000 1 1001 2
+# Test 2
+ss 1002 22 1003 44
+# Test 3
+ss 1007 563 1008 5678

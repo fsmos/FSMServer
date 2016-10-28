@@ -1,6 +1,6 @@
 /*!
 \file
-\brief Модуль взаимодествия с пультом ПО-06
+\brief Модуль коммутатора
 \authors Гусенков.С.В
 \version 0.0.1_rc1
 \date 30.12.2015
@@ -30,7 +30,7 @@ void FSM_SkyNetRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struc
                 return;
             }
         }
-        for(i = 0; i < FSM_PO06DeviceTreeSize; i++) {
+        for(i = 0; i < FSM_SkyNetDeviceTreeSize; i++) {
             if(FSMSkyNetDev[i].reg == 0) {
                 FSMSkyNetDev[i].reg = 1;
                 FSMSkyNetDev[i].ethdev = FSM_FindEthernetDevice(to_dt->IDDevice);
@@ -43,10 +43,10 @@ void FSM_SkyNetRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struc
         }
         break;
     case DelLisr:
-        for(i = 0; i < FSM_E1DeviceTreeSize; i++) {
+        for(i = 0; i < FSM_SkyNetDeviceTreeSize; i++) {
             if((FSMSkyNetDev[i].reg == 1) && (FSMSkyNetDev[i].iddev == to_dt->IDDevice)) {
                 FSMSkyNetDev[i].reg = 0;
-                printk(KERN_INFO "FSMPO06 Device Deleted %u \n", to_dt->IDDevice);
+                printk(KERN_INFO "FSM SkyNet Device Deleted %u \n", to_dt->IDDevice);
                 break;
             }
         }
