@@ -209,7 +209,7 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
     dtsc = FSM_FindDevice(dt.IDDevice);
     if(dtsc != 0)
         dtsc->registr = 0;
-
+    if(FSM_Filter(dt)!=0) return 0;
     for(i = 0; i < FSM_DeviceTreeSize; i++) {
         if(fsm_dt[i].registr == 0) {
             classf = FSM_FindDeviceClass(dt);

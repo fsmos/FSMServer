@@ -69,6 +69,9 @@
     <VirtualDirectory Name="FSM_SA">
       <File Name="../FSMHeader/FSM/FSM_SA/FSM_SA.h"/>
     </VirtualDirectory>
+    <VirtualDirectory Name="FSM_Filter">
+      <File Name="../FSMHeader/FSM/FSM_Filter/FSM_Filter.h"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Make">
     <File Name="Makefile"/>
@@ -232,4 +235,7 @@ source runs.prog</PostConnectCommands>
     <Project Name="FSMSendPack"/>
   </Dependencies>
   <Dependencies Name="Release"/>
+  <VirtualDirectory Name="FSMFilter">
+    <File Name="FSM_Filter.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>

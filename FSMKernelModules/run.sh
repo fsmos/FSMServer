@@ -25,9 +25,14 @@ rmmod FSM_Flash.ko
 rmmod FSM_DeviceProcess.ko
 rmmod FSM_Beep.ko
 rmmod FSM_CRC.ko
+rmmod FSM_Filter.ko
 
 path=""
 a+=""
+
+insmod FSM_Filter.ko
+a+="add-symbol-file $path FSM_Filter.ko $(cat /sys/module/FSM_Filter/sections/.text) -s .bss $(cat /sys/module/FSM_Filter/sections/.bss)\n"
+
 insmod FSM_Beep.ko
 a+="add-symbol-file $path FSM_Beep.ko $(cat /sys/module/FSM_Beep/sections/.text) -s .bss $(cat /sys/module/FSM_Beep/sections/.bss)\n"
 

@@ -33,6 +33,7 @@ TARGET31 =FSMTreeSetting
 TARGET32 =FSM_Flash
 TARGET33 =FSM_CRC
 TARGET34 =FSM_ControlPower
+TARGET35 =FSM_Filter
 
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
@@ -67,6 +68,7 @@ obj-m   += ${TARGET31}.o
 obj-m   += ${TARGET32}.o
 obj-m   += ${TARGET33}.o
 obj-m   += ${TARGET34}.o
+obj-m   += ${TARGET35}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules
