@@ -1,0 +1,11 @@
+{
+ "NodeJS": {
+  "metadata": {
+   "version": "1.0",
+   "ide": "CodeLite",
+   "type": "NodeJS"
+  },
+  "folders": ["/home/gusenkovs/fsmnode"],
+  "m_showHiddenFiles": false
+ }
+}
