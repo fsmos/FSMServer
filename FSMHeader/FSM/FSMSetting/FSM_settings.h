@@ -94,6 +94,8 @@
 #define FSM_EventIOCtlId 1
 #define FSM_StatistickIOCtlId 2
 
+#define FSM_opov_abonent_count FSM_PO06DeviceTreeSize
+#define FSM_opov_cabonent_count 100
 #define FSM_GPIO_BLOCK
 #endif	/* FSM_SETTINGS_H */
 //#define DEBUG_CALL_STACK

@@ -68,7 +68,8 @@ enum FSMST_VidDevice {
 enum FSMST_PodVidDevice {
     ComputerStatistic = 1, ///< ComputerStatistic
     FSM_SettingTree_D = 2,
-    FSM_Flash=3
+    FSM_Flash=3,
+    FSM_Statistic = 4
 };
 /*!
 \brief Род устроства
@@ -76,7 +77,8 @@ enum FSMST_PodVidDevice {
 enum FSMST_RodDevice {
     PCx86 = 1, ///< PCx86
     CTL_FSM_SettingTree_D = 2,
-    CTL_FSM_Flash = 3
+    CTL_FSM_Flash = 3,
+    CTL_FSM_Statistic = 4
 };
 enum FSMST_Cmd /*0*****125*/
 { GetStatistic = 1,

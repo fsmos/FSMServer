@@ -134,7 +134,7 @@ unsigned char fsm_po07_build[4];
             FSMPO07_CCKDevE.ver2=scmd->Data[14];
             FSMPO07_CCKDevE.ver3=scmd->Data[15];
             FSMPO07_CCKDevE.crcerror=0;
-            
+            FSMPO07_CCKDevE.audiostreamid= ((struct FSM_PO07Device*)to_dt->data)->idstream;
             if(FSMPO07_CCKDevE.channel==0) 
             {
             if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");

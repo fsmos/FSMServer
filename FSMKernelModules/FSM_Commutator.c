@@ -11,6 +11,7 @@
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 
 struct FSM_P2P_abonent FSM_P2P_fsmabon[FSM_P2P_abonent_count];
+struct FSM_opov_abonent FSM_opov_fsmabon[FSM_opov_abonent_count];
 
 unsigned short FSM_P2P_Connect(unsigned short id1, unsigned short id2)
 {
@@ -33,16 +34,53 @@ unsigned short FSM_P2P_Connect(unsigned short id1, unsigned short id2)
     return 0xffff;
 }
 EXPORT_SYMBOL(FSM_P2P_Connect);
+
+unsigned short FSM_Opov_Connect(unsigned short idorg, unsigned short* id,unsigned short count)
+{
+    int i = 0;
+    int j=0;
+
+    for(i = 0; i < FSM_opov_abonent_count; i++) {
+        if(FSM_opov_fsmabon[i].reg == 0) {
+            FSM_opov_fsmabon[i].reg = 1;
+            FSM_opov_fsmabon[i].idorg = idorg;
+            FSM_opov_fsmabon[i].idcon = i;
+            for(j=0;j<count;j++) FSM_opov_fsmabon[i].idstreams[i]=id[i];
+            FSM_AudioStreamSetIDConnect(idorg, i, opov);
+            FSM_AudioStreamSetToProcess(idorg, FSM_Commutator_Process);
+            return i;
+        }
+    }
+
+    return 0xffff;
+}
+EXPORT_SYMBOL(FSM_Opov_Connect);
+void FSM_Opov_Add(unsigned short idopov, unsigned short id)
+{
+
+    FSM_opov_fsmabon[idopov].idstreams[FSM_opov_fsmabon[idopov].count]=id;
+    FSM_opov_fsmabon[idopov].count++;
+}
+EXPORT_SYMBOL(FSM_Opov_Add);
+
 void FSM_P2P_Disconnect(unsigned short idcon)
 {
     FSM_P2P_fsmabon[idcon].reg = 0;
 }
 EXPORT_SYMBOL(FSM_P2P_Disconnect);
+
+void FSM_opov_Disconnect(unsigned short idcon)
+{
+    FSM_opov_fsmabon[idcon].reg = 0;
+}
+EXPORT_SYMBOL(FSM_opov_Disconnect);
+
 void FSM_Commutator_Process(char* data, short len)
 {
     struct FSM_SendAudioData* FSMAPk = (struct FSM_SendAudioData*)data;
     unsigned short idcon;
-
+    int i;
+    
     idcon = FSM_AudioStreamGETIDConnect(FSMAPk->IDDevice);
     if(idcon == 0xffff)
         return;
@@ -59,6 +97,14 @@ void FSM_Commutator_Process(char* data, short len)
                                   (char*)FSMAPk,
                                   sizeof(struct FSM_SendAudioData) - sizeof(FSMAPk->Data) + FSMAPk->len);
         }
+        break;
+     case opov:
+           
+           for(i=0;i<FSM_opov_fsmabon[idcon].count;i++)
+               {
+                   FSMAPk->IDDevice = FSM_opov_fsmabon[idcon].idstreams[i];
+                   FSM_AudioStreamToUser(FSM_opov_fsmabon[idcon].idstreams[i], data, sizeof(struct FSM_SendAudioData) - sizeof(FSMAPk->Data) + FSMAPk->len);
+               }
         break;
     }
     // fsmabon[idcon].idcon

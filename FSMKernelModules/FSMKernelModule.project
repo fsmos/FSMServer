@@ -29,7 +29,6 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="FSMKernelModules">
-    <File Name="FSMClientProtocol.c"/>
     <File Name="FSM_ControlDeviceClass.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSMDeviceManager">
@@ -230,15 +229,19 @@ source runs.prog</PostConnectCommands>
     <File Name="FSM_CRC.c"/>
     <File Name="FSM_Beep.c"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug">
-    <Project Name="FSMSendPack"/>
-  </Dependencies>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="FSMFilter">
     <File Name="FSM_Filter.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_Ctl">
     <File Name="FSMServerIODev.c"/>
     <File Name="FSMStatisticCtl.c"/>
+  </VirtualDirectory>
+  <Dependencies Name="Debug">
+    <Project Name="FSMSendPack"/>
+  </Dependencies>
+  <Dependencies Name="Release"/>
+  <VirtualDirectory Name="FSM_Ethernet">
+    <File Name="FSMClientProtocol.c"/>
+    <File Name="FSMTransportP.c"/>
   </VirtualDirectory>
 </CodeLite_Project>

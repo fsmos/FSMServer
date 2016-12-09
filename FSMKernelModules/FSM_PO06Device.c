@@ -71,6 +71,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
                 FSMPO06_fsmas.Data = &FSMPO06Dev[i];
                 FSMPO06Dev[i].idstream = FSM_AudioStreamRegistr(FSMPO06_fsmas);
                 FSMPO06Dev[i].iddev = to_dt->IDDevice;
+                FSMPO06Dev[i].opovid=0;
                 to_dt->data = &FSMPO06Dev[i];
                 to_dt->config = &FSMPO06Dev[i].po06set;
                 FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream, from_dt, to_dt);
@@ -140,7 +141,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             FSMPO06_CCKDevE.ver2=scmd->Data[14];
             FSMPO06_CCKDevE.ver3=scmd->Data[15];
             FSMPO06_CCKDevE.crcerror=0;
-            
+            FSMPO06_CCKDevE.audiostreamid= ((struct FSM_PO06Device*)to_dt->data)->idstream;
             if(FSMPO06_CCKDevE.channel==0) 
             {
             if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
@@ -174,6 +175,17 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
                        scmd->Data[1],
                        scmd->Data[2],
                        scmd->Data[3]);
+            break;
+            case   FSMPo06ConnectOpv:
+            if(((struct FSM_PO06Device*)(to_dt->data))->opovid==0)
+            {
+            ((struct FSM_PO06Device*)(to_dt->data))->opovid = FSM_Opov_Create(((struct FSM_PO06Device*)to_dt->data)->idstream);
+            printk(KERN_INFO "opv_create");
+            }
+            break;
+            case   FSMPo06DisConnectOpv:
+            FSM_opov_Disconnect(((struct FSM_PO06Device*)to_dt->data)->opovid);
+            ((struct FSM_PO06Device*)(to_dt->data))->opovid=0;
             break;
         }
 

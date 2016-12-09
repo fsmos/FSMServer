@@ -122,6 +122,7 @@ struct FSM_PO06Device
     int idcon;
     struct fsm_ethernet_dev* ethdev;
     struct fsm_po06_setting po06set;
+    unsigned short opovid
 };
 struct FSM_MN825Device
 {
@@ -175,6 +176,8 @@ enum FSMPO06Command /*0*****125*/
   FSMPo06Reregister = 11,
   FSMPo06GetCRC = 13,
   FSMPo06SendIP = 14,
+  FSMPo06ConnectOpv = 15,
+  FSMPo06DisConnectOpv = 16,
 };
 enum FSMMN825Command /*0*****125*/
 { FSMMN825SendStream = 1,
@@ -344,6 +347,7 @@ struct CCKDeviceInfo
     unsigned char ver3;
     unsigned char crcerror;
     unsigned int id_build;
+    unsigned short audiostreamid;
   
 };
 
@@ -368,5 +372,6 @@ void FSM_CCK_PO07_SendCMD_ReSet(enum FSMPO07Command fsmcmd, unsigned short IDDev
 void FSM_CCK_PO08_SendCMD(enum FSMPO08Command fsmcmd, unsigned short IDDevice);
 void FSM_CCK_PO08_SendCMD_Set(enum FSMPO08Command fsmcmd, unsigned short IDDevice);
 void FSM_CCK_PO08_SendCMD_ReSet(enum FSMPO08Command fsmcmd, unsigned short IDDevice);
+unsigned short FSM_Opov_Create(unsigned short idorg);
 #endif /* FCM_AUDIODEVICECLASS_H */
 

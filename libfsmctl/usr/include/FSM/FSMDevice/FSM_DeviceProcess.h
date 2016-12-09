@@ -18,6 +18,7 @@
 #include "FSM/FSM_Switch/fsm_switch.h"
 #include "FSM/FSM_Commutator/FSM_Commutator.h"
 #include "FSM/FSMDevice/fsm_electrodevice.h"
+#include "FSM/FSM_Filter/FSM_Filter.h"
 
 typedef struct FSM_DeviceTree FSM_DeviceTree_t;
 /*!

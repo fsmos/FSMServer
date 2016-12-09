@@ -5,6 +5,19 @@
 struct FSM_DeviceFunctionTree FSMCCK_dft;
 struct CCKDeviceInfo FSMCCK_CCKDev[FSM_CCKTreeSize];
 
+unsigned short FSM_Opov_Create(unsigned short idorg)
+{
+    int i;
+    unsigned short con_p = FSM_Opov_Connect(idorg,0,0);
+    for(i=0;i<FSM_CCKTreeSize;i++)
+    {
+        if((FSMCCK_CCKDev[i].type<=5)&&(FSMCCK_CCKDev[i].reg==1)) FSM_Opov_Add(con_p,FSMCCK_CCKDev[i].audiostreamid);
+    }
+   return con_p;
+}
+
+EXPORT_SYMBOL(FSM_Opov_Create);
+
 void FSM_CCKControlDeviceRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     // struct fsm_devices_config* fsmset;
@@ -53,6 +66,7 @@ void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK)
             FSMCCK_CCKDev[i].ver2= CCK->ver2;
             FSMCCK_CCKDev[i].ver3= CCK->ver3;
             FSMCCK_CCKDev[i].crcerror= CCK->crcerror;
+            FSMCCK_CCKDev[i].audiostreamid= CCK->audiostreamid;
             return;
         }
     }
@@ -76,6 +90,7 @@ void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK)
             FSMCCK_CCKDev[i].ver3= CCK->ver3;
             FSMCCK_CCKDev[i].crcerror= CCK->crcerror;
             FSMCCK_CCKDev[i].id_build= CCK->id_build;
+            FSMCCK_CCKDev[i].audiostreamid= CCK->audiostreamid;
             // printk( KERN_INFO "FSM CCK Device Added\n" );
             return;
         }

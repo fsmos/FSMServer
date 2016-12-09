@@ -18,6 +18,7 @@ rmmod FSMFIFOAudioStream.ko
 rmmod FSM_AudioStream.ko
 rmmod FSM_Crypt.ko
 rmmod FSMClientProtocol.ko
+rmmod FSMTransportP.ko
 rmmod FSMServerIODev.ko
 rmmod FSM_GPIO.ko
 rmmod FSMTreeSetting.ko
@@ -53,6 +54,9 @@ a+="add-symbol-file $path FSM_GPIO.ko $(cat /sys/module/FSM_GPIO/sections/.text)
 
 insmod FSMClientProtocol.ko
 a+="add-symbol-file $path FSMClientProtocol.ko $(cat /sys/module/FSMClientProtocol/sections/.text) -s .bss $(cat /sys/module/FSMClientProtocol/sections/.bss) \n"
+
+insmod FSMTransportP.ko
+a+="add-symbol-file $path FSMTransportP.ko $(cat /sys/module/FSMTransportP/sections/.text) -s .bss $(cat /sys/module/FSMTransportP/sections/.bss)\n"
 
 insmod FSMServerIODev.ko
 a+="add-symbol-file $path FSMServerIODev.ko $(cat /sys/module/FSMServerIODev/sections/.text) -s .bss $(cat /sys/module/FSMServerIODev/sections/.bss) \n"
@@ -113,6 +117,8 @@ a+="add-symbol-file $path FSM_SocialAnalytic.ko $(cat /sys/module/FSM_SocialAnal
 
 insmod FSM_ControlPower.ko
 a+="add-symbol-file $path FSM_ControlPower.ko $(cat /sys/module/FSM_ControlPower/sections/.text) -s .bss $(cat /sys/module/FSM_ControlPower/sections/.bss)\n"
+
+
 
 //./FSMSendPack 
 echo -e $a > runs.prog
