@@ -45,7 +45,8 @@ unsigned short FSM_Opov_Connect(unsigned short idorg, unsigned short* id,unsigne
             FSM_opov_fsmabon[i].reg = 1;
             FSM_opov_fsmabon[i].idorg = idorg;
             FSM_opov_fsmabon[i].idcon = i;
-            for(j=0;j<count;j++) FSM_opov_fsmabon[i].idstreams[i]=id[i];
+            FSM_opov_fsmabon[i].count = count;
+            for(j=0;j<count;j++) FSM_opov_fsmabon[i].idstreams[j]=id[j];
             FSM_AudioStreamSetIDConnect(idorg, i, opov);
             FSM_AudioStreamSetToProcess(idorg, FSM_Commutator_Process);
             return i;

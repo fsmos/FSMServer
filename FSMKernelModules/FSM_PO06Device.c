@@ -76,7 +76,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
                 to_dt->config = &FSMPO06Dev[i].po06set;
                 FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream, from_dt, to_dt);
                 printk(KERN_INFO "FSMPO06 Device Added %u \n", to_dt->IDDevice);
-
+                fsmad_prints("FSMPO06 Device Added");
                 FSM_P2P_Connect(FSMPO06Dev[i].idstream, 2);
 
                 // datas[0]=0xd0;

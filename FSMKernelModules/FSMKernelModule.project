@@ -235,6 +235,7 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_Ctl">
     <File Name="FSMServerIODev.c"/>
     <File Name="FSMStatisticCtl.c"/>
+    <File Name="FSM_VirtualCom.c"/>
   </VirtualDirectory>
   <Dependencies Name="Debug">
     <Project Name="FSMSendPack"/>
@@ -243,5 +244,8 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_Ethernet">
     <File Name="FSMClientProtocol.c"/>
     <File Name="FSMTransportP.c"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="FSM_AudioRead">
+    <File Name="FSM_ADConsole.c"/>
   </VirtualDirectory>
 </CodeLite_Project>
