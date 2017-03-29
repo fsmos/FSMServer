@@ -29,7 +29,7 @@ static int fsmad_curr;
 
 static char fsmad_buffer[fsmad_STR_SIZE + 4];
 
-static void fsmad_flush(void)
+void fsmad_flush(void)
 {
 	if (fsmad_curr > 0) {
 		fsmad_buffer[fsmad_curr] = '\0';
@@ -37,7 +37,7 @@ static void fsmad_flush(void)
 		fsmad_curr = 0;
 	}
 }
-static void fsmad_prints(const unsigned char *string)
+void fsmad_prints(const unsigned char *string)
 {
     
     if (!tty_buffer_request_room(&fsmadc_port.port, 1))
@@ -47,7 +47,7 @@ static void fsmad_prints(const unsigned char *string)
 }
 EXPORT_SYMBOL(fsmad_prints);
 
-static int fsmad_printk(const unsigned char *buf, int count)
+int fsmad_printk(const unsigned char *buf, int count)
 {
 	int i = fsmad_curr;
 

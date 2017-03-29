@@ -122,7 +122,7 @@ struct FSM_PO06Device
     int idcon;
     struct fsm_ethernet_dev* ethdev;
     struct fsm_po06_setting po06set;
-    unsigned short opovid
+    unsigned short opovid;
 };
 struct FSM_MN825Device
 {

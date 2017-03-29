@@ -53,6 +53,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
 
     case RegDevice: ///< Регистрация устройства
         FSM_Statstic_SetStatus(to_dt, "ok");
+        fsmad_prints("FSMPO06 Устроство добавлено");
         for(i = 0; i < FSM_PO06DeviceTreeSize; i++) {
             if(FSMPO06Dev[i].iddev == to_dt->IDDevice) {
                 FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream, from_dt, to_dt);
@@ -76,7 +77,6 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
                 to_dt->config = &FSMPO06Dev[i].po06set;
                 FSM_PO06SendStreaminfo(FSMPO06Dev[i].idstream, from_dt, to_dt);
                 printk(KERN_INFO "FSMPO06 Device Added %u \n", to_dt->IDDevice);
-                fsmad_prints("FSMPO06 Device Added");
                 FSM_P2P_Connect(FSMPO06Dev[i].idstream, 2);
 
                 // datas[0]=0xd0;
@@ -141,7 +141,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             FSMPO06_CCKDevE.ver2=scmd->Data[14];
             FSMPO06_CCKDevE.ver3=scmd->Data[15];
             FSMPO06_CCKDevE.crcerror=0;
-            FSMPO06_CCKDevE.audiostreamid= ((struct FSM_PO06Device*)to_dt->data)->idstream;
+            if(to_dt->data!=0) FSMPO06_CCKDevE.audiostreamid= ((struct FSM_PO06Device*)to_dt->data)->idstream;
             if(FSMPO06_CCKDevE.channel==0) 
             {
             if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");

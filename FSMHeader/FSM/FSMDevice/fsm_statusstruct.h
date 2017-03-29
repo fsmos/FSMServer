@@ -322,7 +322,7 @@ void FSM_FlashRecive(char* data, short len, struct FSM_DeviceTree* to_dt);
 
 
 void FSM_CTL_flash_Start(unsigned short IDDevice);
-static int fsmad_printk(const unsigned char *buf, int count);
-static void fsmad_prints(const unsigned char *string);
+int fsmad_printk(const unsigned char *buf, int count);
+void fsmad_prints(const unsigned char *string);
 
 #endif // FSM_STATUSSTRUCT

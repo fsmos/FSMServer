@@ -135,7 +135,7 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             FSMMN825_CCKDevE.ver2=scmd->Data[14];
             FSMMN825_CCKDevE.ver3=scmd->Data[15];
             FSMMN825_CCKDevE.crcerror=0;
-            FSMMN825_CCKDevE.audiostreamid= ((struct FSM_MN825Device*)to_dt->data)->idstream;
+            if(to_dt->data!=0) FSMMN825_CCKDevE.audiostreamid= ((struct FSM_MN825Device*)to_dt->data)->idstream;
             if(FSMMN825_CCKDevE.channel==0) 
             {
             if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");

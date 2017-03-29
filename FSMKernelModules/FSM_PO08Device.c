@@ -134,7 +134,7 @@ unsigned char fsm_po08_build[4];
             FSMPO08_CCKDevE.ver2=scmd->Data[14];
             FSMPO08_CCKDevE.ver3=scmd->Data[15];
             FSMPO08_CCKDevE.crcerror=0;
-            FSMPO08_CCKDevE.audiostreamid= ((struct FSM_PO08Device*)to_dt->data)->idstream;
+            if(to_dt->data!=0) FSMPO08_CCKDevE.audiostreamid= ((struct FSM_PO08Device*)to_dt->data)->idstream;
             
             if(FSMPO08_CCKDevE.channel==0) 
             {
