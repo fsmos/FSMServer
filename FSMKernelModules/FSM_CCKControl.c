@@ -18,6 +18,39 @@ unsigned short FSM_Opov_Create(unsigned short idorg)
 
 EXPORT_SYMBOL(FSM_Opov_Create);
 
+unsigned short FSM_CCKGetListR168(unsigned short* Data)
+{
+    int i,count;
+    count=0;
+    for(i=0;i<FSM_CCKTreeSize;i++)
+    {
+        if((FSMCCK_CCKDev[i].type==MN825)&&(FSMCCK_CCKDev[i].reg==1)) 
+        {
+            Data[count] = FSMCCK_CCKDev[i].id;
+            count++;
+        }
+    }
+   return count;
+}
+
+EXPORT_SYMBOL(FSM_CCKGetListR168);
+
+unsigned short FSM_CCKGetInfoR168(unsigned short* Data,unsigned short id)
+{
+    int i,count;
+    count=0;
+    for(i=0;i<FSM_CCKTreeSize;i++)
+    {
+        if((FSMCCK_CCKDev[i].id==id)&&(FSMCCK_CCKDev[i].reg==1)) 
+        {
+            memcpy(Data,&FSMCCK_CCKDev[i],sizeof(struct CCKDeviceInfo));
+            count++;
+        }
+    }
+   return count;
+}
+
+EXPORT_SYMBOL(FSM_CCKGetInfoR168);
 void FSM_CCKControlDeviceRecive(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
     // struct fsm_devices_config* fsmset;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="FSMKernelModule" InternalType="">
+<CodeLite_Project Name="FSMKernelModule" InternalType="" Version="10.0.0">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
@@ -88,9 +88,9 @@
     <File Name="FSMFIFOAudioStream.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_PO0">
-    <File Name="FSM_PO06Device.c"/>
     <File Name="FSM_PO07Device.c"/>
     <File Name="FSM_PO08Device.c"/>
+    <File Name="FSM_PO06Device.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_Statistic">
     <File Name="FSM_StatisticServer.c"/>

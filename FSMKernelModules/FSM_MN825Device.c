@@ -68,6 +68,11 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
                 FSMMN825_fsmas.Data = &FSMMN825Dev[i];
                 FSMMN825Dev[i].idstream = FSM_AudioStreamRegistr(FSMMN825_fsmas);
                 FSMMN825Dev[i].iddev = to_dt->IDDevice;
+                FSMMN825Dev[i].rwbuf.free=92;
+                FSMMN825Dev[i].rwbuf.rd_ptr=0;
+                FSMMN825Dev[i].rwbuf.wr_ptr=0;
+                FSMMN825Dev[i].r168kb100client=0;
+                FSMMN825Dev[i].r168kb100client_cmd=0;
                 to_dt->data = &FSMMN825Dev[i];
                 to_dt->config = &FSMMN825Dev[i].mn825set;
                 FSM_MN825SendStreaminfo(FSMMN825Dev[i].idstream, from_dt, to_dt);
@@ -135,7 +140,14 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             FSMMN825_CCKDevE.ver2=scmd->Data[14];
             FSMMN825_CCKDevE.ver3=scmd->Data[15];
             FSMMN825_CCKDevE.crcerror=0;
-            if(to_dt->data!=0) FSMMN825_CCKDevE.audiostreamid= ((struct FSM_MN825Device*)to_dt->data)->idstream;
+            if(to_dt->data!=0) 
+            {
+                    FSMMN825_CCKDevE.audiostreamid= ((struct FSM_MN825Device*)to_dt->data)->idstream;
+                    ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_type = scmd->Data[20];
+                    ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_port[0] = scmd->Data[21];
+                    ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_port[1] = scmd->Data[22];
+                    
+            }
             if(FSMMN825_CCKDevE.channel==0) 
             {
             if(to_dt->dt->crcfw==0) printk( KERN_ERR "Firmware CRC Not Check\n");
@@ -169,6 +181,28 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
                        scmd->Data[1],
                        scmd->Data[2],
                        scmd->Data[3]);
+            break;
+        case FSMMN825R168100KB_Packet:
+            if(((struct FSM_MN825Device*)(to_dt->data))->r168kb100client != 0 )
+            {
+                scmd->IDDevice = ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client->IDDevice;
+                scmd->opcode = PacketToDevice; 
+                scmd->cmd = ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client_cmd;
+                ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client->dt->Proc(data,len,((struct FSM_MN825Device*)(to_dt->data))->r168kb100client,to_dt);
+                printk(KERN_INFO "FSM NPP 0x%02x,0x%02x ",scmd->Data[0],scmd->Data[1] );
+                return;
+            } 
+            scmd->IDDevice = to_dt->IDDevice;
+            scmd->opcode = SendCmdToDevice;
+            if(((struct FSM_MN825Device*)to_dt->data)->rwbuf.free>0) 
+            {
+            memcpy(((struct FSM_MN825Device*)to_dt->data)->rwbuf.bfel[((struct FSM_MN825Device*)to_dt->data)->rwbuf.wr_ptr].Dates,scmd->Data,  scmd->countparam);
+            ((struct FSM_MN825Device*)to_dt->data)->rwbuf.bfel[((struct FSM_MN825Device*)to_dt->data)->rwbuf.wr_ptr].len = scmd->countparam;
+            ((struct FSM_MN825Device*)to_dt->data)->rwbuf.free --;
+            ((struct FSM_MN825Device*)to_dt->data)->rwbuf.wr_ptr++;
+            if(((struct FSM_MN825Device*)to_dt->data)->rwbuf.wr_ptr>91) ((struct FSM_MN825Device*)to_dt->data)->rwbuf.wr_ptr=0;
+            }
+            printk(KERN_INFO "FSM NRP 0x%02x,0x%02x ",scmd->Data[0],scmd->Data[1] );
             break;
         }
 
@@ -207,6 +241,35 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             break;
         case FSMMN825GetCRC:
 
+            break;
+        case FSMMN825R168100KB_Packet:
+            scmd->IDDevice = to_dt->IDDevice;
+            scmd->opcode = SendCmdToDevice;
+            to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + scmd->countparam, to_dt->TrDev, to_dt);
+            scmd->opcode = PacketToUserSpace;
+            scmd->countparam =0;
+            break;
+            
+        case FSMMN825R168100KB_PacketUDP:
+            scmd->opcode = PacketToUserSpace;
+            scmd->countparam = 0;
+            while(((struct FSM_MN825Device*)to_dt->data)->rwbuf.free<92) 
+            {
+                scmd->opcode = PacketToUserSpace;
+                memcpy(scmd->Data+scmd->countparam,((struct FSM_MN825Device*)to_dt->data)->rwbuf.bfel[((struct FSM_MN825Device*)to_dt->data)->rwbuf.rd_ptr].Dates,((struct FSM_MN825Device*)to_dt->data)->rwbuf.bfel[((struct FSM_MN825Device*)to_dt->data)->rwbuf.rd_ptr].len  );
+                scmd->countparam += ((struct FSM_MN825Device*)to_dt->data)->rwbuf.bfel[((struct FSM_MN825Device*)to_dt->data)->rwbuf.rd_ptr].len;
+                ((struct FSM_MN825Device*)to_dt->data)->rwbuf.free ++;
+                ((struct FSM_MN825Device*)to_dt->data)->rwbuf.rd_ptr++;
+                if(((struct FSM_MN825Device*)to_dt->data)->rwbuf.rd_ptr>91) ((struct FSM_MN825Device*)to_dt->data)->rwbuf.rd_ptr=0;
+                
+            }
+        break;
+        }
+    case PacketToDevice:
+        switch(scmd->cmd) {
+        case FSMMN825R168100KB_Packet:
+            scmd->opcode = SendCmdToDevice;
+            to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + scmd->countparam, to_dt->TrDev, to_dt);
             break;
         }
         break;

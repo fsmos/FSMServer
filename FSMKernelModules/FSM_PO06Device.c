@@ -49,6 +49,8 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
     unsigned char fsm_po06_crc32[4];
     unsigned char fsm_po06_ramst[2];
     unsigned char fsm_po06_build[4];
+    unsigned char fsm_po06_cfgsize[4];
+    struct FSM_DeviceTree* fsmdv;
     switch(data[0]) {
 
     case RegDevice: ///< Регистрация устройства
@@ -166,6 +168,11 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             fsm_po06_build[1] = scmd->Data[17];
             fsm_po06_build[2] = scmd->Data[18];
             fsm_po06_build[3] = scmd->Data[19];
+            fsm_po06_cfgsize[0] = scmd->Data[20];
+            fsm_po06_cfgsize[1] = scmd->Data[21];
+            fsm_po06_cfgsize[2] = scmd->Data[22];
+            fsm_po06_cfgsize[3] = scmd->Data[23];
+            if(to_dt->data!=0) memcpy(&(((struct FSM_PO06Device*)to_dt->data)->po06set.fsm_p006_su_s),scmd->Data+24,((unsigned int*)fsm_po06_build)[0]);
             FSMPO06_CCKDevE.id_build=((unsigned int*)fsm_po06_build)[0];
             FSMCCK_AddDeviceInfo(&FSMPO06_CCKDevE);
             if(to_dt->debug)
@@ -175,6 +182,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
                        scmd->Data[1],
                        scmd->Data[2],
                        scmd->Data[3]);
+            printk(KERN_INFO "Size Config %i", ((unsigned int*)fsm_po06_cfgsize)[0] );
             break;
             case   FSMPo06ConnectOpv:
             if(((struct FSM_PO06Device*)(to_dt->data))->opovid==0)
@@ -187,6 +195,67 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             FSM_opov_Disconnect(((struct FSM_PO06Device*)to_dt->data)->opovid);
             ((struct FSM_PO06Device*)(to_dt->data))->opovid=0;
             break;
+            
+            case FSMPo06KB100_SendPacket:
+            if(((struct FSM_PO06Device*)(to_dt->data))->r168kb100 ==0)
+            {   
+                printk(KERN_INFO "ConError");      
+                return;
+            }
+            scmd->IDDevice = ((struct FSM_PO06Device*)(to_dt->data))->r168kb100->IDDevice;
+            scmd->opcode = PacketToDevice;
+            scmd->cmd = FSMMN825R168100KB_Packet;
+            ((struct FSM_PO06Device*)(to_dt->data))->r168kb100->dt->Proc(data,len,((struct FSM_PO06Device*)(to_dt->data))->r168kb100,to_dt);
+            printk(KERN_INFO "FSM NP %i 0x%02x,0x%02x 0x%02x,0x%02x",scmd->countparam,scmd->Data[0],scmd->Data[1],scmd->Data[2],scmd->Data[3] );
+            break;
+            
+            case FSMPo06KB100_Connect:
+            fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
+            if(fsmdv == 0 ) 
+            {
+                printk(KERN_INFO "FSM ENP1 %i", ((unsigned short*)scmd->Data)[0]);
+                return;
+            }
+            ((struct FSM_PO06Device*)(to_dt->data))->r168kb100 = fsmdv;
+            ((struct FSM_MN825Device*)(fsmdv->data))->r168kb100client = to_dt;
+            ((struct FSM_MN825Device*)(fsmdv->data))->r168kb100client_cmd = FSMPo06KB100_SendPacket;
+            printk(KERN_INFO "FSM FNP1 %i", ((unsigned short*)scmd->Data)[0]);
+            break;
+            
+            case FSMPo06KB100_DisConnect:
+            ((struct FSM_PO06Device*)(to_dt->data))->r168kb100 = 0;
+            fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
+            if(fsmdv == 0 ) 
+            {
+                printk(KERN_INFO "FSM NP %i", ((unsigned short*)scmd->Data)[0]);
+                return;
+            }
+            if(((struct FSM_MN825Device*)(fsmdv->data))->r168kb100client == to_dt) ((struct FSM_MN825Device*)(fsmdv->data))->r168kb100client = 0;
+            break;
+            case FSMPo06R168_Light:
+            scmd->opcode = SendCmdToDevice;
+            scmd->countparam = FSM_CCKGetListR168(scmd->Data);
+            to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + (scmd->countparam*2), to_dt->TrDev, to_dt);
+            break;
+            case FSMPo06R168_GetDats:
+            scmd->opcode = SendCmdToDevice;
+            fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
+            if(fsmdv == 0) return;
+            FSM_CCKGetInfoR168(&FSMPO06_CCKDevE,((unsigned short*)(scmd->Data))[0]);
+            scmd->Data[0] = ((struct FSM_MN825Device*)fsmdv->data)->r168kb100client_type;
+            scmd->Data[1] = FSMPO06_CCKDevE.ip[0];
+            scmd->Data[2] = FSMPO06_CCKDevE.ip[1];
+            scmd->Data[3] = FSMPO06_CCKDevE.ip[2];
+            scmd->Data[4] = FSMPO06_CCKDevE.ip[3];
+            scmd->Data[5] = ((struct FSM_MN825Device*)fsmdv->data)->r168kb100client_port[0];
+            scmd->Data[6] = ((struct FSM_MN825Device*)fsmdv->data)->r168kb100client_port[1];
+            scmd->Data[7] = FSMPO06_CCKDevE.channel;
+            scmd->countparam = 8;
+            to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + (scmd->countparam), to_dt->TrDev, to_dt);
+            printk(KERN_INFO "FSM DR1 %i", ((unsigned short*)scmd->Data)[0]);
+            break;
+            
+            
         }
 
         break;
@@ -200,6 +269,14 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
         break;
     case Beep: ///<Звук
         break;
+    case PacketToDevice:
+        switch(scmd->cmd) {
+        case FSMPo06KB100_SendPacket:
+            scmd->opcode = SendCmdToDevice;
+            to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + scmd->countparam, to_dt->TrDev, to_dt);
+            printk(KERN_INFO "PTD\n");
+            break;
+        }
     default:
         break;
     }

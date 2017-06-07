@@ -7,6 +7,8 @@
 */
 #ifndef FCM_AUDIODEVICECLASS_H
 #define FCM_AUDIODEVICECLASS_H
+
+#include "FSM/FSMDevice/subscriber.h"
 /*!
 \brief Вид устроства
 */
@@ -90,7 +92,7 @@ struct fsm_mn921_subscriber
 
 struct fsm_po06_setting
 {
-    struct fsm_po06_subscriber fsm_p006_su_s;
+    CPO06_Config fsm_p006_su_s;
     // struct fsm_po06_serversetting fsm_p006_se_s;
 };
 struct fsm_po07_setting
@@ -123,6 +125,19 @@ struct FSM_PO06Device
     struct fsm_ethernet_dev* ethdev;
     struct fsm_po06_setting po06set;
     unsigned short opovid;
+    struct FSM_DeviceTree* r168kb100;
+};
+struct FSM_R168KB100_RWBufEl
+{
+    char Dates[16];
+    char len;
+};
+struct FSM_R168KB100_RWBuf
+{
+    struct FSM_R168KB100_RWBufEl bfel[92];
+    char rd_ptr;
+    char wr_ptr;
+    char free;
 };
 struct FSM_MN825Device
 {
@@ -132,6 +147,11 @@ struct FSM_MN825Device
     int idcon;
     struct fsm_ethernet_dev* ethdev;
     struct fsm_mn825_setting mn825set;
+    struct FSM_R168KB100_RWBuf rwbuf;
+    struct FSM_DeviceTree* r168kb100client;
+    unsigned short r168kb100client_cmd;
+    unsigned char r168kb100client_type;
+    unsigned char r168kb100client_port[2];
 };
 struct FSM_MN921Device
 {
@@ -150,6 +170,7 @@ struct FSM_PO08Device
     int idcon;
     struct fsm_ethernet_dev* ethdev;
     struct fsm_po08_setting po08set;
+    struct FSM_DeviceTree* r168kb100;
 };
 struct FSM_PO07Device
 {
@@ -178,6 +199,11 @@ enum FSMPO06Command /*0*****125*/
   FSMPo06SendIP = 14,
   FSMPo06ConnectOpv = 15,
   FSMPo06DisConnectOpv = 16,
+  FSMPo06KB100_Connect = 17,
+  FSMPo06KB100_SendPacket = 18,
+  FSMPo06KB100_DisConnect = 19,
+  FSMPo06R168_Light = 20,
+  FSMPo06R168_GetDats = 21,
 };
 enum FSMMN825Command /*0*****125*/
 { FSMMN825SendStream = 1,
@@ -193,7 +219,8 @@ enum FSMMN825Command /*0*****125*/
   FSMMN825SetTangenta = 12,
   FSMMN825GetCRC = 13,
   FSMMN825SendIP = 14,
-
+  FSMMN825R168100KB_Packet = 15,
+  FSMMN825R168100KB_PacketUDP = 16,
 };
 enum FSMMN921Command /*0*****125*/
 { FSMMN921SendStream = 1,
@@ -236,7 +263,11 @@ enum FSMPO08Command /*0*****125*/
   FSMPo08Reregister = 11,
   FSMPo08GetCRC = 13,
   FSMPo08SendIP = 14,
-
+  FSMPo08KB100_Connect = 15,
+  FSMPo08KB100_SendPacket = 16,
+  FSMPo08KB100_DisConnect = 17,
+  FSMPo08R168_Light = 18,
+  FSMPo08R168_GetDats = 19,
 };
 
 struct FSME1Pkt
@@ -373,5 +404,7 @@ void FSM_CCK_PO08_SendCMD(enum FSMPO08Command fsmcmd, unsigned short IDDevice);
 void FSM_CCK_PO08_SendCMD_Set(enum FSMPO08Command fsmcmd, unsigned short IDDevice);
 void FSM_CCK_PO08_SendCMD_ReSet(enum FSMPO08Command fsmcmd, unsigned short IDDevice);
 unsigned short FSM_Opov_Create(unsigned short idorg);
+unsigned short FSM_CCKGetListR168(unsigned short* Data);
+unsigned short FSM_CCKGetInfoR168(unsigned short* Data,unsigned short id);
 #endif /* FCM_AUDIODEVICECLASS_H */
 

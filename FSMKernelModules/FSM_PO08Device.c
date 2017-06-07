@@ -43,6 +43,7 @@ void FSM_PO08Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
 unsigned char fsm_po08_ramst[2];
 unsigned char fsm_po08_build[4];
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
+    struct FSM_DeviceTree* fsmdv;
 // char datas[2];
 
     switch(data[0]) {
@@ -67,6 +68,7 @@ unsigned char fsm_po08_build[4];
                 FSMPO08_fsmas.Data = &FSMPO08Dev[i];
                 FSMPO08Dev[i].idstream = FSM_AudioStreamRegistr(FSMPO08_fsmas);
                 FSMPO08Dev[i].iddev = to_dt->IDDevice;
+                FSMPO08Dev[i].r168kb100 =0;
                 to_dt->data = &FSMPO08Dev[i];
                 to_dt->config = &FSMPO08Dev[i].po08set;
                 FSM_PO08SendStreaminfo(FSMPO08Dev[i].idstream, from_dt, to_dt);
@@ -171,6 +173,63 @@ unsigned char fsm_po08_build[4];
                        scmd->Data[2],
                        scmd->Data[3]);
             break;
+            
+        case FSMPo08KB100_SendPacket:
+            if(((struct FSM_PO08Device*)(to_dt->data))->r168kb100 ==0)
+            {   
+                printk(KERN_INFO "ConError");      
+                return;
+            }
+            scmd->IDDevice = ((struct FSM_PO08Device*)(to_dt->data))->r168kb100->IDDevice;
+            scmd->opcode = PacketToDevice;
+            scmd->cmd = FSMMN825R168100KB_Packet;
+            ((struct FSM_PO08Device*)(to_dt->data))->r168kb100->dt->Proc(data,len,((struct FSM_PO08Device*)(to_dt->data))->r168kb100,to_dt);
+            printk(KERN_INFO "FSM NP %i 0x%02x,0x%02x 0x%02x,0x%02x",scmd->countparam,scmd->Data[0],scmd->Data[1],scmd->Data[2],scmd->Data[3] );
+            break;
+        case FSMPo08KB100_Connect:
+            fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
+            if(fsmdv == 0 ) 
+            {
+                printk(KERN_INFO "FSM ENP1 %i", ((unsigned short*)scmd->Data)[0]);
+                return;
+            }
+            ((struct FSM_PO08Device*)(to_dt->data))->r168kb100 = fsmdv;
+            ((struct FSM_MN825Device*)(fsmdv->data))->r168kb100client = to_dt;
+            ((struct FSM_MN825Device*)(fsmdv->data))->r168kb100client_cmd = FSMPo08KB100_SendPacket;
+            printk(KERN_INFO "FSM FNP1 %i", ((unsigned short*)scmd->Data)[0]);
+            break;
+        case FSMPo08KB100_DisConnect:
+            ((struct FSM_PO08Device*)(to_dt->data))->r168kb100 = 0;
+            fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
+            if(fsmdv == 0 ) 
+            {
+                printk(KERN_INFO "FSM NP %i", ((unsigned short*)scmd->Data)[0]);
+                return;
+            }
+            if(((struct FSM_MN825Device*)(fsmdv->data))->r168kb100client == to_dt) ((struct FSM_MN825Device*)(fsmdv->data))->r168kb100client = 0;
+            break;
+        case FSMPo08R168_Light:
+            scmd->opcode = SendCmdToDevice;
+            scmd->countparam = FSM_CCKGetListR168(scmd->Data);
+            to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + (scmd->countparam*2), to_dt->TrDev, to_dt);
+            break;
+        case FSMPo08R168_GetDats:
+            scmd->opcode = SendCmdToDevice;
+            fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
+            if(fsmdv == 0) return;
+            FSM_CCKGetInfoR168(&FSMPO08_CCKDevE,((unsigned short*)(scmd->Data))[0]);
+            scmd->Data[0] = ((struct FSM_MN825Device*)fsmdv->data)->r168kb100client_type;
+            scmd->Data[1] = FSMPO08_CCKDevE.ip[0];
+            scmd->Data[2] = FSMPO08_CCKDevE.ip[1];
+            scmd->Data[3] = FSMPO08_CCKDevE.ip[2];
+            scmd->Data[4] = FSMPO08_CCKDevE.ip[3];
+            scmd->Data[5] = ((struct FSM_MN825Device*)fsmdv->data)->r168kb100client_port[0];
+            scmd->Data[6] = ((struct FSM_MN825Device*)fsmdv->data)->r168kb100client_port[1];
+            scmd->Data[7] = FSMPO08_CCKDevE.channel;
+            scmd->countparam = 8;
+            to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + (scmd->countparam), to_dt->TrDev, to_dt);
+            printk(KERN_INFO "FSM DR1 %i", ((unsigned short*)scmd->Data)[0]);
+            break;
         }
 
         break;
@@ -210,6 +269,14 @@ unsigned char fsm_po08_build[4];
         break;
     case Beep: ///<Звук
         break;
+    
+    case PacketToDevice:
+        switch(scmd->cmd) {
+        case FSMPo08KB100_SendPacket:
+            scmd->opcode = SendCmdToDevice;
+            to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + scmd->countparam, to_dt->TrDev, to_dt);
+            break;
+        }
     default:
         break;
     }
@@ -231,9 +298,11 @@ void ApplaySettingPO08(struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from
     FSMPO08_sendcmd.IDDevice = to_dt->IDDevice;
     FSMPO08_sendcmd.CRC = 0;
     FSMPO08_sendcmd.opcode = SendCmdToDevice;
-    memcpy(&FSMPO08_sendcmd.Data,
+    memcpy(
+           &FSMPO08_sendcmd.Data,
            &(((struct FSM_PO08Device*)to_dt->data)->po08set.fsm_p008_su_s),
-           sizeof(struct fsm_po08_subscriber));
+           sizeof(struct fsm_po08_subscriber)
+           );
     from_dt->dt->Proc((char*)&FSMPO08_sendcmd,
                       sizeof(struct FSM_SendCmd) - sizeof(FSMPO08_sendcmd.Data) + sizeof(struct fsm_po08_subscriber),
                       from_dt,
