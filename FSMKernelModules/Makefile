@@ -37,6 +37,7 @@ TARGET35 =FSM_Filter
 TARGET36 =FSMStatisticCtl
 TARGET37 =FSMTransportP
 TARGET38 =FSM_ADConsole
+TARGET39 =FSM_TCPServer
 
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
@@ -75,6 +76,7 @@ obj-m   += ${TARGET35}.o
 obj-m   += ${TARGET36}.o
 obj-m   += ${TARGET37}.o
 obj-m   += ${TARGET38}.o
+obj-m   += ${TARGET39}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules

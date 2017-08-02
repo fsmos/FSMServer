@@ -10,7 +10,7 @@
 #include <linux/module.h>
 #include <linux/netdevice.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
-
+#include "FSM/FSM_Client/FSM_client.h"
 #include <linux/netfilter.h>
 
 //struct sock* nl_sk = NULL;
@@ -55,6 +55,29 @@ drop:
     kfree_skb(skb);
     return NET_XMIT_DROP;
 }
+
+
+int FSM_Start_Discovery(unsigned short id)
+{
+    struct FSM_Device_Discovery_header regp;
+    struct fsm_ethernet_dev fsmdev;
+    memset(&fsmdev, 0, sizeof(fsmdev));
+    regp.IDDevice = id;
+    regp.opcode = FSM_Device_Discovery;
+    regp.CRC = 0;
+    memset(fsmdev.destmac, 0xFF, 6);
+
+    fsmdev.dev = first_net_device(&init_net);
+
+    while(fsmdev.dev) {
+        FSM_Send_Ethernet_Package(&regp, sizeof(regp), &fsmdev);
+        fsmdev.dev = next_net_device(fsmdev.dev);
+    }
+    return 2;
+}
+
+
+EXPORT_SYMBOL(FSM_Start_Discovery);
 
 unsigned int FSM_Send_Ethernet_Package(void* data, int len, struct fsm_ethernet_dev* fsmdev)
 {
@@ -192,7 +215,7 @@ int
 FSMClientProtocol_pack_rcv(struct sk_buff* skb, struct net_device* dev, struct packet_type* pt, struct net_device* odev)
 {
     struct FSM_DeviceTree* dftv;
-
+    struct fsm_ethernet_dev tmp_eth_dev;
     char dats = ((char*)skb->data)[0];
     struct ethhdr* eth = eth_hdr(skb);
     if(skb->pkt_type == PACKET_OTHERHOST || skb->pkt_type == PACKET_LOOPBACK)
@@ -436,6 +459,47 @@ FSMClientProtocol_pack_rcv(struct sk_buff* skb, struct net_device* dev, struct p
         FSM_TreeRecive((char*)skb->data, skb->len, dftv);
         goto clear;
         break;
+    case FSM_Device_Discovery:
+        tmp_eth_dev.dev = dev;
+        tmp_eth_dev.id = 0;
+        memcpy(tmp_eth_dev.destmac, eth->h_source, 6);
+        dftv = FSM_FindDevice(((struct FSM_Device_Discovery_header*)skb->data)->IDDevice);
+        if(dftv == 0) {
+            printk(KERN_INFO "Discovery Not Finded \n");
+            goto clear;
+        }
+        ((struct FSM_Device_Finded_header*)skb->data)->opcode = FSM_Device_Finded;
+        ((struct FSM_Device_Finded_header*)skb->data)->type = dftv->dt->type;
+        ((struct FSM_Device_Finded_header*)skb->data)->VidDevice = dftv->dt->VidDevice;
+        ((struct FSM_Device_Finded_header*)skb->data)->PodVidDevice = dftv->dt->PodVidDevice;
+        ((struct FSM_Device_Finded_header*)skb->data)->KodDevice = dftv->dt->KodDevice;
+        FSM_Send_Ethernet_Package(skb->data, sizeof(struct FSM_Device_Finded_header), &tmp_eth_dev);
+        break;
+    case FSM_Device_Finded:
+        if(FSM_RegisterEthernetDevice((struct FSM_DeviceRegistr*)skb->data, dev, eth->h_source) == 0) {
+            if(FSM_DeviceExternalRegister(*((struct FSM_Device_Finded_header*)skb->data)) != 0)
+                goto clear;
+        }
+        dftv = FSM_FindDevice(((struct FSM_DeviceRegistr*)skb->data)->IDDevice);
+        if(dftv == 0) {
+            printk(KERN_INFO "Eror \n");
+            goto clear;
+        }
+        // printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice);
+        dftv->TrDev = FSM_Ethernet_dt;
+        break;
+    case PacketToDevice:
+        tmp_eth_dev.dev = dev;
+        tmp_eth_dev.id = 0;
+        memcpy(tmp_eth_dev.destmac, eth->h_source, 6);
+        dftv = FSM_FindDevice(((struct FSM_Device_Discovery_header*)skb->data)->IDDevice);
+        if(dftv == 0) {
+            printk(KERN_INFO "Discovery Not Finded \n");
+            goto clear;
+        }
+        dftv->dt->Proc((char*)skb->data, sizeof(struct FSM_DeviceRegistr), dftv, FSM_Ethernet_dt);
+    break;
+
     }
 
 /*fsdev.destmac[0]=0xa0;

@@ -22,7 +22,6 @@ void FSM_MN825SendStreaminfo(unsigned short id, struct FSM_DeviceTree* to_dt, st
 {
     short plen;
 
-
     memset(&FSMMN825_sendcmd, 0, sizeof(struct FSM_SendCmd));
     FSMMN825_sendcmd.opcode = SendCmdToDevice;
     FSMMN825_sendcmd.IDDevice = from_dt->IDDevice;
@@ -43,6 +42,7 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
       unsigned char fsm_mn825_crc32[4];
     unsigned char fsm_mn825_ramst[2];
     unsigned char fsm_mn825_build[4];
+    struct FSM_DeviceTree* fsmdv;
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
 // char datas[2];
 
@@ -270,6 +270,36 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
         case FSMMN825R168100KB_Packet:
             scmd->opcode = SendCmdToDevice;
             to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + scmd->countparam, to_dt->TrDev, to_dt);
+            break;
+        case FSMMN825R168_GetDats:
+            fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
+            if(fsmdv == 0) 
+            {
+                FSM_Start_Discovery(((unsigned short*)scmd->Data)[0]);
+                return;
+            }
+            
+            FSM_CCKGetInfoR168(&FSMMN825_CCKDevE,((unsigned short*)(scmd->Data))[0]);
+            scmd->Data[0] = ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_type;
+            scmd->Data[1] = FSMMN825_CCKDevE.ip[0];
+            scmd->Data[2] = FSMMN825_CCKDevE.ip[1];
+            scmd->Data[3] = FSMMN825_CCKDevE.ip[2];
+            scmd->Data[4] = FSMMN825_CCKDevE.ip[3];
+            scmd->Data[5] = ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_port[0];
+            scmd->Data[6] = ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_port[1];
+            scmd->Data[7] = FSMMN825_CCKDevE.channel;
+            scmd->countparam = 8;
+            fsmdv->dt->Proc(data,FSMH_Header_Size_SendCmd + scmd->countparam,fsmdv,to_dt);
+        case FSMMN825R168_SetCP:
+            fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
+            if(fsmdv == 0) 
+            {
+                FSM_Start_Discovery(((unsigned short*)scmd->Data)[0]);
+                return;
+            }
+            ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client = fsmdv;
+            ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client_cmd = ((unsigned short*)scmd->Data)[0];
+            
             break;
         }
         break;

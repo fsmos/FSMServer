@@ -248,4 +248,7 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_AudioRead">
     <File Name="FSM_ADConsole.c"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="FSM_ExternalServer">
+    <File Name="FSM_TCPServer.c"/>
+  </VirtualDirectory>
 </CodeLite_Project>

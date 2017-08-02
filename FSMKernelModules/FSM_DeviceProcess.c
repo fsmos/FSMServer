@@ -18,17 +18,35 @@ struct FSM_DeviceFunctionTree fsm_dft[FSM_DeviceFunctionTreeSize];
 \brief Список  устройств
  */
 struct FSM_DeviceTree fsm_dt[FSM_DeviceTreeSize];
+struct FSM_DeviceTree fsm_ext_dt[FSM_ExternalDeviceTreeSize];
 struct fsm_statusstruct fsm_str;
 struct fsm_devices_config fsm_set;
 struct FSM_ProgBuf ProgSSvar;
+struct FSM_DeviceFunctionTree ext_fdt;
 
-
+void FSM_ExternalDevice_Resend(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
+{
+    to_dt->TrDev->dt->Proc(data,len,to_dt,from_dt);
+}
 static int __init FSMDeviceProcess_init(void)
 {
     memset(fsm_dft, 0, sizeof(fsm_dft));
     memset(fsm_dt, 0, sizeof(fsm_dt));
+    memset(fsm_ext_dt, 0, sizeof(fsm_ext_dt));
     FSM_ProgrammSSLoad();
     FSM_SendEventToAllDev(FSM_ServerStarted);
+    ext_fdt.aplayp =0;
+    ext_fdt.config_len = 0;
+    ext_fdt.crcfw = 0;
+    ext_fdt.debug = 0;
+    ext_fdt.KodDevice = 0;
+    ext_fdt.PodVidDevice =0;
+    ext_fdt.Proc = FSM_ExternalDevice_Resend;
+    ext_fdt.registr = 1;
+    ext_fdt.signal_count =0; 
+    ext_fdt.slot_count =0 ;
+    ext_fdt.type =0;
+    ext_fdt.VidDevice=0;
     printk(KERN_INFO "FSMDeviceProcess module loaded\n");
     return 0;
 }
@@ -236,6 +254,39 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
     return 1;
 }
 EXPORT_SYMBOL(FSM_DeviceRegister);
+
+unsigned char FSM_DeviceExternalRegister(struct FSM_Device_Finded_header dt)
+{
+    int i;
+    struct FSM_DeviceTree* dtsc;
+
+    dtsc = FSM_FindDevice(dt.IDDevice);
+    if(dtsc != 0)
+        return 0;
+    for(i = 0; i < FSM_ExternalDeviceTreeSize; i++) {
+        if(fsm_ext_dt[i].registr == 0) {
+                fsm_ext_dt[i].registr = 1;
+                fsm_ext_dt[i].IDDevice = dt.IDDevice;
+                fsm_ext_dt[i].dt = &ext_fdt;
+                fsm_ext_dt[i].id = i;
+                fsm_ext_dt[i].debug = 0;
+                fsm_ext_dt[i].data = 0;
+                //FSM_SendEventToAllDev(FSM_ServerConfigChanged);
+                //FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
+                printk(KERN_INFO "Device External Registred: ID: %u Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n",
+                       dt.IDDevice,
+                       dt.type,
+                       dt.VidDevice,
+                       dt.PodVidDevice,
+                       dt.KodDevice);
+
+                return 0;
+        }
+    }
+
+    return 1;
+}
+EXPORT_SYMBOL(FSM_DeviceExternalRegister);
 /*!
 \brief Поиск класса устроства
 \param[in] dt Пакет регистрации
@@ -288,6 +339,14 @@ struct FSM_DeviceTree* FSM_FindDevice(unsigned short id)
         // if(fsm_dt[i].IDDevice!=0) printk( KERN_INFO "DeviceNotFindScan: ID: %u - %u \n",
         // fsm_dt[i].IDDevice,fsm_dt[i].registr);
         if((fsm_dt[i].IDDevice == id) && (fsm_dt[i].registr == 1)) {
+
+            return &fsm_dt[i];
+        }
+    }
+    for(i = 0; i < FSM_ExternalDeviceTreeSize; i++) {
+        // if(fsm_dt[i].IDDevice!=0) printk( KERN_INFO "DeviceNotFindScan: ID: %u - %u \n",
+        // fsm_dt[i].IDDevice,fsm_dt[i].registr);
+        if((fsm_ext_dt[i].IDDevice == id) && (fsm_ext_dt[i].registr == 1)) {
 
             return &fsm_dt[i];
         }
