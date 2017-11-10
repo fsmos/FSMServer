@@ -15,6 +15,12 @@
 \brief Размер дерева устройств
 */
 #define FSM_DeviceTreeSize 100
+
+/*!
+\brief Размер дерева внешних устройств
+*/
+#define FSM_ExternalDeviceTreeSize 100
+
 /*!
 \brief Размер дерва Ethernet устройств
 */
@@ -96,6 +102,6 @@
 
 #define FSM_opov_abonent_count FSM_PO06DeviceTreeSize
 #define FSM_opov_cabonent_count 100
-#define FSM_GPIO_BLOCK
+//#define FSM_GPIO_BLOCK
 #endif	/* FSM_SETTINGS_H */
 //#define DEBUG_CALL_STACK

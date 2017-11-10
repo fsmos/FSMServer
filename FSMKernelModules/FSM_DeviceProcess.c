@@ -26,6 +26,7 @@ struct FSM_DeviceFunctionTree ext_fdt;
 
 void FSM_ExternalDevice_Resend(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
+    printk(KERN_INFO "Send Data From External Device\n");
     to_dt->TrDev->dt->Proc(data,len,to_dt,from_dt);
 }
 static int __init FSMDeviceProcess_init(void)
@@ -348,7 +349,7 @@ struct FSM_DeviceTree* FSM_FindDevice(unsigned short id)
         // fsm_dt[i].IDDevice,fsm_dt[i].registr);
         if((fsm_ext_dt[i].IDDevice == id) && (fsm_ext_dt[i].registr == 1)) {
 
-            return &fsm_dt[i];
+            return &fsm_ext_dt[i];
         }
     }
     printk(KERN_INFO "DeviceNotFind: ID: %u \n", id);

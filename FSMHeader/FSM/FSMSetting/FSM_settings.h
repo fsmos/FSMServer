@@ -15,6 +15,12 @@
 \brief Размер дерева устройств
 */
 #define FSM_DeviceTreeSize 100
+
+/*!
+\brief Размер дерева внешних устройств
+*/
+#define FSM_ExternalDeviceTreeSize 100
+
 /*!
 \brief Размер дерва Ethernet устройств
 */

@@ -204,6 +204,7 @@ enum FSMPO06Command /*0*****125*/
   FSMPo06KB100_DisConnect = 19,
   FSMPo06R168_Light = 20,
   FSMPo06R168_GetDats = 21,
+  FSMPo06KB100_SendDats = 22,
 };
 enum FSMMN825Command /*0*****125*/
 { FSMMN825SendStream = 1,
@@ -221,6 +222,8 @@ enum FSMMN825Command /*0*****125*/
   FSMMN825SendIP = 14,
   FSMMN825R168100KB_Packet = 15,
   FSMMN825R168100KB_PacketUDP = 16,
+  FSMMN825R168_GetDats =17,
+  FSMMN825R168_SetCP =18
 };
 enum FSMMN921Command /*0*****125*/
 { FSMMN921SendStream = 1,

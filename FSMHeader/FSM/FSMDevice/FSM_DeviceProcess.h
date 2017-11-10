@@ -252,4 +252,9 @@ void FSM_Connect_Signal_to_Slot(unsigned short DevSignal,unsigned short IDsignal
 void FSM_SendSignal(char *data,unsigned short len, struct FSM_DeviceTree* from_dt,unsigned short IDsignal);
 void FSM_ProgrammSSLoad(void);
 void FSMProgrammDevRun(struct FSM_DeviceTree* dt);
+
+unsigned char FSM_DeviceExternalRegister(struct FSM_Device_Finded_header dt);
+
+int FSM_Start_Discovery(unsigned short id);
+
 #endif /* FSM_DEVICEPROCESS_H */

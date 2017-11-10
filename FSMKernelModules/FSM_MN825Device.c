@@ -188,7 +188,7 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
                 scmd->IDDevice = ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client->IDDevice;
                 scmd->opcode = PacketToDevice; 
                 scmd->cmd = ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client_cmd;
-                ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client->dt->Proc(data,len,((struct FSM_MN825Device*)(to_dt->data))->r168kb100client,to_dt);
+                ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client->dt->Proc(data,len,to_dt,((struct FSM_MN825Device*)(to_dt->data))->r168kb100client);
                 printk(KERN_INFO "FSM NPP 0x%02x,0x%02x ",scmd->Data[0],scmd->Data[1] );
                 return;
             } 
@@ -273,13 +273,16 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             break;
         case FSMMN825R168_GetDats:
             fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
+            printk(KERN_INFO "MN825 Reuest Dats Start");
             if(fsmdv == 0) 
             {
                 FSM_Start_Discovery(((unsigned short*)scmd->Data)[0]);
                 return;
             }
             
-            FSM_CCKGetInfoR168(&FSMMN825_CCKDevE,((unsigned short*)(scmd->Data))[0]);
+            FSM_CCKGetInfoR168(&FSMMN825_CCKDevE,to_dt->IDDevice);
+            scmd->IDDevice = ((unsigned short*)(scmd->Data))[0];
+            scmd->cmd = ((unsigned short*)(scmd->Data))[1];
             scmd->Data[0] = ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_type;
             scmd->Data[1] = FSMMN825_CCKDevE.ip[0];
             scmd->Data[2] = FSMMN825_CCKDevE.ip[1];
@@ -288,8 +291,11 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             scmd->Data[5] = ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_port[0];
             scmd->Data[6] = ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_port[1];
             scmd->Data[7] = FSMMN825_CCKDevE.channel;
-            scmd->countparam = 8;
-            fsmdv->dt->Proc(data,FSMH_Header_Size_SendCmd + scmd->countparam,fsmdv,to_dt);
+            scmd->countparam = 9;
+            fsmdv->dt->Proc(data,FSMH_Header_Size_SendCmd + scmd->countparam,to_dt,fsmdv);
+            printk(KERN_INFO "MN825 Reuest Dats");
+            break;
+            
         case FSMMN825R168_SetCP:
             fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
             if(fsmdv == 0) 
@@ -298,8 +304,8 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
                 return;
             }
             ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client = fsmdv;
-            ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client_cmd = ((unsigned short*)scmd->Data)[0];
-            
+            ((struct FSM_MN825Device*)(to_dt->data))->r168kb100client_cmd = ((unsigned short*)scmd->Data)[1];
+            printk(KERN_INFO "MN825 Set CP");
             break;
         }
         break;

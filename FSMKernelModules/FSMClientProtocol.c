@@ -482,13 +482,14 @@ FSMClientProtocol_pack_rcv(struct sk_buff* skb, struct net_device* dev, struct p
         }
         dftv = FSM_FindDevice(((struct FSM_DeviceRegistr*)skb->data)->IDDevice);
         if(dftv == 0) {
-            printk(KERN_INFO "Eror \n");
+            printk(KERN_INFO "Eror Find Device\n");
             goto clear;
         }
         // printk( KERN_INFO "FSM Dev %u\n",((struct FSM_SendCmdTS *)skb->data)->IDDevice);
         dftv->TrDev = FSM_Ethernet_dt;
         break;
     case PacketToDevice:
+        printk(KERN_INFO "PKTR %i\n",(((struct FSM_SendCmd_Header*)skb->data))->cmd);
         tmp_eth_dev.dev = dev;
         tmp_eth_dev.id = 0;
         memcpy(tmp_eth_dev.destmac, eth->h_source, 6);

@@ -45,7 +45,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
     int i;
  
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
-// char datas[2];
+    char datas[2];
     unsigned char fsm_po06_crc32[4];
     unsigned char fsm_po06_ramst[2];
     unsigned char fsm_po06_build[4];
@@ -205,7 +205,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             scmd->IDDevice = ((struct FSM_PO06Device*)(to_dt->data))->r168kb100->IDDevice;
             scmd->opcode = PacketToDevice;
             scmd->cmd = FSMMN825R168100KB_Packet;
-            ((struct FSM_PO06Device*)(to_dt->data))->r168kb100->dt->Proc(data,len,((struct FSM_PO06Device*)(to_dt->data))->r168kb100,to_dt);
+            ((struct FSM_PO06Device*)(to_dt->data))->r168kb100->dt->Proc(data,len,to_dt,((struct FSM_PO06Device*)(to_dt->data))->r168kb100);
             printk(KERN_INFO "FSM NP %i 0x%02x,0x%02x 0x%02x,0x%02x",scmd->countparam,scmd->Data[0],scmd->Data[1],scmd->Data[2],scmd->Data[3] );
             break;
             
@@ -225,12 +225,13 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             else
             {
                 scmd->opcode = PacketToDevice;
-                scmd->cmd = FSMMN825R168_GetDats;
+                scmd->cmd = FSMMN825R168_SetCP;
                 scmd->IDDevice = ((unsigned short*)scmd->Data)[0];
                 ((unsigned short*)scmd->Data)[0] = to_dt->IDDevice;
                 ((unsigned short*)scmd->Data)[1] = FSMPo06KB100_SendPacket;
-                scmd->countparam = 2;
-                fsmdv->dt->Proc(data,FSMH_Header_Size_SendCmd + 4,fsmdv,to_dt);
+                scmd->countparam = 4;
+                fsmdv->dt->Proc(data,FSMH_Header_Size_SendCmd + 4,to_dt,fsmdv);
+                printk(KERN_INFO "FSM SE %i", ((unsigned short*)scmd->Data)[0]);
             }
             printk(KERN_INFO "FSM FNP1 %i", ((unsigned short*)scmd->Data)[0]);
             break;
@@ -260,10 +261,13 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             if(fsmdv == 0) 
             {
                 FSM_Start_Discovery(((unsigned short*)scmd->Data)[0]);
+                printk(KERN_INFO "PO06 Reuest ED") ;
                 return;
+               
             }
             if(fsmdv->data !=0)
             {
+                printk(KERN_INFO "PO06 Reuest Internal Data");
                 FSM_CCKGetInfoR168(&FSMPO06_CCKDevE,((unsigned short*)(scmd->Data))[0]);
                 scmd->Data[0] = ((struct FSM_MN825Device*)fsmdv->data)->r168kb100client_type;
                 scmd->Data[1] = FSMPO06_CCKDevE.ip[0];
@@ -279,12 +283,17 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             }
             else
             {
+                printk(KERN_INFO "PO06 Reuest Data");
                 scmd->opcode = PacketToDevice;
                 scmd->cmd = FSMMN825R168_GetDats;
                 scmd->IDDevice = ((unsigned short*)scmd->Data)[0];
                 ((unsigned short*)scmd->Data)[0] = to_dt->IDDevice;
-                scmd->countparam = 1;
-                fsmdv->dt->Proc(data,len,fsmdv,to_dt);
+                ((unsigned short*)scmd->Data)[1] = FSMPo06KB100_SendDats;
+                scmd->countparam = 2;
+                fsmdv->dt->Proc(data,FSMH_Header_Size_SendCmdTS + 4,to_dt,fsmdv);
+                if(fsmdv->dt == 0) printk(KERN_INFO "DT Not Found");
+                if(fsmdv->dt->Proc == 0) printk(KERN_INFO "Proc Not Found");
+                printk(KERN_INFO "PO06 Reuest Data End");
             }
             break;
             
@@ -310,7 +319,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             printk(KERN_INFO "PTD\n");
             break;
         case FSMPo06KB100_SendDats:
-           
+            printk(KERN_INFO "SDTP\n");
             scmd->opcode = SendCmdToDevice;
             scmd->cmd = FSMPo06R168_GetDats;
             to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + scmd->countparam, to_dt->TrDev, to_dt);

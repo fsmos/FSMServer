@@ -237,10 +237,6 @@ source runs.prog</PostConnectCommands>
     <File Name="FSMStatisticCtl.c"/>
     <File Name="FSM_VirtualCom.c"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug">
-    <Project Name="FSMSendPack"/>
-  </Dependencies>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="FSM_Ethernet">
     <File Name="FSMClientProtocol.c"/>
     <File Name="FSMTransportP.c"/>
@@ -251,4 +247,8 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_ExternalServer">
     <File Name="FSM_TCPServer.c"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug">
+    <Project Name="FSMSendPack"/>
+  </Dependencies>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

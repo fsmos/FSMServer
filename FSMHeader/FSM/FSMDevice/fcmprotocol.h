@@ -77,6 +77,8 @@ enum FSM_CodeOperation {
     Ans_FSM_Setting_Write = 61,    ///<Отчет о выполнение настроек
     FSM_Setting_GetTree = 62,      ///<Список настроек
     Ans_FSM_Setting_GetTree = 63,  ///<Список настроек
+    FSM_Device_Discovery = 64,  ///< Поиск устройства в сети.
+    FSM_Device_Finded = 65,  ///< Поиск устройства в сети.
 };
 /*!
 \brief Тип устройства
@@ -465,8 +467,9 @@ struct FSM_ansSendSmsData
     unsigned char CRC;       ///< CRC
     unsigned short IDDevice; ///< Ид устройства
 
-    unsigned short len;
     unsigned short lennumber; ///< Длина номера телефона
+    unsigned short len;
+    
 
     unsigned char number[16]; ///< Номера телефона
 } __attribute__((aligned(4)));
@@ -1278,6 +1281,27 @@ struct FSM_AnsSetSetting
 
     int status;
 } __attribute__((aligned(4)));
+
+
+struct FSM_Device_Discovery_header
+{
+    unsigned char opcode;    ///< Код операции
+    unsigned char CRC;       ///< CRC
+    unsigned short IDDevice; ///< Ид устройства
+} __attribute__((aligned(4)));
+
+struct FSM_Device_Finded_header
+{
+    unsigned char opcode;    ///< Код операции
+    unsigned char CRC;       ///< CRC
+    unsigned short IDDevice; ///< Ид устройства
+    
+    unsigned char type;         ///< Тип устройства
+    unsigned char VidDevice;    ///< Вид устройства
+    unsigned char PodVidDevice; ///< Подвид устройства
+    unsigned char KodDevice;    ///<Код устройства
+} __attribute__((aligned(4)));
+
 
 enum FSMIOCTL_Cmd {
     FSMIOCTL_SendData,
