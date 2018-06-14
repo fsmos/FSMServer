@@ -2,6 +2,7 @@
 #include <linux/module.h>
 #include <linux/i8253.h>
 #include <linux/timer.h>
+#include <linux/sched.h>
 #include <linux/i2c.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 struct i2c_adapter* FSM_GPIO_adapter = NULL;
@@ -89,13 +90,13 @@ unsigned char FSM_GPIO_Get_Status(enum FSM_GPIO_Bit_Enum Pin)
 }
 EXPORT_SYMBOL(FSM_GPIO_Get_Status);
 
-void FSM_GPIO_Reset_timer_callback(unsigned long data)
+void FSM_GPIO_Reset_timer_callback(struct timer_list *t)
 {
     FSM_GPIO_ReSetBit(GPIO_RESET_PIN);
 }
 EXPORT_SYMBOL(FSM_GPIO_Reset_timer_callback);
 
-void FSM_GPIO_Impulse_timer_callback(unsigned long data)
+void FSM_GPIO_Impulse_timer_callback(struct timer_list *t)
 {
     if(fsm_gpio_eror)
         FSM_GPIO_ReSetBit(GPIO_EROR_PIN);
@@ -251,8 +252,8 @@ static int __init FSM_GPIO_init(void)
     regp.CRC = 0;
     FSM_DeviceRegister(regp);
 
-    setup_timer(&FSM_GPIO_Reset_timer, FSM_GPIO_Reset_timer_callback, 0);
-    setup_timer(&FSM_GPIO_Impulse_timer, FSM_GPIO_Impulse_timer_callback, 0);
+    timer_setup(&FSM_GPIO_Reset_timer, FSM_GPIO_Reset_timer_callback, 0);
+    timer_setup(&FSM_GPIO_Impulse_timer, FSM_GPIO_Impulse_timer_callback, 0);
     fsm_gpio_eror = 0;
     FSM_GPIO_Reset();
     FSM_GPIO_EventEror();

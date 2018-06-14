@@ -45,7 +45,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
     int i;
  
     struct FSM_SendCmdTS* scmd = (struct FSM_SendCmdTS*)data;
-    char datas[2];
+    //char datas[2];
     unsigned char fsm_po06_crc32[4];
     unsigned char fsm_po06_ramst[2];
     unsigned char fsm_po06_build[4];
@@ -252,7 +252,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             break;
             case FSMPo06R168_Light:
             scmd->opcode = SendCmdToDevice;
-            scmd->countparam = FSM_CCKGetListR168(scmd->Data);
+            scmd->countparam = FSM_CCKGetListR168((unsigned short*)scmd->Data);
             to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + (scmd->countparam*2), to_dt->TrDev, to_dt);
             break;
             case FSMPo06R168_GetDats:
@@ -268,7 +268,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
             if(fsmdv->data !=0)
             {
                 printk(KERN_INFO "PO06 Reuest Internal Data");
-                FSM_CCKGetInfoR168(&FSMPO06_CCKDevE,((unsigned short*)(scmd->Data))[0]);
+                FSM_CCKGetInfoR168((unsigned short*)&FSMPO06_CCKDevE,((unsigned short*)(scmd->Data))[0]);
                 scmd->Data[0] = ((struct FSM_MN825Device*)fsmdv->data)->r168kb100client_type;
                 scmd->Data[1] = FSMPO06_CCKDevE.ip[0];
                 scmd->Data[2] = FSMPO06_CCKDevE.ip[1];

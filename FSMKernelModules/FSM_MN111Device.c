@@ -44,7 +44,7 @@ void FSM_TestVoltage(struct FSM_DeviceTree* to_dt, unsigned short cmd)
     FSMMN111_sendcmd.cmd = cmd;
     to_dt->dt->Proc((char*)&FSMMN111_sendcmd, sizeof(struct FSM_SendCmd), to_dt, to_dt);
 }
-void FSM_Test_Callback(unsigned long data)
+void FSM_Test_Callback(struct timer_list *t)
 {
     int i;
     for(i = 0; i < FSM_MN111DeviceTreeSize; i++) {
@@ -344,7 +344,7 @@ static int __init FSM_MN111_init(void)
     FSM_DeviceClassRegister(FSMMN111_dft);
     printk(KERN_INFO "FSM MN111 Module loaded\n");
     FSM_SendEventToAllDev(FSM_CCK_MN111_Started);
-    setup_timer(&FSM_MN111_timer, FSM_Test_Callback, 0);
+    timer_setup(&FSM_MN111_timer, FSM_Test_Callback, 0);
 
     return 0;
 }

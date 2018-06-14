@@ -127,6 +127,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_CCKControl">
     <File Name="FSM_CCKControl.c"/>
+    <File Name="FSM_CCKConfig.c"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">
     <GlobalSettings>
@@ -240,6 +241,7 @@ source runs.prog</PostConnectCommands>
   <VirtualDirectory Name="FSM_Ethernet">
     <File Name="FSMClientProtocol.c"/>
     <File Name="FSMTransportP.c"/>
+    <File Name="FSM_UDPModule.c"/>
   </VirtualDirectory>
   <VirtualDirectory Name="FSM_AudioRead">
     <File Name="FSM_ADConsole.c"/>

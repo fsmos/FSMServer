@@ -1,4 +1,4 @@
-KDIR = /usr/src/linux-source-4.2.0/
+KDIR = /usr/src/linux-source-4.15.0/
 PWD = $(shell pwd) 
 TARGET1 =FSMClientProtocol
 TARGET2 =FSM_DeviceProcess
@@ -39,6 +39,8 @@ TARGET37 =FSMTransportP
 TARGET38 =FSM_ADConsole
 TARGET39 =FSM_TCPServer
 
+TARGET41 =FSM_CCKConfig
+
 obj-m   += $(TARGET1).o
 obj-m   += ${TARGET2}.o
 obj-m   += ${TARGET3}.o
@@ -77,6 +79,7 @@ obj-m   += ${TARGET36}.o
 obj-m   += ${TARGET37}.o
 obj-m   += ${TARGET38}.o
 obj-m   += ${TARGET39}.o
+obj-m   += ${TARGET41}.o
 
 all:
 	make -C $(KDIR) M=$(PWD) modules

@@ -2,7 +2,7 @@
 #include <linux/module.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include <linux/fs.h> 
-#include <asm/uaccess.h>   // Needed by segment descriptors
+//#include <asm/uaccess.h>   // Needed by segment descriptors
 
 struct FSM_DeviceFunctionTree FSMStCTL_dft;
 struct FSM_DeviceTree* FSMStCTL_dftv;

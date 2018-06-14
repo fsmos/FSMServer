@@ -122,6 +122,9 @@ a+="add-symbol-file $path FSM_SocialAnalytic.ko $(cat /sys/module/FSM_SocialAnal
 insmod FSM_ControlPower.ko
 a+="add-symbol-file $path FSM_ControlPower.ko $(cat /sys/module/FSM_ControlPower/sections/.text) -s .bss $(cat /sys/module/FSM_ControlPower/sections/.bss)\n"
 
+insmod FSM_UDPModule.ko
+a+="add-symbol-file $path FSM_ControlPower.ko $(cat /sys/module/FSM_UDPModule/sections/.text) -s .bss $(cat /sys/module/FSM_UDPModule/sections/.bss)\n"
+
 
 
 //./FSMSendPack 

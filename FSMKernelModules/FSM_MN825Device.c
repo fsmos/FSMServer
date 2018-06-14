@@ -201,8 +201,18 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
             ((struct FSM_MN825Device*)to_dt->data)->rwbuf.free --;
             ((struct FSM_MN825Device*)to_dt->data)->rwbuf.wr_ptr++;
             if(((struct FSM_MN825Device*)to_dt->data)->rwbuf.wr_ptr>91) ((struct FSM_MN825Device*)to_dt->data)->rwbuf.wr_ptr=0;
+            for(i=0; i<scmd->countparam/2;i++)
+            {
+                printk(KERN_INFO "FSM NRP 0x%02x,0x%02x ",scmd->Data[i*2],scmd->Data[i*2 
+                +1] );
             }
-            printk(KERN_INFO "FSM NRP 0x%02x,0x%02x ",scmd->Data[0],scmd->Data[1] );
+            }
+            else
+            {
+                
+            printk(KERN_INFO "FSM Buffer Full");
+            }
+            
             break;
         }
 
@@ -280,7 +290,7 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
                 return;
             }
             
-            FSM_CCKGetInfoR168(&FSMMN825_CCKDevE,to_dt->IDDevice);
+            FSM_CCKGetInfoR168((unsigned short*)&FSMMN825_CCKDevE,to_dt->IDDevice);
             scmd->IDDevice = ((unsigned short*)(scmd->Data))[0];
             scmd->cmd = ((unsigned short*)(scmd->Data))[1];
             scmd->Data[0] = ((struct FSM_MN825Device*)to_dt->data)->r168kb100client_type;

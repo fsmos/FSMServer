@@ -2,7 +2,7 @@
 #include <linux/module.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
 #include <linux/fs.h> 
-#include <asm/uaccess.h>   // Needed by segment descriptors
+//#include <asm/uaccess.h>   // Needed by segment descriptors
 
 struct FSM_DeviceFunctionTree FSMFlash_dft;
 struct FSM_DeviceTree* FSMFlash_dftv;
@@ -13,7 +13,7 @@ int FSM_FlashFirmwareOpen(struct FSM_DeviceTree* to_dt,int n)
     struct file *f; 
     int numb;
     char filename[100];
-    
+    loff_t off = 0;
    // preempt_disable();
     printk( KERN_INFO "Firmware Open" ); 
     sprintf(filename,"/fsm/firmware/t%uv%upv%uk%u.fsmflash",
@@ -26,7 +26,7 @@ int FSM_FlashFirmwareOpen(struct FSM_DeviceTree* to_dt,int n)
         printk( KERN_INFO "Firmware not found" ); 
         return -1;
     } 
-    numb = kernel_read( f, 0, (char*)&FSMFlash_flctl[n].firm, sizeof(struct FSMFirmware) ); 
+    numb = kernel_read( f, (char*)&FSMFlash_flctl[n].firm, sizeof(struct FSMFirmware),&off ); 
     filp_close( f, NULL ); 
    // preempt_enable();
     if(!(numb)) return -2;
@@ -40,6 +40,7 @@ int FSM_FlashFirmwareCheck(struct FSM_DeviceFunctionTree* dft)
     int numb;
     char filename[100];
     struct FSMFlahData_StartVector svec;
+    loff_t off = 0;
     //preempt_disable();
     printk( KERN_INFO "Firmware Check Open" ); 
     sprintf(filename,"/fsm/firmware/t%uv%upv%uk%u.fsmflashinfo",
@@ -53,7 +54,7 @@ int FSM_FlashFirmwareCheck(struct FSM_DeviceFunctionTree* dft)
         return -1;
     } 
     
-    numb = kernel_read( f, 0, (char*)&svec, sizeof(struct FSMFlahData_StartVector) ); 
+    numb = kernel_read( f,(char*)&svec, sizeof(struct FSMFlahData_StartVector) ,&off); 
     filp_close( f, NULL ); 
     //preempt_enable();
     if(!(numb)) return -2;

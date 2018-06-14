@@ -170,9 +170,9 @@ void FSM_GPIO_Set_Output(enum FSM_GPIO_Bit_Enum Pin);
 
 unsigned char FSM_GPIO_Get_Status(enum FSM_GPIO_Bit_Enum Pin);
 
-void FSM_GPIO_Reset_timer_callback(unsigned long data);
+void FSM_GPIO_Reset_timer_callback(struct timer_list *t);
 
-void FSM_GPIO_Impulse_timer_callback(unsigned long data);
+void FSM_GPIO_Impulse_timer_callback(struct timer_list *t);
 
 void FSM_GPIO_Reset(void);
 

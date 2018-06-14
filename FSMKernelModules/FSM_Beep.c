@@ -6,7 +6,7 @@
 
 static struct timer_list FSM_Beep_timer;
 
-void FSM_Beep_timer_callback(unsigned long data)
+void FSM_Beep_timer_callback(struct timer_list *t)
 {
     FSM_Beep(0, 0);
 }
@@ -40,7 +40,7 @@ EXPORT_SYMBOL(FSM_Beep);
 
 static int __init FSM_Beep_init(void)
 {
-    setup_timer(&FSM_Beep_timer, FSM_Beep_timer_callback, 0);
+    timer_setup(&FSM_Beep_timer, FSM_Beep_timer_callback, 0);
 
     printk(KERN_INFO "FSM Beep loaded\n");
     return 0;

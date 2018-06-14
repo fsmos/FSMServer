@@ -447,7 +447,7 @@ void FSM_ProgrammSSLoad(void)
         printk( KERN_INFO "Programm not found" ); 
         return;
     } 
-    numb = kernel_read( f, 0, (char*)&ProgSSvar, sizeof(struct FSM_ProgBuf) ); 
+    numb = kernel_read( f, (char*)&ProgSSvar, sizeof(struct FSM_ProgBuf) , 0 ); 
     filp_close( f, NULL ); 
     if(!(numb)) return;   
     FSMProgrammDevRun(0);

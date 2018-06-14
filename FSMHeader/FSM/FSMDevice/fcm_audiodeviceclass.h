@@ -129,7 +129,7 @@ struct FSM_PO06Device
 };
 struct FSM_R168KB100_RWBufEl
 {
-    char Dates[16];
+    char Dates[100];
     char len;
 };
 struct FSM_R168KB100_RWBuf

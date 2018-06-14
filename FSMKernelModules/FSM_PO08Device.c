@@ -210,14 +210,14 @@ unsigned char fsm_po08_build[4];
             break;
         case FSMPo08R168_Light:
             scmd->opcode = SendCmdToDevice;
-            scmd->countparam = FSM_CCKGetListR168(scmd->Data);
+            scmd->countparam = FSM_CCKGetListR168((unsigned short*)scmd->Data);
             to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd + (scmd->countparam*2), to_dt->TrDev, to_dt);
             break;
         case FSMPo08R168_GetDats:
             scmd->opcode = SendCmdToDevice;
             fsmdv = FSM_FindDevice(((unsigned short*)scmd->Data)[0]);
             if(fsmdv == 0) return;
-            FSM_CCKGetInfoR168(&FSMPO08_CCKDevE,((unsigned short*)(scmd->Data))[0]);
+            FSM_CCKGetInfoR168((unsigned short*)&FSMPO08_CCKDevE,((unsigned short*)(scmd->Data))[0]);
             scmd->Data[0] = ((struct FSM_MN825Device*)fsmdv->data)->r168kb100client_type;
             scmd->Data[1] = FSMPO08_CCKDevE.ip[0];
             scmd->Data[2] = FSMPO08_CCKDevE.ip[1];
