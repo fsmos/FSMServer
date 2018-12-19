@@ -1,0 +1,17 @@
+<RCC>
+    <qresource prefix="/">
+        <file>MN141.png</file>
+        <file>MN401.png</file>
+        <file>MN111.png</file>
+        <file>MN921.png</file>
+        <file>MN825.png</file>
+        <file>MN526.png</file>
+        <file>MN523.png</file>
+        <file>MN524.png</file>
+        <file>PO06.png</file>
+        <file>PO08.png</file>
+        <file>PO07.png</file>
+        <file>MN401_on.png</file>
+        <file>MN141_on.png</file>
+    </qresource>
+</RCC>

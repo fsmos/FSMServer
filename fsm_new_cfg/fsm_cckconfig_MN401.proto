@@ -1,0 +1,27 @@
+syntax = "proto3";
+package fsm ;
+
+enum CCKTypeDevice {
+	DT_None = 0;
+	DT_MN921 = 1;
+    	DT_MN825 = 2; 
+    	DT_PO07 = 3;
+    	DT_PO08 = 4;
+    	DT_PO06 = 5;
+    	DT_MN524 = 6;
+    	DT_MN111 = 7;
+	DT_VirtPO = 8;
+	DT_MN401 = 9;
+}
+
+message ServerInfo {
+	int32 ip = 1;
+	int32 sip_port = 2;
+}
+
+
+
+message MN401 {
+	ServerInfo client = 1;
+	repeated CCKTypeDevice devlist = 2;    
+}

@@ -1,0 +1,33 @@
+syntax = "proto3";
+package fsm ;
+
+import "nanopb.proto";
+import "fsm_cckconfig_clientinfo.proto";
+
+message P0_Group_subel {
+	repeated uint32 abonent = 1   [(nanopb).max_count = 10];   
+}
+message P0_Group_el {
+	repeated P0_Group_subel grp = 1   [(nanopb).max_count = 4];   
+}
+message P0_Group {
+	P0_Group_el cnfg = 1;
+	P0_Group_el csvg = 2;
+}
+message PO_Subscriber {
+	uint32 sip_number = 1;
+	uint32 flags = 2;
+}
+message PO_Channel {
+	uint32 self_sip_port = 1;
+	uint32 self_rtp_port = 2;
+	uint32 self_sip_number = 3;
+	uint32 volume = 4;
+	repeated PO_Subscriber SubscriberForCall = 5 [(nanopb).max_count = 12]; 
+}
+message P0 {
+	ClientInfo client = 1;
+	P0_Group grp = 2;
+	bytes mac = 3  [(nanopb).max_size = 6];
+	repeated PO_Channel channel = 4   [(nanopb).max_count = 2];    
+}

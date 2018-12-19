@@ -1,0 +1,29 @@
+syntax = "proto3";
+package json2proto ;
+
+import "nanopb.proto";
+
+message json2proto_MN921_TCH {
+	         string self_sip_description = 1 [(nanopb).max_size = 5];
+	         int32 type_channel = 2;
+	         int32 self_port = 3;
+	         json2proto_MN921_TCH_TCH TCH = 4;
+		 repeated json2proto_MN921_TCH_SubscriberForCall SubscriberForCall = 5 [(nanopb).max_count = 4];
+	         int32 channel = 6;
+	         int32 audio_port = 7;
+}
+
+message json2proto_MN921_TCH_TCH {
+	         int32 MaxToneCallPulse = 1;
+	         int32 MinToneCallPulse = 2;
+	         int32 OutputCallFreq = 3;
+	         int32 type_line = 4;
+	         int32 ToneOutputCallPulse = 5;
+}
+
+message json2proto_MN921_TCH_SubscriberForCall {
+	         string abonent = 1 [(nanopb).max_size = 5];
+	         int32 id = 2;
+}
+
+

@@ -1,0 +1,12 @@
+syntax = "proto3";
+package json2proto ;
+
+message json2proto_MN921_server {
+	         int32 server_sip_port = 1;
+	         int32 gateway = 2;
+	         int32 server_ip = 3;
+	         int32 self_ip = 4;
+	         uint32 subnet_mask = 5;
+}
+
+

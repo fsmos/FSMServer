@@ -1,0 +1,63 @@
+syntax = "proto3";
+package fsm ;
+
+import "nanopb.proto";
+import "fsm_cckconfig_clientinfo.proto";
+
+enum MN921TypeDevice {
+    MB = 0;
+    CB = 1;
+    TCH = 2;
+    ATS = 3;
+}
+
+enum MN921TypeTCH {
+    TwoWire = 0;
+    FourWire_FL = 1;
+    FourWire_TCH = 2;
+}
+
+enum MN921OutputCallFrequency {
+    F_600 = 0;
+    F_2100 = 1;
+}
+
+enum MN921TypeATS {
+    Pulse = 0;
+    Tone = 1;
+}
+
+message MN921_MB {
+	uint32 TimeOutputCall = 1;
+}
+message MN921_CB {
+	uint32 TimeOutputCall = 1;
+}
+message MN921_TCH {
+	MN921TypeTCH typetch = 1;
+	uint32 TimeOutputCall = 2;
+	uint32 MinTimeOutputCall = 3;
+	uint32 MaxTimeOutputCall = 4;
+	MN921OutputCallFrequency ocfr = 5;
+}
+message MN921_ATS {
+	MN921TypeATS typeats = 1;
+}
+
+message MN921_Channel {
+	uint32 self_sip_port = 1;
+	uint32 self_rtp_port = 2;
+	uint32 self_sip_number = 3;
+	uint32 volume = 4;
+	MN921TypeDevice typedev = 5;
+	repeated uint32 SubscriberForCall = 6 [(nanopb).max_count = 4]; 
+	MN921_MB mb = 7;
+ 	MN921_CB cb = 8;
+	MN921_TCH tch = 9;
+	MN921_ATS ats = 10;    
+	
+}
+message MN921 {
+	 ClientInfo client = 1;
+	 repeated MN921_Channel channel = 2   [(nanopb).max_count = 2]; 
+}

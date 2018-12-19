@@ -1,0 +1,48 @@
+syntax = "proto3";
+package fsm ;
+
+import "fsm_cckconfig_clientinfo.proto";
+
+message VirtP0_Group_subel {
+	repeated uint32 abonent = 1;   
+}
+message VirtP0_Group_el {
+	repeated VirtP0_Group_subel grp = 1;   
+}
+message VirtP0_Group {
+	VirtP0_Group_el cnfg = 1;
+	VirtP0_Group_el csvg = 2;
+}
+message VirtPO_Subscriber {
+	string  sipname = 1;
+	uint32 sipnumber = 2;
+	uint32 flags = 3;
+}
+message VirtPO_Channel {
+	uint32 self_sip_port = 1;
+	uint32 self_sip_number = 2;
+	string  self_sip_name = 3;
+	uint32 min_self_rtp_port = 4;
+	uint32 max_self_rtp_port = 5;
+	string audio_device = 6;
+	repeated VirtPO_Subscriber SubscriberForCall = 7; 
+}
+message R168Cfgel {
+	uint32 ip = 1;
+	uint32 port = 2;
+}
+message Ctrlkey {
+	string key = 1;
+	uint32 flags = 2;
+}
+message R168Cfg {
+	repeated R168Cfgel channel = 1;
+}
+message VirtP0 {
+	ClientInfo client = 1;
+	R168Cfg r168= 2;
+	VirtP0_Group grp = 3;
+	int32 rlk_port = 4;
+	Ctrlkey key = 5;
+	repeated VirtPO_Channel channel =  6 ; 
+}

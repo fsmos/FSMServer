@@ -1,0 +1,26 @@
+syntax = "proto3";
+package fsm ;
+import "fsm_cckconfig_MN.proto";
+import "fsm_cckconfig_MN401.proto";
+import "fsm_cckconfig_PO.proto";
+import "fsm_cckconfig_VirtPO.proto";
+
+message GetDeviceRq {
+	int32 id = 1;
+}
+
+message SetDeviceResp{
+	int32 status = 1;
+}
+
+service CCKConfig {
+  rpc GetCfgMN401 (GetDeviceRq) returns (MN401) {}
+  rpc GetCfgMN (GetDeviceRq) returns (MN) {}
+  rpc GetCfgPO (GetDeviceRq) returns (P0) {}
+  rpc GetCfgVirtPO (GetDeviceRq) returns (VirtP0) {}
+
+  rpc SetCfgMN401 (MN401) returns (SetDeviceResp) {}
+  rpc SetCfgMN (MN) returns (SetDeviceResp) {}
+  rpc SetCfgPO (P0) returns (SetDeviceResp) {}
+  rpc SetCfgVirtPO (VirtP0) returns (SetDeviceResp) {}
+}

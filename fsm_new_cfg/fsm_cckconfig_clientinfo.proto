@@ -1,0 +1,9 @@
+syntax = "proto3";
+package fsm ;
+message ClientInfo {
+	int32 id = 1;
+	int32 ip = 2;
+	int32 subnetmask = 3;
+	int32 gateway = 4;
+	int32 iid = 5;
+}
