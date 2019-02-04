@@ -99,6 +99,7 @@ void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK)
             FSMCCK_CCKDev[i].ver2= CCK->ver2;
             FSMCCK_CCKDev[i].ver3= CCK->ver3;
             FSMCCK_CCKDev[i].crcerror= CCK->crcerror;
+            FSMCCK_CCKDev[i].id_build= CCK->id_build;
             FSMCCK_CCKDev[i].audiostreamid= CCK->audiostreamid;
             return;
         }

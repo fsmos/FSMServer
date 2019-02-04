@@ -129,7 +129,7 @@ struct FSM_PO06Device
 };
 struct FSM_R168KB100_RWBufEl
 {
-    char Dates[16];
+    char Dates[100];
     char len;
 };
 struct FSM_R168KB100_RWBuf
@@ -238,6 +238,12 @@ enum FSMMN921Command /*0*****125*/
   FSMMN921Reregister = 11,
   FSMMN921GetCRC = 13,
   FSMMN921SendIP = 14,
+  FSMMN921SendServerCFG = 15,
+  FSMMN921SendChannelTCHCFG = 16,
+  FSMMN921SendChannelCBCFG = 17,
+  FSMMN921SendChannelMBCFG = 18,
+  FSMMN921SendChannelATSCFG = 19,
+  FSMMN921SendSaveConfig = 20
 };
 enum FSMPO07Command /*0*****125*/
 { FSMPO07SendStream = 1,

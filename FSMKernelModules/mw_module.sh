@@ -1,5 +1,5 @@
-rm ../fsm_mn401_firmware/fsmcore/lib/modules/4.2.8-ckt3neobi1neobi/kernel/fsm/*
-cp *.ko ../fsm_mn401_firmware/fsmcore/lib/modules/4.2.8-ckt3neobi1neobi/kernel/fsm
+rm ../fsm_mn401_firmware/fsmcore/lib/modules/4.15.15-fsm/kernel/fsm/*
+cp *.ko ../fsm_mn401_firmware/fsmcore/lib/modules/4.15.15-fsm/kernel/fsm
 cd ../fsm_mn401_firmware
 rm fsmcore.deb
 ./build_fsmcore.sh
