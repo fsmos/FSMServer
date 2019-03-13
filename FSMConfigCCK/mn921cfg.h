@@ -6,6 +6,7 @@
 
 using fsm::MN;
 using fsm::MNTypeDevice;
+using fsm::MN_Channel;
 
 namespace Ui {
 class MN921Cfg;
@@ -56,9 +57,21 @@ private slots:
 
     void on_netsetting_clicked();
 
+    void on_setabonent_1_clicked();
+
+    void on_setabonent_2_clicked();
+
+    void on_setch_1_clicked();
+
+    void on_setch_2_clicked();
+
+    void on_r168seting_clicked();
+
 private:
     Ui::MN921Cfg *ui;
     MN* cfg;
+    MN_Channel* channel[2];
+
 };
 
 #endif // MN921CFG_H

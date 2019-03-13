@@ -39,12 +39,16 @@ SOURCES += main.cpp\
     cpp/nanopb.pb.cc \
     clientcfgform.cpp \
     mn921cfg.cpp \
-    abonentmncfg.cpp
+    abonentmncfg.cpp \
+    mn921channelcfg.cpp \
+    r168s.cpp
 
 FORMS    += mainwindow.ui \
     clientcfgform.ui \
     mn921cfg.ui \
-    abonentmncfg.ui
+    abonentmncfg.ui \
+    mn921channelcfg.ui \
+    r168s.ui
 
 RESOURCES += \
     img.qrc
@@ -63,6 +67,8 @@ HEADERS += \
     mainwindow.h \
     clientcfgform.h \
     mn921cfg.h \
-    abonentmncfg.h
+    abonentmncfg.h \
+    mn921channelcfg.h \
+    r168s.h
 
 
