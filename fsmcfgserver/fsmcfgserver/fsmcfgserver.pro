@@ -92,3 +92,5 @@ unix {
 }
 
 LIBS *= -lfsmcck
+
+FORMS +=

@@ -21,6 +21,7 @@
 #include "FSM/FSMDevice/fsm_electrodevice.h"
 #include "FSM/FSM_Filter/FSM_Filter.h"
 
+
 typedef struct FSM_DeviceTree FSM_DeviceTree_t;
 /*!
 \brief Прототип функции обратной связи
@@ -66,6 +67,8 @@ struct FSM_DeviceTree
     struct FSM_PropertyDevice pdl[FSM_PropertyTreeSize];
     int pdl_count;
     struct fsm_signal_hndl signal[FSM_SignalCount];
+    unsigned long long lifetime;
+    bool pingon;
 };
 /*!
 \brief Информации о виде устройства
@@ -256,5 +259,7 @@ void FSMProgrammDevRun(struct FSM_DeviceTree* dt);
 unsigned char FSM_DeviceExternalRegister(struct FSM_Device_Finded_header dt);
 
 int FSM_Start_Discovery(unsigned short id);
-
+void FSMDeviceProcess_thistimetick(struct timer_list *t);
+void FSM_PingDevice(unsigned short id);
+unsigned int FSM_GetDiffPingDevice(unsigned short id);
 #endif /* FSM_DEVICEPROCESS_H */

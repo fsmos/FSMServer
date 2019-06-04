@@ -41,14 +41,23 @@ SOURCES += main.cpp\
     mn921cfg.cpp \
     abonentmncfg.cpp \
     mn921channelcfg.cpp \
-    r168s.cpp
+    r168s.cpp \
+    POcfg.cpp \
+    poabonentlist.cpp \
+    ellistabonentpo.cpp \
+    groupselect.cpp
 
 FORMS    += mainwindow.ui \
     clientcfgform.ui \
     mn921cfg.ui \
     abonentmncfg.ui \
     mn921channelcfg.ui \
-    r168s.ui
+    r168s.ui \
+    mn921cfg.ui \
+    POcfg.ui \
+    poabonentlist.ui \
+    ellistabonentpo.ui \
+    groupselect.ui
 
 RESOURCES += \
     img.qrc
@@ -69,6 +78,10 @@ HEADERS += \
     mn921cfg.h \
     abonentmncfg.h \
     mn921channelcfg.h \
-    r168s.h
+    r168s.h \
+    POcfg.h \
+    poabonentlist.h \
+    ellistabonentpo.h \
+    groupselect.h
 
 

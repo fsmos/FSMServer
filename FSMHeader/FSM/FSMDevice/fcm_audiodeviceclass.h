@@ -205,6 +205,7 @@ enum FSMPO06Command /*0*****125*/
   FSMPo06R168_Light = 20,
   FSMPo06R168_GetDats = 21,
   FSMPo06KB100_SendDats = 22,
+  FSMPo06SendClearConfig = 23
 };
 enum FSMMN825Command /*0*****125*/
 { FSMMN825SendStream = 1,
@@ -223,7 +224,8 @@ enum FSMMN825Command /*0*****125*/
   FSMMN825R168100KB_Packet = 15,
   FSMMN825R168100KB_PacketUDP = 16,
   FSMMN825R168_GetDats =17,
-  FSMMN825R168_SetCP =18
+  FSMMN825R168_SetCP =18,
+  FSMMN825SendClearConfig = 19
 };
 enum FSMMN921Command /*0*****125*/
 { FSMMN921SendStream = 1,
@@ -243,7 +245,8 @@ enum FSMMN921Command /*0*****125*/
   FSMMN921SendChannelCBCFG = 17,
   FSMMN921SendChannelMBCFG = 18,
   FSMMN921SendChannelATSCFG = 19,
-  FSMMN921SendSaveConfig = 20
+  FSMMN921SendSaveConfig = 20,
+  FSMMN921SendClearConfig = 21
 };
 enum FSMPO07Command /*0*****125*/
 { FSMPO07SendStream = 1,
@@ -258,6 +261,7 @@ enum FSMPO07Command /*0*****125*/
   FSMPo07Reregister = 11,
   FSMPo07GetCRC = 13,
   FSMPo07SendIP = 14,
+  FSMPo07SendClearConfig = 15
 };
 enum FSMPO08Command /*0*****125*/
 { FSMPO08SendStream = 1,
@@ -277,6 +281,7 @@ enum FSMPO08Command /*0*****125*/
   FSMPo08KB100_DisConnect = 17,
   FSMPo08R168_Light = 18,
   FSMPo08R168_GetDats = 19,
+  FSMPo08SendClearConfig = 20
 };
 
 struct FSME1Pkt
@@ -375,20 +380,26 @@ struct CCKDeviceInfo
     unsigned char reg;
     unsigned char type;
     unsigned short id;
+    
     unsigned char Position;
     unsigned char n; 
     unsigned char dstlen;
     unsigned char channel;
+    
     unsigned char ip[4]; 
+    
     unsigned int crc32;
+    
     unsigned short ramstate;
     unsigned char ver1;
     unsigned char ver2;
+    
     unsigned char ver3;
     unsigned char crcerror;
-    unsigned int id_build;
     unsigned short audiostreamid;
-  
+    
+    unsigned int id_build;
+    unsigned int lifedif;
 };
 
 enum FSM_CCKControl_Cmd {
@@ -396,6 +407,7 @@ enum FSM_CCKControl_Cmd {
 };
 
 void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK);
+void FSMCCK_RemoveDeviceInfo(unsigned short id);
 void FSM_CCK_Get_Data(struct CCKDeviceInfo* CCKMass);
 void FSM_CCK_MN111_Reqest_Voltage(enum FSMMN111Command fsmcmd, unsigned short IDDevice);
 float FSM_CCK_MN111_Read_Voltage(enum FSMMN111Command fsmcmd, unsigned short IDDevice);

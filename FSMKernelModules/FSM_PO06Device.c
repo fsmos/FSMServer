@@ -55,6 +55,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
 
     case RegDevice: ///< Регистрация устройства
         FSM_Statstic_SetStatus(to_dt, "ok");
+        to_dt->pingon = true;
         fsmad_prints("FSMPO06 Устроство добавлено");
         for(i = 0; i < FSM_PO06DeviceTreeSize; i++) {
             if(FSMPO06Dev[i].iddev == to_dt->IDDevice) {
@@ -91,7 +92,7 @@ void FSM_PO06Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct 
     case DelLisr:
         for(i = 0; i < FSM_PO06DeviceTreeSize; i++) {
             if((FSMPO06Dev[i].reg == 1) && (FSMPO06Dev[i].iddev == to_dt->IDDevice)) {
-
+                FSMCCK_RemoveDeviceInfo(to_dt->IDDevice);
                 FSM_AudioStreamUnRegistr(FSMPO06Dev[i].idstream);
                 FSMPO06Dev[i].reg = 0;
                 if(to_dt->debug)

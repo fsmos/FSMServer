@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Конфигурация канала ячейки</string>
   </property>
   <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
@@ -49,7 +49,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Настройка ячейки MN921 или  MN825 </string>
+           <string>Настройка параметров линии ячейки</string>
           </property>
          </widget>
         </item>
@@ -141,17 +141,17 @@
               </property>
               <item>
                <property name="text">
-                <string>Двухпроводка</string>
+                <string>2-х проводная линия</string>
                </property>
               </item>
               <item>
                <property name="text">
-                <string>Четырехпроводка-ФЛ</string>
+                <string>4-х проводная линия-ФЛ</string>
                </property>
               </item>
               <item>
                <property name="text">
-                <string>Четырехпроводка-ТЧ</string>
+                <string>4-х проводная линия-ТЧ</string>
                </property>
               </item>
              </widget>
@@ -181,6 +181,24 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QLabel" name="label_15">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>15</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>с</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -206,6 +224,24 @@
               </property>
              </widget>
             </item>
+            <item>
+             <widget class="QLabel" name="label_16">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>15</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>с</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item>
@@ -228,6 +264,24 @@
                <font>
                 <pointsize>15</pointsize>
                </font>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_17">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>15</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>с</string>
               </property>
              </widget>
             </item>
@@ -264,6 +318,36 @@
                 <string>2100</string>
                </property>
               </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_21">
+              <property name="minimumSize">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="sizeIncrement">
+               <size>
+                <width>50</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>15</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Гц</string>
+              </property>
              </widget>
             </item>
            </layout>
@@ -309,6 +393,24 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QLabel" name="label_18">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>с</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
        </layout>
@@ -350,6 +452,24 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QLabel" name="label_19">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>с</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item>
@@ -387,6 +507,24 @@
              <font>
               <pointsize>15</pointsize>
              </font>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_20">
+            <property name="minimumSize">
+             <size>
+              <width>50</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>15</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>с</string>
             </property>
            </widget>
           </item>

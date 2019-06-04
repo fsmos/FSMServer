@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Конфигурация Р168</string>
   </property>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
@@ -49,7 +49,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Настройка R168</string>
+       <string>Настройка Р168</string>
       </property>
      </widget>
     </item>
@@ -94,7 +94,7 @@
                </font>
               </property>
               <property name="text">
-               <string>APD input with..</string>
+               <string>АПД Вход</string>
               </property>
              </widget>
             </item>
@@ -109,12 +109,12 @@
                 </property>
                 <item>
                  <property name="text">
-                  <string>FL1</string>
+                  <string>ФЛ1</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>FL2</string>
+                  <string>фЛ2</string>
                  </property>
                 </item>
                </widget>
@@ -128,12 +128,12 @@
                 </property>
                 <item>
                  <property name="text">
-                  <string>KR1</string>
+                  <string>КР1</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>KR2</string>
+                  <string>КР2</string>
                  </property>
                 </item>
                </widget>
@@ -151,12 +151,12 @@
                 </property>
                 <item>
                  <property name="text">
-                  <string>TCH1</string>
+                  <string>ТЧ1</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>TCH2</string>
+                  <string>ТЧ2</string>
                  </property>
                 </item>
                </widget>
@@ -170,12 +170,12 @@
                 </property>
                 <item>
                  <property name="text">
-                  <string>KR1</string>
+                  <string>КР1</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>KR2</string>
+                  <string>КР2</string>
                  </property>
                 </item>
                </widget>
@@ -190,7 +190,7 @@
                </font>
               </property>
               <property name="text">
-               <string>R168(Ch1)</string>
+               <string>Р168(Канал 1)</string>
               </property>
              </widget>
             </item>
@@ -203,7 +203,7 @@
               </property>
               <item>
                <property name="text">
-                <string>MN825</string>
+                <string>МН825</string>
                </property>
               </item>
               <item>
@@ -231,7 +231,7 @@
              </font>
             </property>
             <property name="text">
-             <string>APD Output with...</string>
+             <string>АПД Выход</string>
             </property>
            </widget>
           </item>
@@ -248,12 +248,12 @@
             </property>
             <item>
              <property name="text">
-              <string>FL1</string>
+              <string>ФЛ1</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>FL2</string>
+              <string>ФЛ2</string>
              </property>
             </item>
            </widget>
@@ -267,12 +267,12 @@
             </property>
             <item>
              <property name="text">
-              <string>KR1</string>
+              <string>КР1</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>KR2</string>
+              <string>КР2</string>
              </property>
             </item>
            </widget>
@@ -290,12 +290,12 @@
             </property>
             <item>
              <property name="text">
-              <string>TCH1</string>
+              <string>ТЧ1</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>TCH2</string>
+              <string>ТЧ2</string>
              </property>
             </item>
            </widget>
@@ -309,12 +309,12 @@
             </property>
             <item>
              <property name="text">
-              <string>KR1</string>
+              <string>КР1</string>
              </property>
             </item>
             <item>
              <property name="text">
-              <string>KR2</string>
+              <string>КР2</string>
              </property>
             </item>
            </widget>
@@ -329,7 +329,7 @@
            </font>
           </property>
           <property name="text">
-           <string>R168(Ch2)</string>
+           <string>Р168(Канал 2)</string>
           </property>
          </widget>
         </item>
@@ -342,7 +342,7 @@
           </property>
           <item>
            <property name="text">
-            <string>MN825</string>
+            <string>МН825</string>
            </property>
           </item>
           <item>

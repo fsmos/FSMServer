@@ -4,10 +4,9 @@
 #include "abonentmncfg.h"
 #include "mn921channelcfg.h"
 #include "r168s.h"
+using fsm::CCKTypeDevice;
 
-
-
-MN921Cfg::MN921Cfg(MN* mncfg,QWidget *parent) :
+MN921Cfg::MN921Cfg(MN* mncfg,unsigned char type, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::MN921Cfg)
 {
@@ -36,6 +35,22 @@ MN921Cfg::MN921Cfg(MN* mncfg,QWidget *parent) :
     ui->ats_ch2->setChecked((this->channel[1]->typedev() == MNTypeDevice::ATS));
     ui->r168_ch2->setChecked((this->channel[1]->typedev() == MNTypeDevice::R168));
     ui->r168100kb_ch2->setChecked((this->channel[1]->typedev() == MNTypeDevice::R168100KB));
+    if(type == CCKTypeDevice::DT_MN921) {
+        ui->r168_ch1->setDisabled(true);
+        ui->r168_ch2->setDisabled(true);
+        ui->r168100kb_ch1->setDisabled(true);
+        ui->r168100kb_ch2->setDisabled(true);
+    }
+    else if(type == CCKTypeDevice::DT_MN825) {
+        ui->mb_ch1->setDisabled(true);
+        ui->mb_ch2->setDisabled(true);
+        ui->cb_ch1->setDisabled(true);
+        ui->cb_ch2->setDisabled(true);
+        ui->tch_ch1->setDisabled(true);
+        ui->tch_ch2->setDisabled(true);
+        ui->ats_ch1->setDisabled(true);
+        ui->ats_ch2->setDisabled(true);
+    }
 }
 
 MN921Cfg::~MN921Cfg()

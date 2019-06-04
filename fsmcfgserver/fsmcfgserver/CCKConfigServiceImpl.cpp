@@ -18,16 +18,17 @@ Status CCKConfigServiceImpl::GetCfgMN401(ServerContext* context, const GetDevice
     struct CCKDeviceInfo CCKDev[FSM_CCKTreeSize];
     memset(position,CCKTypeDevice::DT_None,20);
     FSM_CCK_Get_Data(CCKDev);
-    for(int i=0;i<FSM_CCKTreeSize;i++) {
+   /* for(int i=0;i<FSM_CCKTreeSize;i++) {
         if(CCKDev[i].type != 0)
             position[CCKDev[i].Position] = CCKDev[i].type;
     }
     position[9] = (char)CCKTypeDevice::DT_MN401;
     for(int i=0;i<20;i++) {
        reply->add_devlist((fsm::CCKTypeDevice)position[i]); 
-    }
+    }*/
      //0
-  /*  reply->add_devlist(CCKTypeDevice::DT_MN921); //1
+    reply->add_devlist(CCKTypeDevice::DT_MN111); //1
+    reply->add_devlist(CCKTypeDevice::DT_MN921); //1
     reply->add_devlist(CCKTypeDevice::DT_MN825); //2
     reply->add_devlist(CCKTypeDevice::DT_MN825); //3
     reply->add_devlist(CCKTypeDevice::DT_None); //4
@@ -47,7 +48,7 @@ Status CCKConfigServiceImpl::GetCfgMN401(ServerContext* context, const GetDevice
     reply->add_devlist(CCKTypeDevice::DT_None); //17
     reply->add_devlist(CCKTypeDevice::DT_None); //18
     reply->add_devlist(CCKTypeDevice::DT_None); //19
-    */
+
     return Status::OK;
 }
 
@@ -55,7 +56,22 @@ Status CCKConfigServiceImpl::GetCfgMN(ServerContext* context, const GetDeviceRq*
 {
     int imgid = request->id();
     fstream input(string("fsmcfg_") + std::to_string(imgid) + string("_mn"), ios::in | ios::binary);
-    reply->ParseFromIstream(&input);
+    if((input.is_open() == false))
+    {
+            //reply =  new MN();
+            ClientInfo* client = new ClientInfo();
+            client->set_id(imgid);
+            reply->set_allocated_client(client);
+            return Status::OK;
+    }
+    if (reply->ParseFromIstream(&input) == false) {
+            return Status::CANCELLED;
+    }
+    ClientInfo client=reply->client();
+    if(client.id() == 0) {
+        client.set_id(imgid);
+        reply->set_allocated_client(&client);
+    }
     return Status::OK;
 }
 
@@ -63,7 +79,22 @@ Status CCKConfigServiceImpl::GetCfgPO(ServerContext* context, const GetDeviceRq*
 {
     int imgid = request->id();
     fstream input(string("fsmcfg_") + std::to_string(imgid) + string("_po"), ios::in | ios::binary);
-    reply->ParseFromIstream(&input);
+    if((input.is_open() == false))
+    {
+            //reply =  new MN();
+            ClientInfo* client = new ClientInfo();
+            client->set_id(imgid);
+            reply->set_allocated_client(client);
+            return Status::OK;
+    }
+    if (reply->ParseFromIstream(&input) == false) {
+            return Status::CANCELLED;
+    }
+    ClientInfo client=reply->client();
+    if(client.id() == 0) {
+        client.set_id(imgid);
+        reply->set_allocated_client(&client);
+    }
     return Status::OK;
 }
 
@@ -71,7 +102,22 @@ Status CCKConfigServiceImpl::GetCfgVirtPO(ServerContext* context, const GetDevic
 {
     int imgid = request->id();
     fstream input(string("fsmcfg_") + std::to_string(imgid) + string("_virtpo"), ios::in | ios::binary);
-    reply->ParseFromIstream(&input);
+    if((input.is_open() == false))
+    {
+            //reply =  new MN();
+            ClientInfo* client = new ClientInfo();
+            client->set_id(imgid);
+            reply->set_allocated_client(client);
+            return Status::OK;
+    }
+    if (reply->ParseFromIstream(&input) == false) {
+            return Status::CANCELLED;
+    }
+    ClientInfo client=reply->client();
+    if(client.id() == 0) {
+        client.set_id(imgid);
+        reply->set_allocated_client(&client);
+    }
     return Status::OK;
 }
 

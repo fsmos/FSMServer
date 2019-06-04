@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     FSM_CCK_Get_Data(CCKDev);
     for(i=0;i<FSM_CCKTreeSize;i++)
     {
-      printf("CCK %u Type %s IP %u.%u.%u.%u Position %u CRC32:0x%08x Mem:%u DTS %u Ch %u Ver %u.%u.%u FW St:%s Bd: %u AS: %u\n",CCKDev[i].id,fsm_dev_types[CCKDev[i].type], CCKDev[i].ip[0], CCKDev[i].ip[1], CCKDev[i].ip[2], CCKDev[i].ip[3], CCKDev[i].Position,CCKDev[i].crc32,CCKDev[i].ramstate,CCKDev[i].dstlen,CCKDev[i].channel,CCKDev[i].ver1,CCKDev[i].ver2,CCKDev[i].ver3,fsm_firmware_state[CCKDev[i].crcerror],CCKDev[i].id_build,CCKDev[i].audiostreamid);  
+      if(CCKDev[i].reg == 1) printf("CCK %u Type %s IP %u.%u.%u.%u Position %u CRC32:0x%08x Mem:%u DTS %u Ch %u Ver %u.%u.%u FW St:%s Bd: %u AS: %u ST: %u\n",CCKDev[i].id,fsm_dev_types[CCKDev[i].type], CCKDev[i].ip[0], CCKDev[i].ip[1], CCKDev[i].ip[2], CCKDev[i].ip[3], CCKDev[i].Position,CCKDev[i].crc32,CCKDev[i].ramstate,CCKDev[i].dstlen,CCKDev[i].channel,CCKDev[i].ver1,CCKDev[i].ver2,CCKDev[i].ver3,fsm_firmware_state[CCKDev[i].crcerror],CCKDev[i].id_build,CCKDev[i].audiostreamid,CCKDev[i].lifedif);  
     }
 	
 	return 0;

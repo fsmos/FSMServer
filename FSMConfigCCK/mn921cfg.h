@@ -17,7 +17,7 @@ class MN921Cfg : public QDialog
     Q_OBJECT
 
 public:
-    explicit MN921Cfg(MN* mncfg,QWidget *parent = 0);
+    explicit MN921Cfg(MN* mncfg,unsigned char type, QWidget *parent = 0);
     ~MN921Cfg();
 
 private slots:

@@ -18,6 +18,7 @@ using fsm::MN;
 using fsm::P0;
 using fsm::VirtP0;
 using fsm::CCKTypeDevice;
+using fsm::ClientInfo;
 namespace cckconfig
 {
 

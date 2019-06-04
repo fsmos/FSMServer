@@ -50,6 +50,7 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
 
     case RegDevice: ///< Регистрация устройства
         FSM_Statstic_SetStatus(to_dt, "ok");
+        to_dt->pingon = true;
         FSM_SetTreeAdd(to_dt);
         for(i = 0; i < FSM_MN921DeviceTreeSize; i++) {
             if(FSMMN921Dev[i].iddev == to_dt->IDDevice) {
@@ -87,7 +88,7 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
     case DelLisr:
         for(i = 0; i < FSM_MN921DeviceTreeSize; i++) {
             if((FSMMN921Dev[i].reg == 1) && (FSMMN921Dev[i].iddev == to_dt->IDDevice)) {
-
+                FSMCCK_RemoveDeviceInfo(to_dt->IDDevice);
                 FSM_AudioStreamUnRegistr(FSMMN921Dev[i].idstream);
                 FSMMN921Dev[i].reg = 0;
                 if(to_dt->debug)
@@ -182,6 +183,7 @@ void FSM_MN921Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
         case FSMMN921AudioRun:
         case FSMMN921Reset:
         case FSMMN921Reregister:
+        case FSMMN921SendClearConfig:
             scmd->IDDevice = to_dt->IDDevice;
             scmd->opcode = SendCmdToDevice;
             to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd, to_dt->TrDev, to_dt);

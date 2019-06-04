@@ -14,6 +14,7 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include "FSM/FSMDevice/FSM_DeviceProcess.h"
+#include "FSM/FSMDevice/fsm_statusstruct.h"
 struct CCKDeviceInfo CCKDev[FSM_CCKTreeSize];
 const char* fsm_dev_types[]=
 {
@@ -157,17 +158,18 @@ evbuffer_add_printf(evb, "<!DOCTYPE html> \n <html>\n<head>\n<meta charset=\"utf
 // Add buffer
 
 evbuffer_add_printf(evb, "<h1> %s </h1> \n", "FSM CCK Server");
-evbuffer_add_printf(evb, "<table border=\"1\">\n<tr>\n<td>ID</td>\n<td>Тип</td>\n<td>IP</td>\n<td>Позиция</td>\n<td>CRC32</td>\n<td>Состояние памяти</td>\n<td>Размер дерева настроек</td>\n<td>Канал</td>\n<td>Версия</td>\n<td>Hg Версия</td>\n<td>Прошивка</td>\n<td>Управление</td>\n</tr>\n");
+evbuffer_add_printf(evb, "<table border=\"1\">\n<tr>\n<td>ID</td>\n<td>Тип</td>\n<td>IP</td>\n<td>Позиция</td>\n<td>CRC32</td>\n<td>Состояние памяти</td>\n<td>Размер дерева настроек</td>\n<td>Канал</td>\n<td>Версия</td>\n<td>Hg Версия</td>\n<td>Время отклика</td>\n<td>Прошивка</td>\n<td>Управление</td>\n</tr>\n");
 
 FSM_CCK_Get_Data(CCKDev);
 
 for(i=0;i<FSM_CCKTreeSize;i++)
 {
     //CCKDev[i].crcerror=1;
+    if(CCKDev[i].reg==0) continue;
     if(CCKDev[i].crcerror==0) sprintf(statefw,"В норме");
     else if(CCKDev[i].crcerror==1) sprintf(statefw,"<a href=\"flash?%u\">Востановить прошивку</a>",CCKDev[i].id); 
     else if(CCKDev[i].crcerror==2) sprintf(statefw,"Повреждена"); 
-    evbuffer_add_printf(evb,"<tr>\n<td>%u </td>\n<td>%s</td>\n<td>%u.%u.%u.%u </td>\n<td> %u</td>\n<td>0x%08x</td>\n<td>%u</td>\n<td>%u</td>\n<td>%u</td>\n<td>%u.%u.%u</td><td>%u</td>\n<td>%s</td>\n<td></td></tr>",CCKDev[i].id,fsm_dev_types[CCKDev[i].type], CCKDev[i].ip[0], CCKDev[i].ip[1], CCKDev[i].ip[2], CCKDev[i].ip[3], CCKDev[i].Position,CCKDev[i].crc32,CCKDev[i].ramstate,CCKDev[i].dstlen,CCKDev[i].channel,CCKDev[i].ver1,CCKDev[i].ver2,CCKDev[i].ver3,CCKDev[i].id_build,statefw);  
+    evbuffer_add_printf(evb,"<tr>\n<td>%u </td>\n<td>%s</td>\n<td>%u.%u.%u.%u </td>\n<td> %u</td>\n<td>0x%08x</td>\n<td>%u</td>\n<td>%u</td>\n<td>%u</td>\n<td>%u.%u.%u</td><td>%u</td><td>%u</td>\n<td>%s</td>\n<td></td></tr>",CCKDev[i].id,fsm_dev_types[CCKDev[i].type], CCKDev[i].ip[0], CCKDev[i].ip[1], CCKDev[i].ip[2], CCKDev[i].ip[3], CCKDev[i].Position,CCKDev[i].crc32,CCKDev[i].ramstate,CCKDev[i].dstlen,CCKDev[i].channel,CCKDev[i].ver1,CCKDev[i].ver2,CCKDev[i].ver3,CCKDev[i].id_build,CCKDev[i].lifedif,statefw);  
 }
 
 

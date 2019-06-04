@@ -87,6 +87,7 @@ void FSM_MN111Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
 
     case RegDevice: ///< Регистрация устройства
         FSM_Statstic_SetStatus(to_dt, "ok");
+        to_dt->pingon = true;
         for(i = 0; i < FSM_MN111DeviceTreeSize; i++) {
             if(FSMMN111Dev[i].iddev == to_dt->IDDevice) {
                 FSM_MN111SendStreaminfo(FSMMN111Dev[i].idstream, from_dt, to_dt);

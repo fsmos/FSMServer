@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MN921Cfg</class>
- <widget class="QDialog" name="MN921Cfg">
+ <class>POCfg</class>
+ <widget class="QDialog" name="POCfg">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -23,7 +23,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Конфигурация ячейки</string>
+   <string>Конфигурация пульта оператора</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_11">
    <item>
@@ -92,17 +92,41 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="r168seting">
+          <widget class="QLabel" name="label_12">
+           <property name="font">
+            <font>
+             <pointsize>28</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Группы</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="conf">
            <property name="font">
             <font>
              <pointsize>26</pointsize>
             </font>
            </property>
            <property name="text">
-            <string>R168</string>
+            <string>Конференция</string>
            </property>
            <property name="autoDefault">
             <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="csv">
+           <property name="font">
+            <font>
+             <pointsize>26</pointsize>
+            </font>
+           </property>
+           <property name="text">
+            <string>Циркуляр</string>
            </property>
           </widget>
          </item>
@@ -132,7 +156,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_3">
+        <layout class="QVBoxLayout" name="ch1_cfg">
          <item>
           <widget class="QLabel" name="label_2">
            <property name="font">
@@ -193,92 +217,26 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_8">
            <item>
-            <widget class="QPushButton" name="mb_ch1">
+            <widget class="QLabel" name="label_8">
              <property name="font">
               <font>
                <pointsize>26</pointsize>
               </font>
              </property>
              <property name="text">
-              <string>МБ</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-             <property name="autoExclusive">
-              <bool>false</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
-             </property>
-             <property name="default">
-              <bool>false</bool>
-             </property>
-             <property name="flat">
-              <bool>false</bool>
+              <string>RTP порт</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="cb_ch1">
+            <widget class="QLineEdit" name="rtp_port_ch1">
              <property name="font">
               <font>
                <pointsize>26</pointsize>
               </font>
              </property>
-             <property name="text">
-              <string>ЦБ</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
-             </property>
-             <property name="default">
-              <bool>true</bool>
-             </property>
-             <property name="flat">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="tch_ch1">
-             <property name="font">
-              <font>
-               <pointsize>26</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>ТЧ</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="ats_ch1">
-             <property name="font">
-              <font>
-               <pointsize>26</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>АТС</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
+             <property name="inputMask">
+              <string>9999</string>
              </property>
             </widget>
            </item>
@@ -287,38 +245,26 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_7">
            <item>
-            <widget class="QPushButton" name="r168_ch1">
+            <widget class="QLabel" name="label_10">
              <property name="font">
               <font>
                <pointsize>26</pointsize>
               </font>
              </property>
              <property name="text">
-              <string>Р168100У2</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
+              <string>SIP порт</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="r168100kb_ch1">
+            <widget class="QLineEdit" name="sip_port_ch1">
              <property name="font">
               <font>
                <pointsize>26</pointsize>
               </font>
              </property>
-             <property name="text">
-              <string>Р168100КБ</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
+             <property name="inputMask">
+              <string>99999</string>
              </property>
             </widget>
            </item>
@@ -410,24 +356,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QPushButton" name="setch_1">
-           <property name="font">
-            <font>
-             <pointsize>26</pointsize>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(186, 189, 182);</string>
-           </property>
-           <property name="text">
-            <string>Настройка</string>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
         </layout>
        </item>
        <item>
@@ -441,7 +369,7 @@
         </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout">
+        <layout class="QVBoxLayout" name="ch2_cfg">
          <item>
           <widget class="QLabel" name="label_3">
            <property name="font">
@@ -502,77 +430,26 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_9">
            <item>
-            <widget class="QPushButton" name="mb_ch2">
+            <widget class="QLabel" name="label_9">
              <property name="font">
               <font>
                <pointsize>26</pointsize>
               </font>
              </property>
              <property name="text">
-              <string>МБ</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
+              <string>RTP порт</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="cb_ch2">
+            <widget class="QLineEdit" name="rtp_port_ch2">
              <property name="font">
               <font>
                <pointsize>26</pointsize>
               </font>
              </property>
-             <property name="text">
-              <string>ЦБ</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="tch_ch2">
-             <property name="font">
-              <font>
-               <pointsize>26</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>ТЧ</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="ats_ch2">
-             <property name="font">
-              <font>
-               <pointsize>26</pointsize>
-              </font>
-             </property>
-             <property name="text">
-              <string>АТС</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
+             <property name="inputMask">
+              <string>9999</string>
              </property>
             </widget>
            </item>
@@ -581,38 +458,26 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_10">
            <item>
-            <widget class="QPushButton" name="r168_ch2">
+            <widget class="QLabel" name="label_11">
              <property name="font">
               <font>
                <pointsize>26</pointsize>
               </font>
              </property>
              <property name="text">
-              <string>Р168100У2</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
+              <string>SIP порт</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="r168100kb_ch2">
+            <widget class="QLineEdit" name="sip_port_ch2">
              <property name="font">
               <font>
                <pointsize>26</pointsize>
               </font>
              </property>
-             <property name="text">
-              <string>Р168100КБ</string>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="autoDefault">
-              <bool>false</bool>
+             <property name="inputMask">
+              <string>99999</string>
              </property>
             </widget>
            </item>
@@ -683,24 +548,6 @@
            </property>
            <property name="text">
             <string>Абоненты</string>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="setch_2">
-           <property name="font">
-            <font>
-             <pointsize>26</pointsize>
-            </font>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">background-color: rgb(186, 189, 182);</string>
-           </property>
-           <property name="text">
-            <string>Настройка</string>
            </property>
            <property name="autoDefault">
             <bool>false</bool>

@@ -60,7 +60,7 @@ void FSM_CCKControlDeviceRecive(char* data, short len, struct FSM_DeviceTree* to
     //  unsigned short tmp;
     struct FSM_SendCmdTS* fscts = (struct FSM_SendCmdTS*)data;
     // printk( KERN_INFO "FSM SIOCTL,%u \n",fscts->opcode );
-
+    int i;
     switch(data[0]) {
     case RegDevice:
         FSM_Statstic_SetStatus(to_dt, "ok");
@@ -72,6 +72,9 @@ void FSM_CCKControlDeviceRecive(char* data, short len, struct FSM_DeviceTree* to
     case PacketFromUserSpace: ///< Отправка команды серверу
         switch(fscts->cmd) {
         case FSM_CCKGetInfo:
+            for(i = 0; i < FSM_CCKTreeSize; i++) {
+                FSMCCK_CCKDev[i].lifedif = FSM_GetDiffPingDevice(FSMCCK_CCKDev[i].id);
+            }
             memcpy(fscts->Data, &FSMCCK_CCKDev, sizeof(FSMCCK_CCKDev));
             // printk( KERN_INFO "FSM CCK RC\n" );
             break;
@@ -131,6 +134,19 @@ void FSMCCK_AddDeviceInfo(struct CCKDeviceInfo* CCK)
     }
 }
 EXPORT_SYMBOL(FSMCCK_AddDeviceInfo);
+
+void FSMCCK_RemoveDeviceInfo(unsigned short id)
+{
+    int i;
+    for(i = 0; i < FSM_CCKTreeSize; i++) {
+        if((FSMCCK_CCKDev[i].id == id) && (FSMCCK_CCKDev[i].reg == 1)) {
+            FSMCCK_CCKDev[i].reg = 0;
+            return;
+        }
+    }
+   
+}
+EXPORT_SYMBOL(FSMCCK_RemoveDeviceInfo);
 
 static int __init FSMCCKControlDevice_init(void)
 {

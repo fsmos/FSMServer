@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <grpcpp/grpcpp.h>
 #include "mn921cfg.h"
+#include "POcfg.h"
 #include <QDebug>
 
 using grpc::Channel;
@@ -174,27 +175,40 @@ void MainWindow::on_MN141_clicked()
 }
 void MainWindow::OpenSettingStation(int position) {
     if(mncfg.devlist_size()==0) return;
+    GetDeviceRq rq;
+    ClientContext context;
+    ClientContext context2;
+    SetDeviceResp resp;
+    MN mncfgel;
+    MN921Cfg* mncfgdialog;
+    P0 pocfgel;
+    POCfg* pocfg;
     switch(mncfg.devlist().Get(position)) {
     case CCKTypeDevice::DT_None:
     //break;
     case CCKTypeDevice::DT_MN921:
     case CCKTypeDevice::DT_MN825:
-        auto client = CCKConfig::NewStub(grpc::CreateChannel(this->connparametr.toLatin1().data(), grpc::InsecureChannelCredentials()));
-        GetDeviceRq rq;
         rq.set_id(position);
-        MN mncfgel;
-        ClientContext context;
-        ClientContext context2;
-        SetDeviceResp resp;
-        auto status = client->GetCfgMN(&context,rq,&mncfgel);
-        if(status.ok() == true)
+        if(CCKConfig::NewStub(grpc::CreateChannel(this->connparametr.toLatin1().data(), grpc::InsecureChannelCredentials()))->GetCfgMN(&context,rq,&mncfgel).ok() == true)
         {
-            MN921Cfg* mncfgdialog = new MN921Cfg(&mncfgel);
+            mncfgdialog = new MN921Cfg(&mncfgel,mncfg.devlist().Get(position));
             mncfgdialog->exec();
-            auto client = CCKConfig::NewStub(grpc::CreateChannel(this->connparametr.toLatin1().data(), grpc::InsecureChannelCredentials()));
-            auto status = client->SetCfgMN(&context2,mncfgel,&resp);
+            CCKConfig::NewStub(grpc::CreateChannel(this->connparametr.toLatin1().data(), grpc::InsecureChannelCredentials()))->SetCfgMN(&context2,mncfgel,&resp);
         }
     break;
+    case CCKTypeDevice::DT_PO06:
+    case CCKTypeDevice::DT_PO07:
+    case CCKTypeDevice::DT_PO08:
+        rq.set_id(position);
+        if(CCKConfig::NewStub(grpc::CreateChannel(this->connparametr.toLatin1().data(), grpc::InsecureChannelCredentials()))->GetCfgPO(&context,rq,&pocfgel).ok() == true)
+        {
+            pocfg = new POCfg(&pocfgel,mncfg.devlist().Get(position));
+            pocfg->exec();
+            CCKConfig::NewStub(grpc::CreateChannel(this->connparametr.toLatin1().data(), grpc::InsecureChannelCredentials()))->SetCfgPO(&context2,pocfgel,&resp);
+        }
+    break;
+    default:
+        break;
 
     }
 }

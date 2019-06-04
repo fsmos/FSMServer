@@ -50,6 +50,7 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
 
     case RegDevice: ///< Регистрация устройства
         FSM_Statstic_SetStatus(to_dt, "ok");
+        to_dt->pingon = true;
         for(i = 0; i < FSM_MN825DeviceTreeSize; i++) {
             if(FSMMN825Dev[i].iddev == to_dt->IDDevice) {
                 FSM_MN825SendStreaminfo(FSMMN825Dev[i].idstream, from_dt, to_dt);
@@ -90,7 +91,7 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
     case DelLisr:
         for(i = 0; i < FSM_MN825DeviceTreeSize; i++) {
             if((FSMMN825Dev[i].reg == 1) && (FSMMN825Dev[i].iddev == to_dt->IDDevice)) {
-
+                FSMCCK_RemoveDeviceInfo(to_dt->IDDevice);
                 FSM_AudioStreamUnRegistr(FSMMN825Dev[i].idstream);
                 FSMMN825Dev[i].reg = 0;
                 if(to_dt->debug)
@@ -245,6 +246,7 @@ void FSM_MN825Recive(char* data, short len, struct FSM_DeviceTree* to_dt, struct
         case FSMMN825Reset:
         case FSMMN825Reregister:
         case FSMMN825SetTangenta:
+        case FSMMN825SendClearConfig:
             scmd->IDDevice = to_dt->IDDevice;
             scmd->opcode = SendCmdToDevice;
             to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd, to_dt->TrDev, to_dt);

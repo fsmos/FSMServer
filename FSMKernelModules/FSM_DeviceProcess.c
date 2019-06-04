@@ -23,6 +23,8 @@ struct fsm_statusstruct fsm_str;
 struct fsm_devices_config fsm_set;
 struct FSM_ProgBuf ProgSSvar;
 struct FSM_DeviceFunctionTree ext_fdt;
+unsigned long long FSM_thistime;
+static struct timer_list FSM_Thistime_timer;
 
 void FSM_ExternalDevice_Resend(char* data, short len, struct FSM_DeviceTree* to_dt, struct FSM_DeviceTree* from_dt)
 {
@@ -48,14 +50,45 @@ static int __init FSMDeviceProcess_init(void)
     ext_fdt.slot_count =0 ;
     ext_fdt.type =0;
     ext_fdt.VidDevice=0;
+    FSM_thistime = 0;
+    timer_setup(&FSM_Thistime_timer, FSMDeviceProcess_thistimetick, 0);
+    mod_timer(&FSM_Thistime_timer, jiffies + msecs_to_jiffies(60000));
     printk(KERN_INFO "FSMDeviceProcess module loaded\n");
     return 0;
 }
+
+void FSMDeviceProcess_thistimetick(struct timer_list *t) {
+    FSM_thistime++;
+    int i;
+    struct FSM_DeviceDelete  fdd;
+    struct FSM_Ping  fp;
+    fdd.CRC = 0;
+    fdd.opcode = DelLisr;
+    fp.CRC = 0;
+    fp.opcode = FSMPing;
+    for(i = 0; i < FSM_DeviceTreeSize; i++) {
+        // if(fsm_dt[i].IDDevice!=0) printk( KERN_INFO "DeviceNotFindScan: ID: %u - %u \n",
+        // fsm_dt[i].IDDevice,fsm_dt[i].registr);
+        if((fsm_dt[i].registr == 1) && (fsm_dt[i].pingon == true)) {
+            if ((FSM_thistime -fsm_dt[i].lifetime)>10) {
+                fdd.IDDevice=fsm_dt[i].IDDevice;
+                fsm_dt[i].dt->Proc((char*)&fdd, sizeof(struct FSM_DeviceDelete), &fsm_dt[i], 0);
+                fsm_dt[i].registr = 0;
+            } else {
+                fp.IDDevice=fsm_dt[i].IDDevice;
+                fsm_dt[i].TrDev->dt->Proc((char*)&fp, sizeof(struct FSM_Ping), &fsm_dt[i], fsm_dt[i].TrDev);
+            }
+        }
+    }
+    mod_timer(&FSM_Thistime_timer, jiffies + msecs_to_jiffies(60000));
+}
+
 static void __exit FSMDeviceProcess_exit(void)
 {
 
     memset(fsm_dft, 0, sizeof(fsm_dft));
     memset(fsm_dt, 0, sizeof(fsm_dt));
+    del_timer(&FSM_Thistime_timer);
     printk(KERN_INFO "FSMDeviceProcess module unloaded\n");
 }
 
@@ -224,7 +257,7 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
     int i;
     struct FSM_DeviceFunctionTree* classf;
     struct FSM_DeviceTree* dtsc;
-
+    
     dtsc = FSM_FindDevice(dt.IDDevice);
     if(dtsc != 0)
         dtsc->registr = 0;
@@ -238,6 +271,8 @@ unsigned char FSM_DeviceRegister(struct FSM_DeviceRegistr dt)
                 fsm_dt[i].dt = classf;
                 fsm_dt[i].id = i;
                 fsm_dt[i].debug = 0;
+                fsm_dt[i].pingon = false;
+                fsm_dt[i].lifetime = FSM_thistime;
                 FSM_SendEventToAllDev(FSM_ServerConfigChanged);
                 FSM_SendEventToAllDev(FSM_ServerStatisticChanged);
                 printk(KERN_INFO "DeviceRegistred: ID: %u Type:%u; Vid:%u; PodVid:%u; KodDevice: %u \n",
@@ -357,6 +392,44 @@ struct FSM_DeviceTree* FSM_FindDevice(unsigned short id)
     return 0;
 }
 EXPORT_SYMBOL(FSM_FindDevice);
+
+/*!
+\brief Ping устроства
+\param[in] id ID
+\return Ссылку на класс устроства
+*/
+void FSM_PingDevice(unsigned short id)
+{
+    int i;
+
+    for(i = 0; i < FSM_DeviceTreeSize; i++) {
+        // if(fsm_dt[i].IDDevice!=0) printk( KERN_INFO "DeviceNotFindScan: ID: %u - %u \n",
+        // fsm_dt[i].IDDevice,fsm_dt[i].registr);
+        if((fsm_dt[i].IDDevice == id) && (fsm_dt[i].registr == 1)) {
+            fsm_dt[i].lifetime = FSM_thistime;
+            return;
+        }
+    }
+
+    return;
+}
+EXPORT_SYMBOL(FSM_PingDevice);
+
+unsigned int FSM_GetDiffPingDevice(unsigned short id)
+{
+    int i;
+
+    for(i = 0; i < FSM_DeviceTreeSize; i++) {
+        // if(fsm_dt[i].IDDevice!=0) printk( KERN_INFO "DeviceNotFindScan: ID: %u - %u \n",
+        // fsm_dt[i].IDDevice,fsm_dt[i].registr);
+        if((fsm_dt[i].IDDevice == id) && (fsm_dt[i].registr == 1)) {
+            return  FSM_thistime - fsm_dt[i].lifetime ;
+        }
+    }
+
+    return 0xFFFFFF;
+}
+EXPORT_SYMBOL(FSM_GetDiffPingDevice);
 /*!
 \brief Удаление из списка устроства
 \param[in] fdd Пакет удаления устройства

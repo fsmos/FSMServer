@@ -50,6 +50,7 @@ unsigned char fsm_po08_build[4];
 
     case RegDevice: ///< Регистрация устройства
         FSM_Statstic_SetStatus(to_dt, "ok");
+        to_dt->pingon = true;
         for(i = 0; i < FSM_PO08DeviceTreeSize; i++) {
             if(FSMPO08Dev[i].iddev == to_dt->IDDevice) {
                 FSM_PO08SendStreaminfo(FSMPO08Dev[i].idstream, from_dt, to_dt);
@@ -86,7 +87,7 @@ unsigned char fsm_po08_build[4];
     case DelLisr:
         for(i = 0; i < FSM_PO08DeviceTreeSize; i++) {
             if((FSMPO08Dev[i].reg == 1) && (FSMPO08Dev[i].iddev == to_dt->IDDevice)) {
-
+                FSMCCK_RemoveDeviceInfo(to_dt->IDDevice);
                 FSM_AudioStreamUnRegistr(FSMPO08Dev[i].idstream);
                 FSMPO08Dev[i].reg = 0;
                 if(to_dt->debug)
@@ -240,6 +241,7 @@ unsigned char fsm_po08_build[4];
         case FSMPo08AudioRun:
         case FSMPo08Reset:
         case FSMPo08Reregister:
+        case FSMPo08SendClearConfig:
             scmd->IDDevice = to_dt->IDDevice;
             scmd->opcode = SendCmdToDevice;
             to_dt->TrDev->dt->Proc((char*)scmd, FSMH_Header_Size_SendCmd, to_dt->TrDev, to_dt);
